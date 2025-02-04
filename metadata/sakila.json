@@ -1,0 +1,514 @@
+{
+  "database": "sakila",
+  "tables": [
+    {
+      "name": "actor",
+      "description": "Table for storing actor information.",
+      "columns": [
+        {
+          "key": "actor_id",
+          "name": "actor_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each actor."
+        },
+        {
+          "key": "first_name",
+          "name": "first_name",
+          "type": "VARCHAR2(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "First name of the actor."
+        },
+        {
+          "key": "last_name",
+          "name": "last_name",
+          "type": "VARCHAR2(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Last name of the actor."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Timestamp for the last update of the record."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "film_actor",
+          "primary_table": "actor",
+          "join": "actor.actor_id = film_actor.actor_id",
+          "description": "Actor is related to films via the film_actor table, representing the films in which the actor appeared."
+        }
+      ]
+    },
+    {
+      "name": "film",
+      "description": "Table for storing film details.",
+      "columns": [
+        {
+          "key": "film_id",
+          "name": "film_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each film."
+        },
+        {
+          "key": "title",
+          "name": "title",
+          "type": "VARCHAR2(255)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the film."
+        },
+        {
+          "key": "language_id",
+          "name": "language_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "language",
+            "column": "language_id"
+          },
+          "description": "Foreign key referencing the language of the film."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "language",
+          "primary_table": "film",
+          "join": "film.language_id = language.language_id",
+          "description": "Film table references the language table to store the language of the film."
+        }
+      ]
+    },
+    {
+      "name": "film_actor",
+      "description": "Join table for storing the relationship between films and actors.",
+      "columns": [
+        {
+          "key": "actor_id",
+          "name": "actor_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": {
+            "table": "actor",
+            "column": "actor_id"
+          },
+          "description": "Foreign key referencing actor_id in the actor table."
+        },
+        {
+          "key": "film_id",
+          "name": "film_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": {
+            "table": "film",
+            "column": "film_id"
+          },
+          "description": "Foreign key referencing film_id in the film table."
+        }
+      ]
+    },
+    {
+      "name": "customer",
+      "description": "Table for storing customer information.",
+      "columns": [
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each customer."
+        },
+        {
+          "key": "store_id",
+          "name": "store_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "store",
+            "column": "store_id"
+          },
+          "description": "Foreign key referencing the store where the customer is registered."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "rental",
+          "primary_table": "customer",
+          "join": "customer.customer_id = rental.customer_id",
+          "description": "Customers are linked to rentals through the rental table, tracking their rental history."
+        }
+      ]
+    },
+    {
+      "name": "inventory",
+      "description": "Table for storing film inventory.",
+      "columns": [
+        {
+          "key": "inventory_id",
+          "name": "inventory_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each inventory item."
+        },
+        {
+          "key": "film_id",
+          "name": "film_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "film",
+            "column": "film_id"
+          },
+          "description": "Foreign key referencing the film in inventory."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "film",
+          "primary_table": "inventory",
+          "join": "inventory.film_id = film.film_id",
+          "description": "Inventory table references films to track available copies."
+        }
+      ]
+    },
+    {
+      "name": "rental",
+      "description": "Table for storing rental transactions.",
+      "columns": [
+        {
+          "key": "rental_id",
+          "name": "rental_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each rental transaction."
+        }
+      ]
+    },
+    {
+      "name": "category",
+      "description": "Table for storing film categories.",
+      "columns": [
+        {
+          "key": "category_id",
+          "name": "category_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each film category."
+        },
+        {
+          "key": "name",
+          "name": "name",
+          "type": "VARCHAR2(25)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the film category."
+        }
+      ]
+    },
+    {
+      "name": "film_category",
+      "description": "Join table for storing the relationship between films and categories.",
+      "columns": [
+        {
+          "key": "film_id",
+          "name": "film_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": {
+            "table": "film",
+            "column": "film_id"
+          },
+          "description": "Foreign key referencing film_id in the film table."
+        },
+        {
+          "key": "category_id",
+          "name": "category_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": {
+            "table": "category",
+            "column": "category_id"
+          },
+          "description": "Foreign key referencing category_id in the category table."
+        }
+      ]
+    },
+    {
+      "name": "language",
+      "description": "Table for storing languages available for films.",
+      "columns": [
+        {
+          "key": "language_id",
+          "name": "language_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each language."
+        },
+        {
+          "key": "name",
+          "name": "name",
+          "type": "CHAR(20)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the language."
+        }
+      ]
+    },
+    {
+      "name": "payment",
+      "description": "Table for storing payment transactions.",
+      "columns": [
+        {
+          "key": "payment_id",
+          "name": "payment_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each payment transaction."
+        },
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "customer",
+            "column": "customer_id"
+          },
+          "description": "Foreign key referencing the customer making the payment."
+        }
+      ]
+    },
+    {
+      "name": "address",
+      "description": "Table for storing addresses of customers and stores.",
+      "columns": [
+        {
+          "key": "address_id",
+          "name": "address_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each address."
+        },
+        {
+          "key": "city_id",
+          "name": "city_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "city",
+            "column": "city_id"
+          },
+          "description": "Foreign key referencing city_id in the city table."
+        }
+      ]
+    },
+    {
+      "name": "city",
+      "description": "Table for storing city information.",
+      "columns": [
+        {
+          "key": "city_id",
+          "name": "city_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each city."
+        },
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "country",
+            "column": "country_id"
+          },
+          "description": "Foreign key referencing country_id in the country table."
+        }
+      ]
+    },
+    {
+      "name": "country",
+      "description": "Table for storing country information.",
+      "columns": [
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each country."
+        },
+        {
+          "key": "name",
+          "name": "name",
+          "type": "VARCHAR2(50)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the country."
+        }
+      ]
+    },
+    {
+      "name": "film_text",
+      "description": "Table for storing film descriptions.",
+      "columns": [
+        {
+          "key": "film_id",
+          "name": "film_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each film."
+        },
+        {
+          "key": "title",
+          "name": "title",
+          "type": "VARCHAR2(255)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the film."
+        },
+        {
+          "key": "description",
+          "name": "description",
+          "type": "CLOB",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the film."
+        }
+      ]
+    },
+    {
+      "name": "staff",
+      "description": "Table for storing staff information.",
+      "columns": [
+        {
+          "key": "staff_id",
+          "name": "staff_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each staff member."
+        },
+        {
+          "key": "first_name",
+          "name": "first_name",
+          "type": "VARCHAR2(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "First name of the staff member."
+        },
+        {
+          "key": "last_name",
+          "name": "last_name",
+          "type": "VARCHAR2(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Last name of the staff member."
+        },
+        {
+          "key": "store_id",
+          "name": "store_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "store",
+            "column": "store_id"
+          },
+          "description": "Foreign key referencing the store where the staff member works."
+        }
+      ]
+    },
+    {
+      "name": "store",
+      "description": "Table for storing store information.",
+      "columns": [
+        {
+          "key": "store_id",
+          "name": "store_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": ["PRIMARY KEY"],
+          "references": null,
+          "description": "Unique identifier for each store."
+        },
+        {
+          "key": "manager_staff_id",
+          "name": "manager_staff_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "staff",
+            "column": "staff_id"
+          },
+          "description": "Foreign key referencing the staff member who manages the store."
+        },
+        {
+          "key": "address_id",
+          "name": "address_id",
+          "type": "NUMBER(22)",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "address",
+            "column": "address_id"
+          },
+          "description": "Foreign key referencing the store's address."
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-from text_to_sql import TextToSQL, Config, LLMConfig
+from text_to_sql import TextToSQL, Config, LLMConfig, SLConfig
 from dotenv import load_dotenv
 
 import os
@@ -18,7 +18,14 @@ config = Config(
         model="gemini-1.5-flash",
         provider="gemini",
         api_key=os.getenv("API_KEY"),
-    )
+    ),
+    schema_linker_config=SLConfig(
+        type="api",
+        model="gemini-1.5-flash",
+        provider="gemini",
+        api_key=os.getenv("API_KEY"),
+        schema_path="./metadata/sakila.json",
+    ),
 )
 text_to_sql_model = TextToSQL(config=config)
 

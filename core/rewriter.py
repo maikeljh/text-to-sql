@@ -1,6 +1,7 @@
 from common import LLMConfig
 from .base_llm import BaseLLM
 
+
 class RewriterPrompt(BaseLLM):
     """
     A specialized LLM for rewriting user prompts into structured queries.
@@ -13,7 +14,7 @@ class RewriterPrompt(BaseLLM):
         :param config: LLMConfig object containing model type, API key, and other settings.
         """
         super().__init__(
-            config=config, system_prompt_path="files/rewriter_system_prompt.txt"
+            config=config, system_prompt_path="files/rewriter_prompt_system_prompt.txt"
         )
 
     def generate(self, user_prompt: str) -> str:
@@ -29,4 +30,5 @@ class RewriterPrompt(BaseLLM):
         rewritten_prompt = self.model.generate(
             system_prompt=self.system_prompt, user_prompt=user_prompt
         )
+        print(f"Rewritten Prompt: {rewritten_prompt}")
         return rewritten_prompt

@@ -92,6 +92,24 @@
           "primary_table": "film",
           "join": "film.language_id = language.language_id",
           "description": "Film table references the language table to store the language of the film."
+        },
+        {
+          "foreign_table": "film_actor",
+          "primary_table": "film",
+          "join": "film.film_id = film_actor.film_id",
+          "description": "Film table references the film_actor table to map actors and films."
+        },
+        {
+          "foreign_table": "inventory",
+          "primary_table": "film",
+          "join": "film.film_id = inventory.film_id",
+          "description": "Film table references the inventory table to track available copies of films."
+        },
+        {
+          "foreign_table": "film_category",
+          "primary_table": "film",
+          "join": "film.film_id = film_category.film_id",
+          "description": "Film table references the film_category table to store categories of the film."
         }
       ]
     },
@@ -123,6 +141,20 @@
           },
           "description": "Foreign key referencing film_id in the film table."
         }
+      ],
+      "relations": [
+        {
+          "foreign_table": "actor",
+          "primary_table": "film_actor",
+          "join": "film_actor.actor_id = actor.actor_id",
+          "description": "Actor is related to films via the film_actor table, representing the films in which the actor appeared."
+        },
+        {
+          "foreign_table": "film",
+          "primary_table": "film_actor",
+          "join": "film_actor.film_id = film.film_id",
+          "description": "Film is related to actors via the film_actor table, representing the actors appearing in the films."
+        }
       ]
     },
     {
@@ -153,10 +185,22 @@
       ],
       "relations": [
         {
+          "foreign_table": "store",
+          "primary_table": "customer",
+          "join": "customer.store_id = store.store_id",
+          "description": "Customer is linked to the store where they registered."
+        },
+        {
           "foreign_table": "rental",
           "primary_table": "customer",
           "join": "customer.customer_id = rental.customer_id",
           "description": "Customers are linked to rentals through the rental table, tracking their rental history."
+        },
+        {
+          "foreign_table": "address",
+          "primary_table": "customer",
+          "join": "customer.address_id = address.address_id",
+          "description": "Customers reference their registered address."
         }
       ]
     },
@@ -192,6 +236,12 @@
           "primary_table": "inventory",
           "join": "inventory.film_id = film.film_id",
           "description": "Inventory table references films to track available copies."
+        },
+        {
+          "foreign_table": "store",
+          "primary_table": "inventory",
+          "join": "inventory.store_id = store.store_id",
+          "description": "Inventory items are associated with a specific store."
         }
       ]
     },
@@ -207,6 +257,26 @@
           "attributes": ["PRIMARY KEY"],
           "references": null,
           "description": "Unique identifier for each rental transaction."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "customer",
+          "primary_table": "rental",
+          "join": "rental.customer_id = customer.customer_id",
+          "description": "Rental transactions are linked to customers who rent the films."
+        },
+        {
+          "foreign_table": "inventory",
+          "primary_table": "rental",
+          "join": "rental.inventory_id = inventory.inventory_id",
+          "description": "Rental transactions reference inventory to track rented films."
+        },
+        {
+          "foreign_table": "staff",
+          "primary_table": "rental",
+          "join": "rental.staff_id = staff.staff_id",
+          "description": "Rental transactions reference staff members who process the rentals."
         }
       ]
     },
@@ -262,6 +332,20 @@
           },
           "description": "Foreign key referencing category_id in the category table."
         }
+      ],
+      "relations": [
+        {
+          "foreign_table": "film",
+          "primary_table": "film_category",
+          "join": "film_category.film_id = film.film_id",
+          "description": "Film_category table links films to their respective categories."
+        },
+        {
+          "foreign_table": "category",
+          "primary_table": "film_category",
+          "join": "film_category.category_id = category.category_id",
+          "description": "Film_category table links categories to their respective films."
+        }
       ]
     },
     {
@@ -313,6 +397,26 @@
           },
           "description": "Foreign key referencing the customer making the payment."
         }
+      ],
+      "relations": [
+        {
+          "foreign_table": "customer",
+          "primary_table": "payment",
+          "join": "payment.customer_id = customer.customer_id",
+          "description": "Payments are linked to customers who make the payment transactions."
+        },
+        {
+          "foreign_table": "rental",
+          "primary_table": "payment",
+          "join": "payment.rental_id = rental.rental_id",
+          "description": "Payments reference rental transactions they are associated with."
+        },
+        {
+          "foreign_table": "staff",
+          "primary_table": "payment",
+          "join": "payment.staff_id = staff.staff_id",
+          "description": "Payments reference staff members processing the transactions."
+        }
       ]
     },
     {
@@ -340,6 +444,14 @@
           },
           "description": "Foreign key referencing city_id in the city table."
         }
+      ],
+      "relations": [
+        {
+          "foreign_table": "city",
+          "primary_table": "address",
+          "join": "address.city_id = city.city_id",
+          "description": "Addresses reference the city they belong to."
+        }
       ]
     },
     {
@@ -366,6 +478,14 @@
             "column": "country_id"
           },
           "description": "Foreign key referencing country_id in the country table."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "country",
+          "primary_table": "city",
+          "join": "city.country_id = country.country_id",
+          "description": "Cities reference the country they belong to."
         }
       ]
     },
@@ -469,6 +589,20 @@
           },
           "description": "Foreign key referencing the store where the staff member works."
         }
+      ],
+      "relations": [
+        {
+          "foreign_table": "store",
+          "primary_table": "staff",
+          "join": "staff.store_id = store.store_id",
+          "description": "Staff members are linked to the store where they work."
+        },
+        {
+          "foreign_table": "address",
+          "primary_table": "staff",
+          "join": "staff.address_id = address.address_id",
+          "description": "Staff members reference their address."
+        }
       ]
     },
     {
@@ -507,6 +641,20 @@
             "column": "address_id"
           },
           "description": "Foreign key referencing the store's address."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "staff",
+          "primary_table": "store",
+          "join": "store.manager_staff_id = staff.staff_id",
+          "description": "Stores are managed by a staff member."
+        },
+        {
+          "foreign_table": "address",
+          "primary_table": "store",
+          "join": "store.address_id = address.address_id",
+          "description": "Stores are located at a specific address."
         }
       ]
     }

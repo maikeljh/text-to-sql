@@ -17,7 +17,7 @@ class QueryExecutor:
             database=self.config.database,
             user=self.config.user,
             password=self.config.password,
-            port=self.config.port
+            port=self.config.port,
         )
         self.connection.autocommit = False
 
@@ -32,6 +32,9 @@ class QueryExecutor:
         cursor = self.connection.cursor()
         try:
             cursor.execute(query, params)
+            if cursor.description is None:
+                return []
+
             columns = [desc[0] for desc in cursor.description]
             results = [dict(zip(columns, row)) for row in cursor.fetchall()]
             self.connection.commit()

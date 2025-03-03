@@ -27,7 +27,10 @@ class QueryEvaluator:
             return 1.0 if not actual_set else 0.0
 
         correct_matches = sum(
-            any(actual_row.issubset(exp_row) or exp_row.issubset(actual_row) for exp_row in expected_set)
+            any(
+                actual_row.issubset(exp_row) or exp_row.issubset(actual_row)
+                for exp_row in expected_set
+            )
             for actual_row in actual_set
         )
 

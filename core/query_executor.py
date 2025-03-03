@@ -1,15 +1,11 @@
-from common import QueryConfig
-from typing import Dict, List, Any
-
 import psycopg2
-
 
 class QueryExecutor:
     """
     A class for executing SQL queries using a configured PostgreSQL database connection.
     """
 
-    def __init__(self, config: QueryConfig):
+    def __init__(self, config):
         """
         Initializes the QueryExecutor with a database connection.
 
@@ -21,10 +17,11 @@ class QueryExecutor:
             database=self.config.database,
             user=self.config.user,
             password=self.config.password,
-            port=self.config.port,
+            port=self.config.port
         )
+        self.connection.autocommit = False
 
-    def execute_query(self, query: str, params: tuple = ()) -> List[Dict[str, Any]]:
+    def execute_query(self, query: str, params: tuple = ()):
         """
         Executes an SQL query and returns the results as a list of dictionaries.
 
@@ -33,11 +30,18 @@ class QueryExecutor:
         :return: Query result as a list of dictionaries.
         """
         cursor = self.connection.cursor()
-        cursor.execute(query, params)
-        columns = [desc[0] for desc in cursor.description]
-        results = [dict(zip(columns, row)) for row in cursor.fetchall()]
-        cursor.close()
-        return results
+        try:
+            cursor.execute(query, params)
+            columns = [desc[0] for desc in cursor.description]
+            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
+            self.connection.commit()
+            return results
+        except psycopg2.Error as e:
+            self.connection.rollback()
+            print(f"Error executing query: {e}")
+            return []
+        finally:
+            cursor.close()
 
     def close_connection(self):
         """Closes the database connection."""

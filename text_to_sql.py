@@ -9,6 +9,7 @@ from core import (
     SchemaLinker,
     RetrieveContext,
     QueryExecutor,
+    QueryEvaluator,
 )
 
 
@@ -25,6 +26,7 @@ class TextToSQL:
             config=self.config.retrieve_context_config
         )
         self.query_executor = QueryExecutor(config=self.config.query_executor_config)
+        self.evaluator = QueryEvaluator()
 
     def generate(self, user_prompt):
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
@@ -37,6 +39,10 @@ class TextToSQL:
         )
         return query
 
-    def evaluate(self, query, true_query=""):
-        result = self.query_executor.execute_query(query)
-        print(f"Query Result: {result}")
+    def evaluate(self, query, true_query):
+        predicted_result = self.query_executor.execute_query(query)
+        expected_result = self.query_executor.execute_query(true_query)
+        acc = self.evaluator.calculate_accuracy(
+            expected=expected_result, actual=predicted_result
+        )
+        return acc

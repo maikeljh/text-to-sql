@@ -49,20 +49,61 @@ class SLConfig(LLMConfig):
         )
 
 
+class ContextConfig:
+    def __init__(
+        self,
+        data_path: str,
+    ):
+        self.data_path = data_path
+
+    def __repr__(self):
+        return f"ContextConfig(data_path={self.data_path})"
+
+
+class QueryConfig:
+    """
+    Configuration class for managing PostgreSQL database connection settings.
+    """
+
+    def __init__(
+        self, host: str, database: str, user: str, password: str, port: int = 5432
+    ):
+        """
+        Initializes the QueryConfig object.
+
+        :param host: PostgreSQL server host.
+        :param database: Database name.
+        :param user: Database user.
+        :param password: Database password.
+        :param port: Database port (default is 5432).
+        """
+        self.host = host
+        self.database = database
+        self.user = user
+        self.password = password
+        self.port = port
+
+
 class Config:
     def __init__(
         self,
         rewriter_config: LLMConfig,
         query_generator_config: LLMConfig,
         schema_linker_config: SLConfig,
+        retrieve_context_config: ContextConfig,
+        query_executor_config: QueryConfig,
     ):
         self.rewriter_config = rewriter_config
         self.query_generator_config = query_generator_config
         self.schema_linker_config = schema_linker_config
+        self.retrieve_context_config = retrieve_context_config
+        self.query_executor_config = query_executor_config
 
     def __repr__(self):
         return (
             f"Config(rewriter_config={self.rewriter_config}, "
             f"query_generator_config={self.query_generator_config}, "
+            f"retrieve_context_config={self.retrieve_context_config}, "
+            f"query_executor_config={self.query_executor_config}, "
             f"schema_linker_config={self.schema_linker_config})"
         )

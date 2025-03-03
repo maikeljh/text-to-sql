@@ -2,8 +2,14 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-from common import Config, LLMConfig, SLConfig
-from core import RewriterPrompt, QueryGenerator, SchemaLinker
+from common import Config, LLMConfig, SLConfig, ContextConfig, QueryConfig
+from core import (
+    RewriterPrompt,
+    QueryGenerator,
+    SchemaLinker,
+    RetrieveContext,
+    QueryExecutor,
+)
 
 
 class TextToSQL:
@@ -15,11 +21,22 @@ class TextToSQL:
         self.rewriter = RewriterPrompt(config=self.config.rewriter_config)
         self.query_generator = QueryGenerator(config=self.config.query_generator_config)
         self.schema_linker = SchemaLinker(config=self.config.schema_linker_config)
+        self.retrieve_context = RetrieveContext(
+            config=self.config.retrieve_context_config
+        )
+        self.query_executor = QueryExecutor(config=self.config.query_executor_config)
 
     def generate(self, user_prompt):
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
         filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
+        relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
         query = self.query_generator.generate(
-            user_prompt=rewritten_prompt, schema=filtered_schema
+            user_prompt=rewritten_prompt,
+            schema=filtered_schema,
+            example=relevant_example,
         )
         return query
+
+    def evaluate(self, query, true_query=""):
+        result = self.query_executor.execute_query(query)
+        print(f"Query Result: {result}")

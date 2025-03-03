@@ -20,7 +20,9 @@ class QueryGenerator(BaseLLM):
             config=config, system_prompt_path="files/query_generator_system_prompt.txt"
         )
 
-    def generate(self, user_prompt: str, schema: Dict[str, Any]) -> str:
+    def generate(
+        self, user_prompt: str, schema: Dict[str, Any], example: Dict[str, Any]
+    ) -> str:
         """
         Converts a natural language query into an SQL query.
 
@@ -35,7 +37,12 @@ class QueryGenerator(BaseLLM):
             raise ValueError("Schema must be a non-empty dictionary.")
 
         schema_json = json.dumps(schema, indent=2)
-        formatted_system_prompt = self.system_prompt.format(database_schema=schema_json)
+        formatted_system_prompt = self.system_prompt.format(
+            database_schema=schema_json,
+            relevant_question=example["relevant_question"],
+            relevant_answer=example["relevant_answer"],
+            relevant_summary=example["relevant_summary"],
+        )
         sql_query = self.model.generate(
             system_prompt=formatted_system_prompt, user_prompt=user_prompt
         )

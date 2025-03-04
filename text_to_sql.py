@@ -27,12 +27,20 @@ class TextToSQL:
         )
         self.query_executor = QueryExecutor(config=self.config.query_executor_config)
         self.evaluator = QueryEvaluator()
+    
+    def generate_baseline(self, user_prompt):
+        filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
+        query = self.query_generator.generate_baseline(
+            user_prompt=user_prompt,
+            schema=filtered_schema,
+        )
+        return query
 
-    def generate(self, user_prompt):
+    def generate_v1(self, user_prompt):
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
         filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
         relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
-        query = self.query_generator.generate(
+        query = self.query_generator.generate_v1(
             user_prompt=rewritten_prompt,
             schema=filtered_schema,
             example=relevant_example,

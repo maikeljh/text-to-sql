@@ -40,9 +40,12 @@ class TextToSQL:
         return query
 
     def evaluate(self, query, true_query):
-        predicted_result = self.query_executor.execute_query(query)
-        expected_result = self.query_executor.execute_query(true_query)
-        acc = self.evaluator.calculate_accuracy(
-            expected=expected_result, actual=predicted_result
-        )
-        return acc
+        try:
+            predicted_result = self.query_executor.execute_query(query)
+            expected_result = self.query_executor.execute_query(true_query)
+            acc = self.evaluator.calculate_accuracy(
+                expected=expected_result, actual=predicted_result
+            )
+            return acc
+        except:
+            return 0.0

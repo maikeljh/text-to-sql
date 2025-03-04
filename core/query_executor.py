@@ -19,7 +19,7 @@ class QueryExecutor:
             password=self.config.password,
             port=self.config.port,
         )
-        self.connection.autocommit = False
+        self.connection.autocommit = True
 
     def execute_query(self, query: str, params: tuple = ()):
         """
@@ -36,11 +36,8 @@ class QueryExecutor:
                 return []
 
             columns = [desc[0] for desc in cursor.description]
-            results = [dict(zip(columns, row)) for row in cursor.fetchall()]
-            self.connection.commit()
-            return results
+            return [dict(zip(columns, row)) for row in cursor.fetchall()]
         except psycopg2.Error as e:
-            self.connection.rollback()
             print(f"Error executing query: {e}")
             return []
         finally:

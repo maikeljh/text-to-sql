@@ -104,12 +104,12 @@ ORDER BY
     SUM(p.amount) AS total_revenue
 FROM 
     store s
-    JOIN staff st ON s.manager_staff_id = st.staff_id
-    JOIN inventory i ON s.store_id = i.store_id
-    JOIN rental r ON i.inventory_id = r.inventory_id
-    JOIN payment p ON r.rental_id = p.rental_id
+JOIN staff st ON s.manager_staff_id = st.staff_id
+JOIN inventory i ON s.store_id = i.store_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN payment p ON r.rental_id = p.rental_id
 GROUP BY 
-    s.store_id
+    s.store_id, manager_name
 ORDER BY 
     total_revenue DESC
 LIMIT 1;","This SQL query identifies the store with the highest total revenue by aggregating payment amounts across all transactions. It joins the 'store' table with 'staff' to retrieve the store manager's name and further joins 'inventory', 'rental', and 'payment' tables to track revenue. The result provides the store ID, manager's full name, and total revenue, sorted in descending order, returning only the top-performing store. Potential modifications include removing the LIMIT clause to rank all stores by revenue, filtering by date range to analyze revenue trends over time, or incorporating additional metrics such as average transaction value. This query is useful for answering questions about store performance, revenue distribution, and managerial impact on sales.","Which store has made the most money, and who is the manager there?",Can you find out which store has the highest revenue and who runs it?
@@ -254,13 +254,15 @@ WHERE
     SELECT 
         f.film_id, 
         f.title, 
-        AVG(DATEDIFF(r.return_date, r.rental_date)) AS avg_rental_duration
+        AVG(r.return_date - r.rental_date) AS avg_rental_duration
     FROM 
         film f
-        JOIN inventory i ON f.film_id = i.film_id
-        JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE 
+        r.return_date IS NOT NULL
     GROUP BY 
-        f.film_id
+        f.film_id, f.title
 )
 SELECT 
     film_id, 
@@ -287,13 +289,15 @@ ORDER BY
 "Which films have never been rented but are in the top 5 most popular categories? Show the film ID, title, and category name.","WITH top_categories AS (
     SELECT 
         fc.category_id, 
+        c.name AS category_name,
         COUNT(r.rental_id) AS rental_count
     FROM 
         film_category fc
-        JOIN inventory i ON fc.film_id = i.film_id
-        JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN category c ON fc.category_id = c.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
     GROUP BY 
-        fc.category_id
+        fc.category_id, c.name
     ORDER BY 
         rental_count DESC
     LIMIT 5
@@ -302,13 +306,14 @@ never_rented_films AS (
     SELECT 
         f.film_id, 
         f.title, 
+        c.category_id, 
         c.name AS category_name
     FROM 
         film f
-        JOIN film_category fc ON f.film_id = fc.film_id
-        JOIN category c ON fc.category_id = c.category_id
-        LEFT JOIN inventory i ON f.film_id = i.film_id
-        LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    LEFT JOIN inventory i ON f.film_id = i.film_id
+    LEFT JOIN rental r ON i.inventory_id = r.inventory_id
     WHERE 
         r.rental_id IS NULL
 )
@@ -318,7 +323,8 @@ SELECT
     nrf.category_name
 FROM 
     never_rented_films nrf
-    JOIN top_categories tc ON nrf.category_name = tc.category_id;","This SQL query identifies films that have never been rented within the top 5 most rented categories. It first determines the top 5 categories by rental count using the 'film_category', 'inventory', and 'rental' tables, ranking them in descending order of rentals. Then, it retrieves films that have never been rented by checking for missing rental records in the 'rental' table while joining with 'film', 'film_category', and 'category'. Finally, it filters these never-rented films to include only those belonging to the top 5 most rented categories. Potential modifications include adjusting the category ranking limit to analyze a broader range of categories, incorporating rental trends over time to track seasonal demand, or joining with customer demographics to explore audience preferences. This query helps answer questions related to inventory optimization, potential marketing efforts for underperforming films, and category-specific rental patterns.",Are there any movies in the most popular genres that have never been rented?,Can you find films that belong to the top 5 categories but have never been rented?
+JOIN 
+    top_categories tc ON nrf.category_id = tc.category_id;","This SQL query identifies films that have never been rented within the top 5 most rented categories. It first determines the top 5 categories by rental count using the 'film_category', 'inventory', and 'rental' tables, ranking them in descending order of rentals. Then, it retrieves films that have never been rented by checking for missing rental records in the 'rental' table while joining with 'film', 'film_category', and 'category'. Finally, it filters these never-rented films to include only those belonging to the top 5 most rented categories. Potential modifications include adjusting the category ranking limit to analyze a broader range of categories, incorporating rental trends over time to track seasonal demand, or joining with customer demographics to explore audience preferences. This query helps answer questions related to inventory optimization, potential marketing efforts for underperforming films, and category-specific rental patterns.",Are there any movies in the most popular genres that have never been rented?,Can you find films that belong to the top 5 categories but have never been rented?
 "Which customers have rented films from all categories? Show the customer ID, first name, and last name.","WITH customer_categories AS (
     SELECT 
         r.customer_id, 
@@ -343,14 +349,16 @@ WHERE
     SELECT 
         f.film_id, 
         f.title, 
-        SUM(p.amount) / SUM(DATEDIFF(r.return_date, r.rental_date)) AS revenue_per_day
+        SUM(p.amount) / NULLIF(SUM(EXTRACT(DAY FROM (r.return_date - r.rental_date))), 0) AS revenue_per_day
     FROM 
         film f
-        JOIN inventory i ON f.film_id = i.film_id
-        JOIN rental r ON i.inventory_id = r.inventory_id
-        JOIN payment p ON r.rental_id = p.rental_id
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        r.return_date IS NOT NULL
     GROUP BY 
-        f.film_id
+        f.film_id, f.title
 )
 SELECT 
     film_id, 
@@ -389,24 +397,34 @@ ORDER BY
         c.name AS category_name
     FROM 
         rental r
-        JOIN inventory i ON r.inventory_id = i.inventory_id
-        JOIN film_category fc ON i.film_id = fc.film_id
-        JOIN category c ON fc.category_id = c.category_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
     GROUP BY 
         r.customer_id, c.name
+),
+customer_category_count AS (
+    SELECT 
+        cc.customer_id, 
+        cu.first_name, 
+        cu.last_name, 
+        STRING_AGG(cc.category_name, ', ' ORDER BY cc.category_name) AS categories,
+        COUNT(DISTINCT cc.category_name) AS category_count
+    FROM 
+        customer_categories cc
+    JOIN customer cu ON cc.customer_id = cu.customer_id
+    GROUP BY 
+        cc.customer_id, cu.first_name, cu.last_name
 )
 SELECT 
-    cc.customer_id, 
-    cu.first_name, 
-    cu.last_name, 
-    GROUP_CONCAT(cc.category_name ORDER BY cc.category_name) AS categories
+    customer_id, 
+    first_name, 
+    last_name, 
+    categories
 FROM 
-    customer_categories cc
-    JOIN customer cu ON cc.customer_id = cu.customer_id
-GROUP BY 
-    cc.customer_id
-HAVING 
-    COUNT(cc.category_name) = 2;","This SQL query identifies customers who have rented films from exactly two distinct categories. It utilizes the 'rental', 'inventory', 'film_category', and 'category' tables to associate customers with film categories based on rental history. The query employs GROUP_CONCAT() to concatenate category names per customer and filters the results using HAVING COUNT(category_name) = 2 to retain only those with rentals spanning two categories. The output includes customer details and their rented categories, providing insights into customer preferences. Potential modifications include adjusting the category count filter to analyze customers with broader or narrower genre preferences, incorporating rental frequency metrics to highlight customers with consistent rental patterns, or joining payment data to assess revenue contributions from multi-category renters. Analysts can leverage this query to understand cross-category rental behavior, segment customers by rental diversity, and refine marketing strategies for targeted promotions.",Are there any customers who have only rented movies from two different categories?,Can you find customers who have explored exactly two genres?
+    customer_category_count
+WHERE 
+    category_count = 2;","This SQL query identifies customers who have rented films from exactly two distinct categories. It utilizes the 'rental', 'inventory', 'film_category', and 'category' tables to associate customers with film categories based on rental history. The query employs GROUP_CONCAT() to concatenate category names per customer and filters the results using HAVING COUNT(category_name) = 2 to retain only those with rentals spanning two categories. The output includes customer details and their rented categories, providing insights into customer preferences. Potential modifications include adjusting the category count filter to analyze customers with broader or narrower genre preferences, incorporating rental frequency metrics to highlight customers with consistent rental patterns, or joining payment data to assess revenue contributions from multi-category renters. Analysts can leverage this query to understand cross-category rental behavior, segment customers by rental diversity, and refine marketing strategies for targeted promotions.",Are there any customers who have only rented movies from two different categories?,Can you find customers who have explored exactly two genres?
 "Which films have been rented more than the average number of rentals for their category? Show the film ID, title, category name, and rental count.","WITH category_rentals AS (
     SELECT 
         fc.category_id, 
@@ -612,27 +630,28 @@ Which movies have been rented more than 10 times but have never been returned la
     COUNT(r.rental_id) AS rentals_count
 FROM 
     film f
-    JOIN inventory i ON f.film_id = i.film_id
-    JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
 WHERE 
-    r.return_date <= r.rental_date + INTERVAL f.rental_duration DAY
+    r.return_date <= (r.rental_date + f.rental_duration * INTERVAL '1 day')
 GROUP BY 
-    f.film_id
+    f.film_id, f.title
 HAVING 
     COUNT(r.rental_id) > 10;","This SQL query identifies films that have been rented more than 10 times while being returned within the allocated rental duration. It retrieves data from the 'film', 'inventory', and 'rental' tables, filtering rentals where the return date does not exceed the rental duration. The query groups results by film ID and counts the number of rentals per film, applying a HAVING clause to include only films with more than 10 rentals. The output provides insights into popular films that are returned on time, which can be useful for inventory management and rental policy analysis. Possible modifications include adjusting the rental threshold to identify highly or rarely rented films, incorporating late returns to analyze overdue rentals, or filtering by a specific time period to examine seasonal trends in film popularity.",Are there any movies that have been rented over 10 times but always returned on time?,Can you list movies that have been rented a lot but never returned late?
 Which staff members have processed the most payments on weekends? Show the staff name and the number of payments processed.,"SELECT 
-    CONCAT(s.first_name, ' ', s.last_name) AS staff_name, 
+    s.first_name || ' ' || s.last_name AS staff_name, 
     COUNT(p.payment_id) AS payments_count
 FROM 
     staff s
-    JOIN payment p ON s.staff_id = p.staff_id
+JOIN payment p ON s.staff_id = p.staff_id
 WHERE 
-    DAYOFWEEK(p.payment_date) IN (1, 7) -- 1 = Sunday, 7 = Saturday
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
 GROUP BY 
-    s.staff_id
+    s.staff_id, s.first_name, s.last_name
 ORDER BY 
     payments_count DESC
-LIMIT 10;","This SQL query retrieves the top 10 staff members who processed the highest number of payments on weekends (Saturday and Sunday). It queries the 'staff' and 'payment' tables, joining them on 'staff_id', and filters transactions occurring on weekends using the DAYOFWEEK function. The query then groups results by staff member, counting the number of payments processed per staff, and orders them in descending order of payment count. The output provides insights into weekend workload distribution among staff, which could inform staffing decisions and scheduling. Possible modifications include adjusting the filter to analyze payments on weekdays, adding a date range filter to focus on a specific time period, or incorporating total payment amounts to evaluate staff performance based on revenue generated rather than transaction count.""",Which employees handle the most payments on Saturdays and Sundays?,Can you find out which staff members process the most weekend transactions?
+LIMIT 10;
+","This SQL query retrieves the top 10 staff members who processed the highest number of payments on weekends (Saturday and Sunday). It queries the 'staff' and 'payment' tables, joining them on 'staff_id', and filters transactions occurring on weekends using the DAYOFWEEK function. The query then groups results by staff member, counting the number of payments processed per staff, and orders them in descending order of payment count. The output provides insights into weekend workload distribution among staff, which could inform staffing decisions and scheduling. Possible modifications include adjusting the filter to analyze payments on weekdays, adding a date range filter to focus on a specific time period, or incorporating total payment amounts to evaluate staff performance based on revenue generated rather than transaction count.""",Which employees handle the most payments on Saturdays and Sundays?,Can you find out which staff members process the most weekend transactions?
 "Which movies have the highest revenue but the lowest rental rate? Show the movie title, rental rate, and total revenue.
 sql
 ","WITH film_revenue AS (
@@ -740,15 +759,15 @@ LIMIT 10;","This SQL query identifies the top 10 films that have never been rent
         c.customer_id, 
         CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
         f.title, 
-        DATE_FORMAT(r.rental_date, '%Y-%m') AS rental_month, 
+        TO_CHAR(r.rental_date, 'YYYY-MM') AS rental_month,
         COUNT(r.rental_id) AS rentals_count
     FROM 
         customer c
-        JOIN rental r ON c.customer_id = r.customer_id
-        JOIN inventory i ON r.inventory_id = i.inventory_id
-        JOIN film f ON i.film_id = f.film_id
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
     GROUP BY 
-        c.customer_id, f.film_id, rental_month
+        c.customer_id, f.film_id, rental_month, c.first_name, c.last_name, f.title
 )
 SELECT 
     customer_name, 
@@ -785,15 +804,16 @@ WHERE
     COUNT(r.rental_id) AS rentals_count
 FROM 
     film f
-    JOIN inventory i ON f.film_id = i.film_id
-    JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
 WHERE 
-    MONTH(r.rental_date) = 12 -- December
+    EXTRACT(MONTH FROM r.rental_date) = 12
 GROUP BY 
-    f.film_id
+    f.film_id, f.title
 ORDER BY 
     rentals_count DESC
-LIMIT 10;","This SQL query identifies the top 10 most rented movies in December by counting the number of rentals for each film. It retrieves data from the 'film', 'inventory', and 'rental' tables, filtering rentals to include only those made in December using the MONTH() function. The query aggregates rental counts per film, orders the results in descending order, and limits the output to the top 10. This analysis is useful for understanding seasonal rental trends and identifying popular holiday movies. Potential modifications include adjusting the month filter to analyze different periods, incorporating revenue data to determine the highest-grossing films, or segmenting results by customer demographics to explore audience preferences.",Which movies are the most popular during the holiday season?,Can you find the films that get rented the most in December?
+LIMIT 10;
+","This SQL query identifies the top 10 most rented movies in December by counting the number of rentals for each film. It retrieves data from the 'film', 'inventory', and 'rental' tables, filtering rentals to include only those made in December using the MONTH() function. The query aggregates rental counts per film, orders the results in descending order, and limits the output to the top 10. This analysis is useful for understanding seasonal rental trends and identifying popular holiday movies. Potential modifications include adjusting the month filter to analyze different periods, incorporating revenue data to determine the highest-grossing films, or segmenting results by customer demographics to explore audience preferences.",Which movies are the most popular during the holiday season?,Can you find the films that get rented the most in December?
 Which customers have rented movies from every category but have never rented a movie with a replacement cost over $20? Show the customer name.,"WITH customer_categories AS (
     SELECT 
         c.customer_id, 
@@ -910,13 +930,13 @@ Which movies have been rented the most by customers under the age of 25? Show th
         COUNT(r.rental_id) AS rentals_count
     FROM 
         film f
-        JOIN inventory i ON f.film_id = i.film_id
-        JOIN rental r ON i.inventory_id = r.inventory_id
-        JOIN customer c ON r.customer_id = c.customer_id
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN customer c ON r.customer_id = c.customer_id
     WHERE 
-        TIMESTAMPDIFF(YEAR, c.create_date, CURDATE()) < 25
+        EXTRACT(YEAR FROM AGE(CURRENT_DATE, c.create_date)) < 25
     GROUP BY 
-        f.film_id
+        f.film_id, f.title
 )
 SELECT 
     title, 
@@ -925,7 +945,8 @@ FROM
     young_customer_rentals
 ORDER BY 
     rentals_count DESC
-LIMIT 10;","This SQL query identifies the top 10 most rented movies among customers who have had an account for less than 25 years. It pulls data from the 'film', 'inventory', 'rental', and 'customer' tables, filtering customers based on their account creation date using TIMESTAMPDIFF(YEAR, c.create_date, CURDATE()) < 25. The query counts the number of rentals per film and orders the results in descending order of rental count. The output provides insight into the movie preferences of relatively new or younger customers. Potential modifications include adjusting the age threshold to analyze different customer cohorts, incorporating genre information to examine category-specific popularity, or extending the analysis to include rental frequency trends over time.",Which movies are the most popular among young customers under 25?,Can you show me the top films rented by people younger than 25?
+LIMIT 10;
+","This SQL query identifies the top 10 most rented movies among customers who have had an account for less than 25 years. It pulls data from the 'film', 'inventory', 'rental', and 'customer' tables, filtering customers based on their account creation date using TIMESTAMPDIFF(YEAR, c.create_date, CURDATE()) < 25. The query counts the number of rentals per film and orders the results in descending order of rental count. The output provides insight into the movie preferences of relatively new or younger customers. Potential modifications include adjusting the age threshold to analyze different customer cohorts, incorporating genre information to examine category-specific popularity, or extending the analysis to include rental frequency trends over time.",Which movies are the most popular among young customers under 25?,Can you show me the top films rented by people younger than 25?
 Which movies have the highest revenue but have never been rented on weekends? Show the movie title and total revenue.,"WITH film_revenue AS (
     SELECT 
         f.film_id, 
@@ -933,13 +954,13 @@ Which movies have the highest revenue but have never been rented on weekends? Sh
         SUM(p.amount) AS total_revenue
     FROM 
         film f
-        JOIN inventory i ON f.film_id = i.film_id
-        JOIN rental r ON i.inventory_id = r.inventory_id
-        JOIN payment p ON r.rental_id = p.rental_id
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
     WHERE 
-        DAYOFWEEK(r.rental_date) NOT IN (1, 7) -- Exclude weekends
+        EXTRACT(DOW FROM r.rental_date) NOT IN (0, 6)
     GROUP BY 
-        f.film_id
+        f.film_id, f.title
 )
 SELECT 
     title, 
@@ -948,7 +969,8 @@ FROM
     film_revenue
 ORDER BY 
     total_revenue DESC
-LIMIT 10;","This SQL query identifies the top 10 highest-grossing films based on total revenue generated from payments, excluding rentals that occurred on weekends. It utilizes the 'film', 'inventory', 'rental', and 'payment' tables, summing payment amounts per film while filtering out transactions made on Saturdays and Sundays using DAYOFWEEK(r.rental_date) NOT IN (1, 7). The output highlights the most profitable movies during weekdays, which can be useful for understanding demand trends outside peak weekend periods. Potential modifications include analyzing revenue specifically for weekends to compare performance, incorporating customer demographics to identify key spending groups, or adjusting the date filter to study seasonal revenue trends.",Are there any high-earning movies that no one rents on weekends?,Can you find films that make a lot of money but are never rented on Saturdays or Sundays?
+LIMIT 10;
+","This SQL query identifies the top 10 highest-grossing films based on total revenue generated from payments, excluding rentals that occurred on weekends. It utilizes the 'film', 'inventory', 'rental', and 'payment' tables, summing payment amounts per film while filtering out transactions made on Saturdays and Sundays using DAYOFWEEK(r.rental_date) NOT IN (1, 7). The output highlights the most profitable movies during weekdays, which can be useful for understanding demand trends outside peak weekend periods. Potential modifications include analyzing revenue specifically for weekends to compare performance, incorporating customer demographics to identify key spending groups, or adjusting the date filter to study seasonal revenue trends.",Are there any high-earning movies that no one rents on weekends?,Can you find films that make a lot of money but are never rented on Saturdays or Sundays?
 Which customers have rented movies from every category but have never rented a movie with a rating of 'PG-13'? Show the customer name.,"WITH customer_categories AS (
     SELECT 
         c.customer_id, 
@@ -1010,12 +1032,13 @@ Which movies have the highest number of rentals but have never been returned lat
     COUNT(r.rental_id) AS rentals_count
 FROM 
     film f
-    JOIN inventory i ON f.film_id = i.film_id
-    JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
 WHERE 
-    r.return_date <= r.rental_date + INTERVAL f.rental_duration DAY
+    r.return_date <= r.rental_date + f.rental_duration * INTERVAL '1 day'
 GROUP BY 
-    f.film_id
+    f.film_id, f.title
 ORDER BY 
     rentals_count DESC
-LIMIT 10;","This SQL query identifies the top 10 most frequently rented movies that were returned on time, based on their rental duration. It retrieves data from the 'film', 'inventory', and 'rental' tables, counting the number of rentals per movie while filtering for those returned within the allowed rental duration. The results are grouped by film and sorted in descending order of rental count. Possible modifications include adjusting the rental duration condition to analyze overdue rentals, incorporating customer data to identify frequent renters, or adding a time filter to observe trends in on-time returns over specific periods.",Are there movies that have been rented a lot but always returned on time?,Can you list the most rented films that have never been returned late?
+LIMIT 10;
+","This SQL query identifies the top 10 most frequently rented movies that were returned on time, based on their rental duration. It retrieves data from the 'film', 'inventory', and 'rental' tables, counting the number of rentals per movie while filtering for those returned within the allowed rental duration. The results are grouped by film and sorted in descending order of rental count. Possible modifications include adjusting the rental duration condition to analyze overdue rentals, incorporating customer data to identify frequent renters, or adding a time filter to observe trends in on-time returns over specific periods.",Are there movies that have been rented a lot but always returned on time?,Can you list the most rented films that have never been returned late?

@@ -27,16 +27,31 @@ class TextToSQL:
         )
         self.query_executor = QueryExecutor(config=self.config.query_executor_config)
         self.evaluator = QueryEvaluator()
-    
-    def generate_baseline(self, user_prompt):
+
+    def generate_baseline(self, user_prompt, method):
         filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
         query = self.query_generator.generate_baseline(
             user_prompt=user_prompt,
             schema=filtered_schema,
         )
+        if method == "Multistage":
+            attempts_left = self.config.max_retry_attempt
+            while attempts_left > 0:
+                try:
+                    self.query_executor.execute_query(query)
+                    break
+                except Exception as e:
+                    attempts_left -= 1
+                    query = self.query_generator.fix_query(
+                        user_prompt=user_prompt,
+                        sql_query=query,
+                        error_message=str(e),
+                        schema=filtered_schema,
+                    )
+
         return query
 
-    def generate_v1(self, user_prompt):
+    def generate_v1(self, user_prompt, method):
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
         filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
         relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
@@ -45,6 +60,21 @@ class TextToSQL:
             schema=filtered_schema,
             example=relevant_example,
         )
+        if method == "Multistage":
+            attempts_left = self.config.max_retry_attempt
+            while attempts_left > 0:
+                try:
+                    self.query_executor.execute_query(query)
+                    break
+                except Exception as e:
+                    attempts_left -= 1
+                    query = self.query_generator.fix_query(
+                        user_prompt=user_prompt,
+                        sql_query=query,
+                        error_message=str(e),
+                        schema=filtered_schema,
+                    )
+
         return query
 
     def evaluate(self, query, true_query):

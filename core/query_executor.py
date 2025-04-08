@@ -1,5 +1,6 @@
 import psycopg2
 
+
 class QueryExecutor:
     """
     A class for executing SQL queries using a configured PostgreSQL database connection.

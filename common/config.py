@@ -92,12 +92,14 @@ class Config:
         schema_linker_config: SLConfig,
         retrieve_context_config: ContextConfig,
         query_executor_config: QueryConfig,
+        max_retry_attempt: int = 5,
     ):
         self.rewriter_config = rewriter_config
         self.query_generator_config = query_generator_config
         self.schema_linker_config = schema_linker_config
         self.retrieve_context_config = retrieve_context_config
         self.query_executor_config = query_executor_config
+        self.max_retry_attempt = max_retry_attempt
 
     def __repr__(self):
         return (
@@ -105,5 +107,6 @@ class Config:
             f"query_generator_config={self.query_generator_config}, "
             f"retrieve_context_config={self.retrieve_context_config}, "
             f"query_executor_config={self.query_executor_config}, "
-            f"schema_linker_config={self.schema_linker_config})"
+            f"schema_linker_config={self.schema_linker_config}), "
+            f"max_retry_attempt={self.max_retry_attempt}"
         )

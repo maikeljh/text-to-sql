@@ -7,20 +7,21 @@ function LoginPage() {
   const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    const res = await fetch("http://localhost:8000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    // const res = await fetch("http://localhost:8000/login", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ username, password }),
+    // });
 
-    const data = await res.json();
+    // const data = await res.json();
 
-    if (res.ok) {
-      localStorage.setItem("user_id", data.user_id);
-      navigate("/chat");
-    } else {
-      alert(data.detail || "Login failed");
-    }
+    // if (res.ok) {
+    //   localStorage.setItem("user_id", data.user_id);
+    //   navigate("/chat");
+    // } else {
+    //   alert(data.detail || "Login failed");
+    // }
+    navigate("/chat");
   };
 
   return (
@@ -59,7 +60,7 @@ function LoginPage() {
           </div>
           <button
             onClick={handleLogin}
-            className="w-full bg-white text-gray-900 font-semibold py-2 rounded hover:bg-gray-200 transition"
+            className="w-full bg-white text-gray-900 font-semibold py-2 rounded hover:bg-gray-200 transition cursor-pointer"
           >
             Login
           </button>

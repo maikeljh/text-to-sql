@@ -1,4 +1,4 @@
-from common import LLMConfig
+from text_to_sql.common import LLMConfig
 from .base_llm import BaseLLM
 from typing import Dict, Any
 

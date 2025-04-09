@@ -1,12 +1,15 @@
-from common import LLMConfig, APIModel, LocalModel
+from abc import ABC, abstractmethod
+from text_to_sql.common import LLMConfig, APIModel, LocalModel
+from typing import Optional
+import os
 
 
-class GeneralLLM:
+class BaseLLM(ABC):
     """
     Base class for LLM models, supporting both local and API-based models.
     """
 
-    def __init__(self, config: LLMConfig):
+    def __init__(self, config: LLMConfig, system_prompt_path: str):
         """
         Initializes the LLM model based on the configuration.
 
@@ -24,6 +27,10 @@ class GeneralLLM:
             raise ValueError(
                 "Invalid model type specified. Choose either 'local' or 'api'."
             )
+
+        self.system_prompt = self._load_system_prompt(
+            system_prompt_path=system_prompt_path
+        )
 
     def _load_local_model(self) -> LocalModel:
         """Loads a local model if specified in the configuration."""
@@ -43,15 +50,27 @@ class GeneralLLM:
             provider=self.config.provider,
         )
 
-    def generate(self, system_prompt: str, user_prompt: str) -> str:
+    def _load_system_prompt(self, system_prompt_path: Optional[str] = None) -> str:
+        """
+        Loads the system prompt from a file.
+
+        :param system_prompt_path: Path to the system prompt text file.
+        :return: System prompt as a string.
+        """
+        if not system_prompt_path or not os.path.exists(system_prompt_path):
+            raise FileNotFoundError(
+                f"System prompt file not found at {system_prompt_path}."
+            )
+
+        with open(system_prompt_path, "r") as file:
+            return file.read().strip()
+
+    @abstractmethod
+    def generate(self, user_prompt: str) -> str:
         """
         Abstract method to generate a response. Must be implemented by subclasses.
 
         :param user_prompt: User's input prompt.
         :return: Model-generated response.
         """
-        result = self.model.generate(
-            system_prompt=system_prompt,
-            user_prompt=user_prompt,
-        )
-        return result.strip()
+        pass

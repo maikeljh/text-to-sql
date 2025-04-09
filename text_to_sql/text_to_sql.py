@@ -2,8 +2,8 @@ import os
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
-from common import Config, LLMConfig, SLConfig, ContextConfig, QueryConfig
-from core import (
+from text_to_sql.common import Config, LLMConfig, SLConfig, ContextConfig, QueryConfig
+from text_to_sql.core import (
     RewriterPrompt,
     QueryGenerator,
     SchemaLinker,

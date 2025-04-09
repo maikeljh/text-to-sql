@@ -1,9 +1,9 @@
 from langchain_core.tools import tool
 from langgraph.graph import StateGraph, END
 from dotenv import load_dotenv
-from text_to_sql import TextToSQL
-from core import GeneralLLM
-from common import (
+from text_to_sql.text_to_sql import TextToSQL
+from text_to_sql.core import GeneralLLM
+from text_to_sql.common import (
     Config,
     LLMConfig,
     SLConfig,

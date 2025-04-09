@@ -1,5 +1,5 @@
 import json, ast
-from common import SLConfig
+from text_to_sql.common import SLConfig
 from .base_llm import BaseLLM
 from typing import Dict, List, Any, Set
 from sentence_transformers import SentenceTransformer, util

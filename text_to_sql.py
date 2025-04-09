@@ -91,9 +91,9 @@ class TextToSQL:
 
             final_sql_prompt += "Return only the final SQL query that answers the full question."
 
-            final_query = self.query_generator.model.generate(
-                system_prompt="You are an expert SQL assistant that synthesizes multiple steps into one correct SQL query.",
+            final_query = self.query_generator.generate_baseline(
                 user_prompt=final_sql_prompt,
+                schema=filtered_schema,
             )
 
             return final_query.strip()
@@ -157,7 +157,7 @@ class TextToSQL:
                 step_sql = self.query_generator.generate_v1(
                     user_prompt=step,
                     schema=filtered_schema,
-                    relevant_example=relevant_example,
+                    example=relevant_example,
                 )
                 intermediate_queries.append({"step": step, "sql": step_sql})
 
@@ -172,9 +172,11 @@ class TextToSQL:
 
             final_sql_prompt += "Return only the final SQL query that answers the full question."
 
-            final_query = self.query_generator.model.generate(
-                system_prompt="You are an expert SQL assistant that synthesizes multiple steps into one correct SQL query.",
+            relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
+            final_query = self.query_generator.generate_v1(
                 user_prompt=final_sql_prompt,
+                schema=filtered_schema,
+                example=relevant_example,
             )
 
             return final_query.strip()

@@ -5,3 +5,4 @@ from .summarization import Summarization
 from .retrieve_context import RetrieveContext
 from .query_executor import QueryExecutor
 from .evaluator import QueryEvaluator
+from .general_llm import GeneralLLM

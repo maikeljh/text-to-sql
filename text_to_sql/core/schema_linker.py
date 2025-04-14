@@ -17,7 +17,7 @@ class SchemaLinker(BaseLLM):
         :param config: SLConfig object containing model type, API key, and schema path.
         """
         super().__init__(
-            config=config, system_prompt_path="files/schema_linker_system_prompt.txt"
+            config=config, system_prompt_path="files/prompt/schema_linker_system_prompt.txt"
         )
         self.schema_path = config.schema_path
         self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")

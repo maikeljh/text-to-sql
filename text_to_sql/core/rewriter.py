@@ -14,7 +14,7 @@ class RewriterPrompt(BaseLLM):
         :param config: LLMConfig object containing model type, API key, and other settings.
         """
         super().__init__(
-            config=config, system_prompt_path="files/rewriter_prompt_system_prompt.txt"
+            config=config, system_prompt_path="files/prompt/rewriter_prompt_system_prompt.txt"
         )
 
     def generate(self, user_prompt: str) -> str:

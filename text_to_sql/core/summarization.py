@@ -15,7 +15,7 @@ class Summarization(BaseLLM):
         :param config: LLMConfig object containing model type, API key, and other settings.
         """
         super().__init__(
-            config=config, system_prompt_path="files/summarization_system_prompt.txt"
+            config=config, system_prompt_path="files/prompt/summarization_system_prompt.txt"
         )
 
     def generate(self, sql: str) -> str:

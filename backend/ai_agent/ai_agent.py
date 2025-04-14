@@ -1,3 +1,10 @@
+import sys
+import os
+
+# Add parent directory to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from typing import TypedDict, List, Optional
 from langchain_core.tools import tool
 from langgraph.graph import StateGraph, END
 from dotenv import load_dotenv
@@ -10,8 +17,6 @@ from text_to_sql.common import (
     ContextConfig,
     QueryConfig,
 )
-
-import os
 
 # Load environment variables
 load_dotenv()
@@ -36,9 +41,9 @@ text_to_sql_config = Config(
         model="gemini-1.5-flash",
         provider="gemini",
         api_key=os.getenv("API_KEY"),
-        schema_path="./metadata/sakila.json",
+        schema_path="./files/metadata/sakila.json",
     ),
-    retrieve_context_config=ContextConfig(data_path="./dataset/dataset_sakila.csv"),
+    retrieve_context_config=ContextConfig(data_path="./files/dataset/dataset_sakila.csv"),
     query_executor_config=QueryConfig(
         host=os.getenv("DB_HOST"),
         database=os.getenv("DB_DATABASE"),
@@ -71,6 +76,7 @@ def format_history(history, max_turns=5):
 # Tool: Detect if query is SQL-related
 @tool
 def detect_intent_tool(state: dict) -> dict:
+    """Detect whether a query is related to SQL or not."""
     query = state["query"]
     history = state.get("history", [])
     history_text = format_history(history, max_turns=3)
@@ -92,6 +98,7 @@ def detect_intent_tool(state: dict) -> dict:
 # Tool: Check if the query is specific enough for SQL generation
 @tool
 def is_question_detailed_enough(state: dict) -> dict:
+    """Check if the query is specific enough for SQL generation."""
     query = state["query"]
     history = state.get("history", [])
     history_text = format_history(history, max_turns=3)
@@ -113,6 +120,7 @@ def is_question_detailed_enough(state: dict) -> dict:
 # Tool: Generate SQL and update history
 @tool
 def generate_sql_tool(state: dict) -> dict:
+    """Generate SQL query from user input and update conversation history."""
     query = state["query"]
     sql = text_to_sql.generate_v1(user_prompt=query, method="Multistage")
 
@@ -129,27 +137,32 @@ def generate_sql_tool(state: dict) -> dict:
     }
 
 # Build workflow graph
-workflow = StateGraph()
+class AgentState(TypedDict):
+    query: str
+    history: Optional[List[dict]]
+    DetectIntent: Optional[str]
+    CheckDetails: Optional[str]
+    GenerateSQL: Optional[str]
 
-# Add nodes
-workflow.add_node("DetectIntent", detect_intent_tool)
-workflow.add_node("CheckDetails", is_question_detailed_enough)
-workflow.add_node("GenerateSQL", generate_sql_tool)
+workflow = StateGraph(AgentState)
 
-# Conditional routing
-workflow.add_conditional_edges("DetectIntent", lambda x: x["DetectIntent"], {
-    "sql": "CheckDetails",
+workflow.add_node("DetectIntentTool", detect_intent_tool)
+workflow.add_node("CheckDetailsTool", is_question_detailed_enough)
+workflow.add_node("GenerateSQLTool", generate_sql_tool)
+
+workflow.add_conditional_edges("DetectIntentTool", lambda x: x["DetectIntent"], {
+    "sql": "CheckDetailsTool",
     "other": END
 })
 
-workflow.add_conditional_edges("CheckDetails", lambda x: x["CheckDetails"], {
-    "yes": "GenerateSQL",
+workflow.add_conditional_edges("CheckDetailsTool", lambda x: x["CheckDetails"], {
+    "yes": "GenerateSQLTool",
     "no": END
 })
 
-# Define start and end
-workflow.set_entry_point("DetectIntent")
-workflow.set_finish_point("GenerateSQL")
+workflow.set_entry_point("DetectIntentTool")
+workflow.set_finish_point("GenerateSQLTool")
+
 
 # Compile graph
 graph = workflow.compile()

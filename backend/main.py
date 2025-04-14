@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database.db import init_db
-from backend.routers import user, chat
+from routers import user, chat
 
 app = FastAPI()
 init_db()

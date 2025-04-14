@@ -17,13 +17,13 @@ class QueryGenerator(BaseLLM):
         :param config: LLMConfig object containing model type, API key, and other settings.
         """
         super().__init__(
-            config=config, system_prompt_path="files/query_generator_system_prompt.txt"
+            config=config, system_prompt_path="files/prompt/query_generator_system_prompt.txt"
         )
         self.system_prompt_baseline = self._load_system_prompt(
-            system_prompt_path="files/query_generator_system_prompt_baseline.txt"
+            system_prompt_path="files/prompt/query_generator_system_prompt_baseline.txt"
         )
         self.system_prompt_multistage = self._load_system_prompt(
-            system_prompt_path="files/query_generator_system_prompt_multistage.txt"
+            system_prompt_path="files/prompt/query_generator_system_prompt_multistage.txt"
         )
 
     def generate(

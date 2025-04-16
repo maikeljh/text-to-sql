@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import { BiSearch, BiPlus } from "react-icons/bi";
 import { BsSoundwave } from "react-icons/bs";
+import toast from "react-hot-toast";
 
 const dummyHistory = [
   {
@@ -35,6 +36,7 @@ function ChatPage() {
   const [query, setQuery] = useState("");
   const [historyList, setHistoryList] = useState(dummyHistory);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
 
@@ -103,6 +105,18 @@ function ChatPage() {
     };
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user_id");
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully", {
+      style: {
+        background: "#000",
+        color: "#fff",
+      },
+    });
+    navigate("/");
+  };
+
   const groupedHistory = groupByDate(historyList);
 
   return (
@@ -159,8 +173,24 @@ function ChatPage() {
             <span className="rounded-full bg-white/10 p-1">🤖</span>
             Chatbot
           </h1>
-          <div className="bg-white/10 rounded-full p-2 cursor-pointer">
-            <FiUser size={20} />
+          <div className="relative">
+            <div
+              className="bg-white/10 rounded-full p-2 cursor-pointer"
+              onClick={() => setShowDropdown((prev) => !prev)}
+            >
+              <FiUser size={20} />
+            </div>
+
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-32 bg-black text-white rounded shadow-lg z-50 cursor-pointer">
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-800 cursor-pointer"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

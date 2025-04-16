@@ -7,6 +7,7 @@ from models.models import User, ChatHistory, ChatMessage
 from database.db import get_db
 from utils.misc import generate_title
 from utils.auth import get_current_user_id
+from langdetect import detect
 
 import orjson
 
@@ -65,14 +66,21 @@ async def handle_query(
     data = result.get("GenerateSQL", [])
 
     # Compose final agent response
+    try:
+        lang = detect(req.query)
+    except:
+        lang = "en"
+
     if intent == "other":
         response = {
-            "response": "Sorry, I can only help with business-related questions. Please ask something involving data insights.",
+            "response": "Maaf, saya hanya bisa membantu pertanyaan terkait bisnis dan data." if lang == "id" else
+                        "Sorry, I can only help with business-related questions. Please ask something involving data insights.",
             "data": [],
         }
     elif detail == "no":
         response = {
-            "response": "Could you provide more specific details so I can give detailed data insights for you?",
+            "response": "Bisa tolong berikan detail yang lebih spesifik agar saya bisa memberi insight data yang relevan?" if lang == "id" else
+                        "Could you provide more specific details so I can give detailed data insights for you?",
             "data": [],
         }
     else:
@@ -80,6 +88,7 @@ async def handle_query(
             "response": summary,
             "data": data,
         }
+
 
     # Save chat message to history
     chat_msg = ChatMessage(

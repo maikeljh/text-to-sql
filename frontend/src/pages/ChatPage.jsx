@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import { BiSearch, BiPlus } from "react-icons/bi";
@@ -14,6 +14,7 @@ function ChatPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (!userId) {
@@ -44,6 +45,11 @@ function ChatPage() {
     if (userId) fetchHistories();
   }, [userId]);
 
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedChat?.messages]);
 
   const handleSend = async () => {
     if (!query.trim()) return;
@@ -315,75 +321,80 @@ function ChatPage() {
 
           {selectedChat && (
             <div className="flex-1 flex flex-col justify-between w-full">
-              <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-                {selectedChat.messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex ${
-                      msg.sender === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
+              <div
+                className="flex-1 overflow-y-auto pr-2"
+                style={{ maxHeight: "70vh" }}
+              >
+                <div className="space-y-4">
+                  {selectedChat.messages.map((msg, i) => (
                     <div
-                      className={`px-4 py-3 rounded-2xl max-w-[75%] text-sm whitespace-pre-line ${
-                        msg.sender === "user" ? "bg-cyan-600" : "bg-gray-700"
+                      key={i}
+                      className={`flex ${
+                        msg.sender === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
-                      {msg.message === "Thinking..." ? (
-                        <div className="flex items-center space-x-1 text-white/70 text-sm font-light tracking-wider">
-                          <span>Thinking</span>
-                          <span className="animate-bounce [animation-delay:0ms]">
-                            .
-                          </span>
-                          <span className="animate-bounce [animation-delay:150ms]">
-                            .
-                          </span>
-                          <span className="animate-bounce [animation-delay:300ms]">
-                            .
-                          </span>
-                        </div>
-                      ) : (
-                        msg.message
-                      )}
+                      <div
+                        className={`px-4 py-3 rounded-2xl max-w-[75%] text-sm whitespace-pre-line ${
+                          msg.sender === "user" ? "bg-cyan-600" : "bg-gray-700"
+                        }`}
+                      >
+                        {msg.message === "Thinking..." ? (
+                          <div className="flex items-center space-x-1 text-white/70 text-sm font-light tracking-wider">
+                            <span>Thinking</span>
+                            <span className="animate-bounce [animation-delay:0ms]">
+                              .
+                            </span>
+                            <span className="animate-bounce [animation-delay:150ms]">
+                              .
+                            </span>
+                            <span className="animate-bounce [animation-delay:300ms]">
+                              .
+                            </span>
+                          </div>
+                        ) : (
+                          msg.message
+                        )}
 
-                      {/* If bot message and contains data to show */}
-                      {msg.sender === "bot" && msg.data?.length > 0 && (
-                        <div className="mt-3 overflow-x-auto rounded border border-white/10">
-                          <table className="min-w-full table-auto text-left text-sm text-white bg-[#1B2332] rounded">
-                            <thead className="bg-white/10 text-white uppercase text-xs">
-                              <tr>
-                                {Object.keys(msg.data[0]).map((key) => (
-                                  <th
-                                    key={key}
-                                    className="px-4 py-2 border-b border-white/10"
-                                  >
-                                    {key.replace(/_/g, " ")}
-                                  </th>
-                                ))}
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {msg.data.map((row, rIdx) => (
-                                <tr
-                                  key={rIdx}
-                                  className="hover:bg-white/5 transition"
-                                >
-                                  {Object.values(row).map((val, cIdx) => (
-                                    <td
-                                      key={cIdx}
-                                      className="px-4 py-2 border-b border-white/5"
+                        {msg.sender === "bot" && msg.data?.length > 0 && (
+                          <div className="mt-3 overflow-x-auto rounded border border-white/10">
+                            <table className="min-w-full table-auto text-left text-sm text-white bg-[#1B2332] rounded">
+                              <thead className="bg-white/10 text-white uppercase text-xs">
+                                <tr>
+                                  {Object.keys(msg.data[0]).map((key) => (
+                                    <th
+                                      key={key}
+                                      className="px-4 py-2 border-b border-white/10"
                                     >
-                                      {val}
-                                    </td>
+                                      {key.replace(/_/g, " ")}
+                                    </th>
                                   ))}
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
+                              </thead>
+                              <tbody>
+                                {msg.data.map((row, rIdx) => (
+                                  <tr
+                                    key={rIdx}
+                                    className="hover:bg-white/5 transition"
+                                  >
+                                    {Object.values(row).map((val, cIdx) => (
+                                      <td
+                                        key={cIdx}
+                                        className="px-4 py-2 border-b border-white/5"
+                                      >
+                                        {val}
+                                      </td>
+                                    ))}
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
               </div>
 
               {/* Input Area */}

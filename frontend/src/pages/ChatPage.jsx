@@ -266,9 +266,19 @@ function ChatPage() {
               </h2>
 
               {loading && (
-                <div className="flex justify-center items-center gap-2 text-white/60">
-                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white/50" />
-                  <span className="text-sm">Thinking...</span>
+                <div className="flex flex-col items-center justify-center text-white/70 mt-4">
+                  <div className="flex items-center space-x-1 text-sm font-light tracking-wider">
+                    <span>Thinking</span>
+                    <span className="animate-bounce [animation-delay:0ms]">
+                      .
+                    </span>
+                    <span className="animate-bounce [animation-delay:150ms]">
+                      .
+                    </span>
+                    <span className="animate-bounce [animation-delay:300ms]">
+                      .
+                    </span>
+                  </div>
                 </div>
               )}
 
@@ -292,7 +302,11 @@ function ChatPage() {
                     className="text-white bg-cyan-600 p-2 rounded-full cursor-pointer"
                     disabled={loading}
                   >
-                    <BsSoundwave size={20} />
+                    {loading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <BsSoundwave size={20} />
+                    )}
                   </button>
                 </div>
               </div>
@@ -314,7 +328,22 @@ function ChatPage() {
                         msg.sender === "user" ? "bg-cyan-600" : "bg-gray-700"
                       }`}
                     >
-                      {msg.message}
+                      {msg.message === "Thinking..." ? (
+                        <div className="flex items-center space-x-1 text-white/70 text-sm font-light tracking-wider">
+                          <span>Thinking</span>
+                          <span className="animate-bounce [animation-delay:0ms]">
+                            .
+                          </span>
+                          <span className="animate-bounce [animation-delay:150ms]">
+                            .
+                          </span>
+                          <span className="animate-bounce [animation-delay:300ms]">
+                            .
+                          </span>
+                        </div>
+                      ) : (
+                        msg.message
+                      )}
 
                       {/* If bot message and contains data to show */}
                       {msg.sender === "bot" && msg.data?.length > 0 && (
@@ -378,7 +407,11 @@ function ChatPage() {
                     className="text-white bg-cyan-600 p-2 rounded-full cursor-pointer"
                     disabled={loading}
                   >
-                    <BsSoundwave size={20} />
+                    {loading ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
+                    ) : (
+                      <BsSoundwave size={20} />
+                    )}
                   </button>
                 </div>
               </div>

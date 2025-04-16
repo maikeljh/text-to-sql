@@ -91,7 +91,10 @@ async def handle_query(
     db.commit()
 
     # Return response
-    return response
+    return {
+        "chat_id": chat.id,
+        **response
+    }
 
 
 @router.get("/histories")

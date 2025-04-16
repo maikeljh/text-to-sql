@@ -1,0 +1,43 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="510"
+  height="510"
+  viewBox="0 0 510 510"
+>
+  <!-- Use a numeric width & height on foreignObject; remove externalResourcesRequired -->
+  <foreignObject
+    x="0"
+    y="0"
+    width="510"
+    height="510"
+  >
+    <!-- Keep the proper XHTML namespace -->
+    <div xmlns="http://www.w3.org/1999/xhtml" 
+         style="width:510px; height:510px; margin:0; padding:0; overflow:hidden; border-radius:300px; background:#6d28d9; display:flex; align-items:center; justify-content:center; box-shadow:rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;">
+      <!-- You can simplify or remove these Tailwind-like classes. Safari often ignores them in foreignObject. 
+           Instead, use inline CSS where possible. -->
+      <span style="width:400px; height:400px; display:inline-block;">
+        <!-- Your nested SVG icon or other markup goes here. 
+             Keep the nested <svg> but remove extraneous style blocks that Safari can’t parse. -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="400"
+          height="400"
+          viewBox="0 0 24 24"
+          fill="rgb(140, 121, 140)"
+          stroke="rgb(22, 22, 22)"
+          stroke-width="1.92"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          style="fill-opacity:0.82;"
+        >
+          <ellipse cx="12" cy="5" rx="9" ry="3"/>
+          <path d="M3 5V19A9 3 0 0 0 15 21.84"/>
+          <path d="M21 5V8"/>
+          <path d="M21 12L18 17H22L19 22"/>
+          <path d="M3 12A9 3 0 0 0 14.59 14.87"/>
+        </svg>
+      </span>
+    </div>
+  </foreignObject>
+</svg>

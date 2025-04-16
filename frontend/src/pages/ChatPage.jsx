@@ -5,38 +5,13 @@ import { BiSearch, BiPlus } from "react-icons/bi";
 import { BsSoundwave } from "react-icons/bs";
 import toast from "react-hot-toast";
 
-const dummyHistory = [
-  {
-    id: 1,
-    title: "What is React?",
-    messages: [
-      { sender: "user", message: "What is React?" },
-      {
-        sender: "bot",
-        message: "React is a JavaScript library for building UI.",
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: 2,
-    title: "Explain Docker",
-    messages: [
-      { sender: "user", message: "What is Docker?" },
-      {
-        sender: "bot",
-        message: "Docker is a tool to containerize applications.",
-      },
-    ],
-    timestamp: new Date(new Date().setDate(new Date().getDate() - 1)),
-  },
-];
-
 function ChatPage() {
   const [query, setQuery] = useState("");
-  const [historyList, setHistoryList] = useState(dummyHistory);
+  const [historyList, setHistoryList] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
 
@@ -46,62 +21,144 @@ function ChatPage() {
     }
   }, [userId, navigate]);
 
-  const handleSend = () => {
-    if (!query.trim()) return;
-
-    const newMessage = { sender: "user", message: query };
-    const botReply = {
-      sender: "bot",
-      message: "This is a dummy reply to: " + query,
+  useEffect(() => {
+    const fetchHistories = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/chat/histories`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const data = await res.json();
+        setHistoryList(data);
+      } catch {
+        toast.error("Failed to fetch histories", {
+          style: { background: "#000", color: "#fff" },
+        });
+      }
     };
 
-    if (selectedChat) {
-      const updated = {
-        ...selectedChat,
-        messages: [...selectedChat.messages, newMessage, botReply],
-      };
-      setSelectedChat(updated);
+    if (userId) fetchHistories();
+  }, [userId]);
 
-      setHistoryList((prev) =>
-        prev.map((chat) => (chat.id === selectedChat.id ? updated : chat))
-      );
-    } else {
-      const newChat = {
-        id: historyList.length + 1,
-        title: query,
-        messages: [newMessage, botReply],
-        timestamp: new Date(),
-      };
-      setHistoryList([newChat, ...historyList]);
-      setSelectedChat(newChat);
-    }
+
+  const handleSend = async () => {
+    if (!query.trim()) return;
+
+    const userMessage = { sender: "user", message: query };
+    const loadingMessage = { sender: "bot", message: "Thinking...", data: [] };
 
     setQuery("");
+    setLoading(true);
+
+    // Append only if chat is selected
+    if (selectedChat) {
+      setSelectedChat((prev) => ({
+        ...prev,
+        messages: [...prev.messages, userMessage, loadingMessage],
+      }));
+    }
+
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/chat/query`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            query,
+            chat_id: selectedChat?.id || null,
+          }),
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        const newChatId = data.chat_id;
+
+        // Always update history list
+        const refresh = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/chat/histories`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        const updatedList = await refresh.json();
+        setHistoryList(updatedList);
+
+        // If new chat just created, this will select it
+        await handleSelectHistory(newChatId);
+      } else {
+        toast.error("Failed to send message");
+      }
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSelectHistory = (chatId) => {
-    const found = historyList.find((c) => c.id === chatId);
-    setSelectedChat(found);
+  const handleSelectHistory = async (chatId) => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/chat/history/${chatId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+      const data = await res.json();
+
+      const transformedMessages = data.messages
+        .map((msg) => [
+          { sender: "user", message: msg.user },
+          {
+            sender: "bot",
+            message: msg.agent.response,
+            data: msg.agent.data.result || [],
+          },
+        ])
+        .flat();
+
+      setSelectedChat({
+        id: data.chat_id,
+        title: data.chat_title,
+        messages: transformedMessages,
+        timestamp: new Date(data.messages[0]?.timestamp || Date.now()),
+      });
+    } catch {
+      toast.error("Failed to load chat", {
+        style: { background: "#000", color: "#fff" },
+      });
+    }
   };
 
   const groupByDate = (history) => {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
+    const today = new Date().toDateString();
+    const yesterday = new Date(
+      new Date().setDate(new Date().getDate() - 1)
+    ).toDateString();
 
     return {
       Today: history.filter(
-        (c) => c.timestamp?.toDateString() === today.toDateString()
+        (c) => new Date(c.created_at).toDateString() === today
       ),
       Yesterday: history.filter(
-        (c) => c.timestamp?.toDateString() === yesterday.toDateString()
+        (c) => new Date(c.created_at).toDateString() === yesterday
       ),
-      "Previous 7 Days": history.filter(
-        (c) =>
-          c.timestamp &&
-          c.timestamp.toDateString() !== today.toDateString() &&
-          c.timestamp.toDateString() !== yesterday.toDateString()
-      ),
+      "Previous 7 Days": history.filter((c) => {
+        const d = new Date(c.created_at).toDateString();
+        return d !== today && d !== yesterday;
+      }),
     };
   };
 
@@ -117,7 +174,11 @@ function ChatPage() {
     navigate("/");
   };
 
-  const groupedHistory = groupByDate(historyList);
+  const filteredHistories = historyList.filter((chat) =>
+    chat.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const groupedHistory = groupByDate(filteredHistories);
 
   return (
     <div
@@ -138,6 +199,8 @@ function ChatPage() {
           <BiSearch size={18} className="text-white/70" />
           <input
             type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search"
             className="bg-transparent ml-2 outline-none w-full text-sm text-white"
           />
@@ -201,18 +264,33 @@ function ChatPage() {
               <h2 className="text-3xl font-semibold text-white mb-6">
                 What can I help with?
               </h2>
-              <div className="bg-[#1B2332]/80 rounded-2xl p-4 max-w-2xl w-full ml-6">
+
+              {loading && (
+                <div className="flex justify-center items-center gap-2 text-white/60">
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-white/50" />
+                  <span className="text-sm">Thinking...</span>
+                </div>
+              )}
+
+              <div className="bg-[#1B2332]/80 rounded-2xl p-4 max-w-2xl w-full ml-10">
                 <div className="flex items-center gap-2">
-                  <input
-                    type="text"
+                  <textarea
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
                     placeholder="Type here"
-                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base"
+                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-none"
+                    rows={1}
                   />
                   <button
                     onClick={handleSend}
                     className="text-white bg-cyan-600 p-2 rounded-full cursor-pointer"
+                    disabled={loading}
                   >
                     <BsSoundwave size={20} />
                   </button>
@@ -237,6 +315,43 @@ function ChatPage() {
                       }`}
                     >
                       {msg.message}
+
+                      {/* If bot message and contains data to show */}
+                      {msg.sender === "bot" && msg.data?.length > 0 && (
+                        <div className="mt-3 overflow-x-auto rounded border border-white/10">
+                          <table className="min-w-full table-auto text-left text-sm text-white bg-[#1B2332] rounded">
+                            <thead className="bg-white/10 text-white uppercase text-xs">
+                              <tr>
+                                {Object.keys(msg.data[0]).map((key) => (
+                                  <th
+                                    key={key}
+                                    className="px-4 py-2 border-b border-white/10"
+                                  >
+                                    {key.replace(/_/g, " ")}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {msg.data.map((row, rIdx) => (
+                                <tr
+                                  key={rIdx}
+                                  className="hover:bg-white/5 transition"
+                                >
+                                  {Object.values(row).map((val, cIdx) => (
+                                    <td
+                                      key={cIdx}
+                                      className="px-4 py-2 border-b border-white/5"
+                                    >
+                                      {val}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -245,16 +360,23 @@ function ChatPage() {
               {/* Input Area */}
               <div className="bg-[#1B2332]/80 rounded-2xl p-4 mt-4">
                 <div className="flex items-center gap-2">
-                  <input
-                    type="text"
+                  <textarea
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSend();
+                      }
+                    }}
                     placeholder="Type here"
-                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base"
+                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-none"
+                    rows={1}
                   />
                   <button
                     onClick={handleSend}
                     className="text-white bg-cyan-600 p-2 rounded-full cursor-pointer"
+                    disabled={loading}
                   >
                     <BsSoundwave size={20} />
                   </button>

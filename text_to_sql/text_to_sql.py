@@ -198,3 +198,16 @@ class TextToSQL:
             return acc
         except:
             return 0.0
+
+    def execute_query(self, query: str):
+        """
+        Execute a raw SQL query using the configured QueryExecutor.
+        Returns:
+            - result: Query result as a list of rows or values
+            - error: If execution fails, return error message
+        """
+        try:
+            result = self.query_executor.execute_query(query)
+            return {"result": result}
+        except Exception as e:
+            return {"error": str(e)}

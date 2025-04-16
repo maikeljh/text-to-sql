@@ -2,12 +2,12 @@ import sys
 import os
 
 # Add parent directory to path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from typing import TypedDict, List, Optional
+from pydantic import BaseModel
+from typing import List, Optional
 from langchain_core.tools import tool
 from langgraph.graph import StateGraph, END
-from dotenv import load_dotenv
 from text_to_sql.text_to_sql import TextToSQL
 from text_to_sql.core import GeneralLLM
 from text_to_sql.common import (
@@ -17,9 +17,6 @@ from text_to_sql.common import (
     ContextConfig,
     QueryConfig,
 )
-
-# Load environment variables
-load_dotenv()
 
 # Configurations
 text_to_sql_config = Config(
@@ -43,13 +40,15 @@ text_to_sql_config = Config(
         api_key=os.getenv("API_KEY"),
         schema_path="./files/metadata/sakila.json",
     ),
-    retrieve_context_config=ContextConfig(data_path="./files/dataset/dataset_sakila.csv"),
+    retrieve_context_config=ContextConfig(
+        data_path="./files/dataset/dataset_sakila.csv"
+    ),
     query_executor_config=QueryConfig(
-        host=os.getenv("DB_HOST"),
-        database=os.getenv("DB_DATABASE"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        port=os.getenv("DB_PORT"),
+        host=os.getenv("DB_SOURCE_HOST"),
+        database=os.getenv("DB_SOURCE_DATABASE"),
+        user=os.getenv("DB_SOURCE_USER"),
+        password=os.getenv("DB_SOURCE_PASSWORD"),
+        port=os.getenv("DB_SOURCE_PORT"),
     ),
 )
 
@@ -64,6 +63,16 @@ general_config = LLMConfig(
 text_to_sql = TextToSQL(config=text_to_sql_config)
 llm_agent = GeneralLLM(config=general_config)
 
+
+class AgentState(BaseModel):
+    query: str
+    history: Optional[List[dict]] = []
+    DetectIntent: Optional[str] = None
+    CheckDetails: Optional[str] = None
+    GenerateSQL: Optional[str] = None
+    Summary: Optional[str] = None
+
+
 # Format conversation history for context
 def format_history(history, max_turns=5):
     if not history:
@@ -73,34 +82,60 @@ def format_history(history, max_turns=5):
         [f"User: {turn['user']}\nAgent: {turn['agent']}" for turn in recent_history]
     )
 
-# Tool: Detect if query is SQL-related
-@tool
-def detect_intent_tool(state: dict) -> dict:
-    """Detect whether a query is related to SQL or not."""
-    query = state["query"]
-    history = state.get("history", [])
-    history_text = format_history(history, max_turns=3)
 
-    system_prompt = f"""
-    You are an AI assistant that determines if a query is related to SQL or not.
-    Recent conversation:
-    {history_text}
+# Tool: Detect if query is data-retrieval related (for text-to-SQL use case)
+def detect_intent_tool(state: AgentState) -> dict:
+    query = state.query
 
-    Now, classify the following query into 'sql' or 'other'.
+    """
+    Detect whether the query is about retrieving data from a database (for SQL generation).
+    Return 'data' if it is, otherwise 'other'.
     """
 
-    result = llm_agent.generate(
-        system_prompt=system_prompt.strip(),
-        user_prompt=query
-    )
-    return {"DetectIntent": result.strip().lower()}
+    system_prompt = f"""
+    You are an expert assistant that decides if a user query is asking to retrieve data from a database.
+    Return ONLY one of the following labels:
+
+    - data: if the query is asking about facts, entities, statistics, filters, aggregations, rankings, or structured info.
+    - other: if the query is not about retrieving data (e.g., definitions, instructions, or general advice).
+
+    Here are some EXAMPLES:
+
+    Query: Which actors have the first name 'Scarlett'?  
+    → data
+
+    Query: How many distinct actor last names are there?  
+    → data
+
+    Query: What is SQL?  
+    → other
+
+    Query: What does SELECT do in SQL?  
+    → other
+
+    Query: Which customers rented more than 3 categories?  
+    → data
+
+    Now, based on the query below, return only `data` or `other` (lowercase only — no explanation).
+
+    Query:
+    \"\"\"{query}\"\"\"
+    """
+
+    result = llm_agent.generate(system_prompt=system_prompt.strip(), user_prompt="")
+    final = result.strip().lower()
+
+    if final not in ["data", "other"]:
+        final = "other"
+
+    return {"DetectIntent": final}
+
 
 # Tool: Check if the query is specific enough for SQL generation
-@tool
-def is_question_detailed_enough(state: dict) -> dict:
+def is_question_detailed_enough(state: AgentState) -> dict:
     """Check if the query is specific enough for SQL generation."""
-    query = state["query"]
-    history = state.get("history", [])
+    query = state.query
+    history = state.history or []
     history_text = format_history(history, max_turns=3)
 
     system_prompt = f"""
@@ -111,58 +146,91 @@ def is_question_detailed_enough(state: dict) -> dict:
     Is the following query detailed enough to generate a specific SQL query? Return only 'yes' or 'no'.
     """
 
-    result = llm_agent.generate(
-        system_prompt=system_prompt.strip(),
-        user_prompt=query
-    )
-    return {"CheckDetails": result.strip().lower()}
+    result = llm_agent.generate(system_prompt=system_prompt.strip(), user_prompt=query)
+    final = result.strip().lower()
+
+    if final not in ["yes", "no"]:
+        final = "no"
+
+    return {"CheckDetails": final}
+
 
 # Tool: Generate SQL and update history
-@tool
-def generate_sql_tool(state: dict) -> dict:
+def generate_sql_tool(state: AgentState) -> dict:
     """Generate SQL query from user input and update conversation history."""
-    query = state["query"]
+    query = state.query
     sql = text_to_sql.generate_v1(user_prompt=query, method="Multistage")
+    result = text_to_sql.execute_query(sql)
 
-    # Update history
-    history = state.get("history", [])
-    history.append({
-        "user": query,
-        "agent": sql
-    })
+    return {"GenerateSQL": result}
 
-    return {
-        "GenerateSQL": sql,
-        "history": history
-    }
+
+# Tool: Summarize SQL execution result
+def summarize_data_tool(state: AgentState) -> dict:
+    """Generate a natural language summary of the SQL result and update history."""
+    query = state.query
+    sql_output = state.GenerateSQL or {}
+    history = state.history or []
+
+    # Extract SQL result for natural language summary
+    raw_data = sql_output.get("result", []) if isinstance(sql_output, dict) else []
+    error_msg = sql_output.get("error") if isinstance(sql_output, dict) else None
+
+    # Format the data (or error) for summarization
+    data_str = str(raw_data[:10]) if raw_data else (error_msg or "No data returned.")
+
+    system_prompt = f"""
+    You are an AI assistant that helps users understand SQL results.
+    
+    The user asked: "{query}"
+    The SQL result is:
+    {data_str}
+    
+    Please summarize the result in natural language as if explaining to a non-technical user.
+    """
+
+    summary = llm_agent.generate(
+        system_prompt=system_prompt.strip(), user_prompt=""
+    ).strip()
+
+    # Append to conversation history
+    history.append(
+        {
+            "user": query,
+            "agent": {
+                "response": summary,
+                "data": raw_data if raw_data else [error_msg] if error_msg else [],
+            },
+        }
+    )
+
+    return {"Summary": summary, "history": history}
+
 
 # Build workflow graph
-class AgentState(TypedDict):
-    query: str
-    history: Optional[List[dict]]
-    DetectIntent: Optional[str]
-    CheckDetails: Optional[str]
-    GenerateSQL: Optional[str]
-
 workflow = StateGraph(AgentState)
 
 workflow.add_node("DetectIntentTool", detect_intent_tool)
 workflow.add_node("CheckDetailsTool", is_question_detailed_enough)
 workflow.add_node("GenerateSQLTool", generate_sql_tool)
+workflow.add_node("SummarizeDataTool", summarize_data_tool)
 
-workflow.add_conditional_edges("DetectIntentTool", lambda x: x["DetectIntent"], {
-    "sql": "CheckDetailsTool",
-    "other": END
-})
+workflow.add_conditional_edges(
+    "DetectIntentTool",
+    lambda x: x.DetectIntent,
+    {"data": "CheckDetailsTool", "other": END},
+)
 
-workflow.add_conditional_edges("CheckDetailsTool", lambda x: x["CheckDetails"], {
-    "yes": "GenerateSQLTool",
-    "no": END
-})
+workflow.add_conditional_edges(
+    "CheckDetailsTool",
+    lambda x: x.CheckDetails,
+    {"yes": "GenerateSQLTool", "no": END},
+)
+
+workflow.add_edge("GenerateSQLTool", "SummarizeDataTool")
 
 workflow.set_entry_point("DetectIntentTool")
-workflow.set_finish_point("GenerateSQLTool")
-
+workflow.set_finish_point("SummarizeDataTool")
 
 # Compile graph
 graph = workflow.compile()

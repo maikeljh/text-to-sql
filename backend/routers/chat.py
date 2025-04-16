@@ -161,3 +161,19 @@ def get_chat_history_by_id(
             for m in messages
         ],
     }
+
+@router.delete("/history/{chat_id}")
+def delete_chat_history(
+    chat_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    chat = db.query(ChatHistory).filter_by(id=chat_id, user_id=user_id).first()
+    if not chat:
+        raise HTTPException(status_code=404, detail="Chat not found")
+
+    db.query(ChatMessage).filter_by(chat_id=chat_id).delete()
+    db.delete(chat)
+    db.commit()
+
+    return {"detail": "Chat history deleted successfully"}

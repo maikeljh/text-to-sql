@@ -12,6 +12,8 @@ function ChatPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [targetChatId, setTargetChatId] = useState(null);
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
   const messagesEndRef = useRef(null);
@@ -148,6 +150,40 @@ function ChatPage() {
     }
   };
 
+  const openDeleteModal = (chatId) => {
+    setTargetChatId(chatId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/chat/history/${targetChatId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        toast.success("Chat deleted", {
+          style: { background: "#000", color: "#fff" },
+        });
+        setHistoryList((prev) => prev.filter((c) => c.id !== targetChatId));
+        if (selectedChat?.id === targetChatId) setSelectedChat(null);
+      } else {
+        toast.error("Failed to delete chat");
+      }
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setShowDeleteModal(false);
+      setTargetChatId(null);
+    }
+  };
+
   const groupByDate = (history) => {
     const today = new Date().toDateString();
     const yesterday = new Date(
@@ -217,17 +253,28 @@ function ChatPage() {
             <div key={group}>
               <p className="text-xs text-white/60 mb-2">{group}</p>
               {chats.map((chat) => (
-                <p
+                <div
                   key={chat.id}
-                  onClick={() => handleSelectHistory(chat.id)}
-                  className={`mb-1 px-2 py-1 rounded-lg cursor-pointer ${
-                    selectedChat?.id === chat.id
-                      ? "bg-white/20 text-white"
-                      : "hover:bg-white/10 text-white/80"
-                  }`}
+                  className="flex items-center justify-between group"
                 >
-                  {chat.title}
-                </p>
+                  <p
+                    onClick={() => handleSelectHistory(chat.id)}
+                    className={`flex-1 px-2 py-1 rounded-lg cursor-pointer truncate ${
+                      selectedChat?.id === chat.id
+                        ? "bg-white/20 text-white"
+                        : "hover:bg-white/10 text-white/80"
+                    }`}
+                  >
+                    {chat.title}
+                  </p>
+                  <button
+                    onClick={() => openDeleteModal(chat.id)}
+                    className="text-white/50 hover:text-red-400 text-sm ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                    title="Delete"
+                  >
+                    ✕
+                  </button>
+                </div>
               ))}
             </div>
           ))}
@@ -430,6 +477,31 @@ function ChatPage() {
           )}
         </div>
       </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-[#1B2332] border border-white/10 rounded-xl p-6 w-[300px] shadow-xl text-white text-center">
+            <h3 className="text-lg font-semibold mb-3">Delete Chat</h3>
+            <p className="text-sm text-white/70 mb-6">
+              Are you sure you want to delete this chat? This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-sm cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm cursor-pointer"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

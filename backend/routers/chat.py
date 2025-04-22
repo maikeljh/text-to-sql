@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from typing import Optional
 from ai_agent.ai_agent import AgentState, graph
-from models.models import User, ChatHistory, ChatMessage
+from models.models import User, ChatHistory, ChatMessage, ChatFeedback
+from models.schemas import QueryRequest, FeedbackRequest
 from database.db import get_db
 from utils.misc import generate_title
 from utils.auth import get_current_user_id
@@ -13,11 +12,6 @@ import orjson
 
 
 router = APIRouter()
-
-
-class QueryRequest(BaseModel):
-    query: str
-    chat_id: Optional[int] = None
 
 
 @router.post("/query")
@@ -150,6 +144,7 @@ def get_chat_history_by_id(
         "chat_title": chat.title,
         "messages": [
             {
+                "id": m.id,
                 "user": m.user_input,
                 "agent": (
                     orjson.loads(m.agent_response)
@@ -157,6 +152,7 @@ def get_chat_history_by_id(
                     else m.agent_response
                 ),
                 "timestamp": m.timestamp.isoformat(),
+                "feedback": m.feedback.feedback if m.feedback else None,
             }
             for m in messages
         ],
@@ -177,3 +173,28 @@ def delete_chat_history(
     db.commit()
 
     return {"detail": "Chat history deleted successfully"}
+
+@router.post("/feedback")
+def give_feedback(
+    req: FeedbackRequest,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    message = db.query(ChatMessage).filter_by(id=req.message_id).first()
+
+    if not message:
+        raise HTTPException(status_code=404, detail="Chat message not found")
+
+    chat = db.query(ChatHistory).filter_by(id=message.chat_id, user_id=user_id).first()
+    if not chat:
+        raise HTTPException(status_code=403, detail="Not authorized to give feedback on this message")
+
+    existing = db.query(ChatFeedback).filter_by(message_id=message.id).first()
+    if existing:
+        existing.feedback = req.feedback
+    else:
+        db.add(ChatFeedback(message_id=message.id, feedback=req.feedback))
+
+    db.commit()
+
+    return {"detail": f"Feedback '{req.feedback}' saved successfully"}

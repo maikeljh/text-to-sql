@@ -126,16 +126,17 @@ function ChatPage() {
       );
       const data = await res.json();
 
-      const transformedMessages = data.messages
-        .map((msg) => [
-          { sender: "user", message: msg.user },
-          {
-            sender: "bot",
-            message: msg.agent.response,
-            data: msg.agent.data.result || [],
-          },
-        ])
-        .flat();
+      const transformedMessages = data.messages.flatMap((msg) => [
+        { sender: "user", message: msg.user },
+        {
+          sender: "bot",
+          message: msg.agent.response,
+          data: msg.agent.data.result || [],
+          id: msg.id,
+          feedback: msg.feedback || null,
+        },
+      ]);
+
 
       setSelectedChat({
         id: data.chat_id,
@@ -181,6 +182,30 @@ function ChatPage() {
     } finally {
       setShowDeleteModal(false);
       setTargetChatId(null);
+    }
+  };
+
+  const sendFeedback = async (messageId, feedback) => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ message_id: messageId, feedback }),
+      });
+      toast.success("Feedback sent!", {
+        style: { background: "#000", color: "#fff" },
+      });
+      setSelectedChat((prev) => ({
+        ...prev,
+        messages: prev.messages.map((m) =>
+          m.id === messageId ? { ...m, feedback } : m
+        ),
+      }));
+    } catch {
+      toast.error("Failed to send feedback");
     }
   };
 
@@ -435,6 +460,24 @@ function ChatPage() {
                                 ))}
                               </tbody>
                             </table>
+                          </div>
+                        )}
+                        {msg.sender === "bot" && !msg.feedback && (
+                          <div className="flex justify-end mt-2 space-x-2">
+                            <button
+                              onClick={() => sendFeedback(msg.id, "positive")}
+                              title="Thumbs Up"
+                              className="text-green-400 hover:text-green-600 text-xl cursor-pointer"
+                            >
+                              👍
+                            </button>
+                            <button
+                              onClick={() => sendFeedback(msg.id, "negative")}
+                              title="Thumbs Down"
+                              className="text-red-400 hover:text-red-600 text-xl cursor-pointer"
+                            >
+                              👎
+                            </button>
                           </div>
                         )}
                       </div>

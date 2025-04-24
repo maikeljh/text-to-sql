@@ -14,9 +14,23 @@ function ChatPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [targetChatId, setTargetChatId] = useState(null);
+  const [showTableModal, setShowTableModal] = useState(false);
+  const [modalTableData, setModalTableData] = useState([]);
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
   const messagesEndRef = useRef(null);
+
+  const handle401Redirect = (res) => {
+    if (res.status === 401) {
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("token");
+      navigate("/");
+      toast.error("Session expired. Please login again.", {
+        style: { background: "#000", color: "#fff" },
+      });
+      throw new Error("Unauthorized");
+    }
+  };
 
   useEffect(() => {
     if (!userId) {
@@ -35,6 +49,15 @@ function ChatPage() {
             },
           }
         );
+        if (res.status === 401) {
+          localStorage.removeItem("user_id");
+          localStorage.removeItem("token");
+          navigate("/");
+          toast.error("Session expired. Please login again.", {
+            style: { background: "#000", color: "#fff" },
+          });
+          throw new Error("Unauthorized");
+        }
         const data = await res.json();
         setHistoryList(data);
       } catch {
@@ -45,7 +68,7 @@ function ChatPage() {
     };
 
     if (userId) fetchHistories();
-  }, [userId]);
+  }, [navigate, userId]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -85,6 +108,7 @@ function ChatPage() {
           }),
         }
       );
+      handle401Redirect(res);
 
       const data = await res.json();
       if (res.ok) {
@@ -99,6 +123,7 @@ function ChatPage() {
             },
           }
         );
+        handle401Redirect(refresh);
         const updatedList = await refresh.json();
         setHistoryList(updatedList);
 
@@ -124,6 +149,7 @@ function ChatPage() {
           },
         }
       );
+      handle401Redirect(res);
       const data = await res.json();
 
       const transformedMessages = data.messages.flatMap((msg) => [
@@ -168,6 +194,8 @@ function ChatPage() {
         }
       );
 
+      handle401Redirect(res);
+
       if (res.ok) {
         toast.success("Chat deleted", {
           style: { background: "#000", color: "#fff" },
@@ -187,7 +215,7 @@ function ChatPage() {
 
   const sendFeedback = async (messageId, feedback) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/feedback`, {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -195,6 +223,13 @@ function ChatPage() {
         },
         body: JSON.stringify({ message_id: messageId, feedback }),
       });
+
+      handle401Redirect(res);
+
+      if (!res.ok) {
+        throw new Error("Failed to send feedback");
+      }
+
       toast.success("Feedback sent!", {
         style: { background: "#000", color: "#fff" },
       });
@@ -405,76 +440,101 @@ function ChatPage() {
                         msg.sender === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
-                      <div
-                        className={`px-4 py-3 rounded-2xl max-w-[75%] text-sm whitespace-pre-line ${
-                          msg.sender === "user" ? "bg-cyan-600" : "bg-gray-700"
-                        }`}
-                      >
-                        {msg.message === "Thinking..." ? (
-                          <div className="flex items-center space-x-1 text-white/70 text-sm font-light tracking-wider">
-                            <span>Thinking</span>
-                            <span className="animate-bounce [animation-delay:0ms]">
-                              .
-                            </span>
-                            <span className="animate-bounce [animation-delay:150ms]">
-                              .
-                            </span>
-                            <span className="animate-bounce [animation-delay:300ms]">
-                              .
-                            </span>
-                          </div>
-                        ) : (
-                          msg.message
-                        )}
+                      <div className="flex flex-col items-end max-w-[75%]">
+                        <div
+                          className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-line text-left ${
+                            msg.sender === "user"
+                              ? "bg-cyan-600"
+                              : "bg-gray-700"
+                          }`}
+                        >
+                          {msg.message === "Thinking..." ? (
+                            <div className="flex items-center space-x-1 text-white/70 text-sm font-light tracking-wider">
+                              <span>Thinking</span>
+                              <span className="animate-bounce [animation-delay:0ms]">
+                                .
+                              </span>
+                              <span className="animate-bounce [animation-delay:150ms]">
+                                .
+                              </span>
+                              <span className="animate-bounce [animation-delay:300ms]">
+                                .
+                              </span>
+                            </div>
+                          ) : (
+                            msg.message
+                          )}
 
-                        {msg.sender === "bot" && msg.data?.length > 0 && (
-                          <div className="mt-3 overflow-x-auto rounded border border-white/10">
-                            <table className="min-w-full table-auto text-left text-sm text-white bg-[#1B2332] rounded">
-                              <thead className="bg-white/10 text-white uppercase text-xs">
-                                <tr>
-                                  {Object.keys(msg.data[0]).map((key) => (
-                                    <th
-                                      key={key}
-                                      className="px-4 py-2 border-b border-white/10"
-                                    >
-                                      {key.replace(/_/g, " ")}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {msg.data.map((row, rIdx) => (
-                                  <tr
-                                    key={rIdx}
-                                    className="hover:bg-white/5 transition"
-                                  >
-                                    {Object.values(row).map((val, cIdx) => (
-                                      <td
-                                        key={cIdx}
-                                        className="px-4 py-2 border-b border-white/5"
+                          {msg.sender === "bot" && msg.data?.length > 0 && (
+                            <>
+                              <div className="mt-3 overflow-x-auto rounded border border-white/10">
+                                <table className="min-w-full table-auto text-left text-sm text-white bg-[#1B2332] rounded">
+                                  <thead className="bg-white/10 text-white uppercase text-xs">
+                                    <tr>
+                                      {Object.keys(msg.data[0])
+                                        .slice(0, 7)
+                                        .map((key) => (
+                                          <th
+                                            key={key}
+                                            className="px-4 py-2 border-b border-white/10"
+                                          >
+                                            {key.replace(/_/g, " ")}
+                                          </th>
+                                        ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {msg.data.slice(0, 10).map((row, rIdx) => (
+                                      <tr
+                                        key={rIdx}
+                                        className="hover:bg-white/5 transition"
                                       >
-                                        {val}
-                                      </td>
+                                        {Object.values(row)
+                                          .slice(0, 7)
+                                          .map((val, cIdx) => (
+                                            <td
+                                              key={cIdx}
+                                              className="px-4 py-2 border-b border-white/5"
+                                            >
+                                              {val}
+                                            </td>
+                                          ))}
+                                      </tr>
                                     ))}
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        )}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              {(Object.keys(msg.data[0]).length > 7 ||
+                                msg.data.length > 10) && (
+                                <div className="text-right mt-3">
+                                  <button
+                                    onClick={() => {
+                                      setShowTableModal(true);
+                                      setModalTableData(msg.data);
+                                    }}
+                                    className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-200 transition"
+                                  >
+                                    See All
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
                         {msg.sender === "bot" && !msg.feedback && (
-                          <div className="flex justify-end mt-2 space-x-2">
+                          <div className="flex justify-end mt-2 space-x-2 pr-1">
                             <button
                               onClick={() => sendFeedback(msg.id, "positive")}
                               title="Thumbs Up"
-                              className="text-green-400 hover:text-green-600 text-xl cursor-pointer"
+                              className="cursor-pointer px-3 py-1.5 rounded-lg border border-green-400 bg-green-500/10 hover:bg-green-500/20 text-green-400 hover:text-green-300 transition"
                             >
                               👍
                             </button>
                             <button
                               onClick={() => sendFeedback(msg.id, "negative")}
                               title="Thumbs Down"
-                              className="text-red-400 hover:text-red-600 text-xl cursor-pointer"
+                              className="cursor-pointer px-3 py-1.5 rounded-lg border border-red-400 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition"
                             >
                               👎
                             </button>
@@ -520,6 +580,58 @@ function ChatPage() {
           )}
         </div>
       </div>
+      {showTableModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#1B2332] max-w-6xl w-full max-h-[90vh] overflow-y-auto rounded-xl p-6 border border-white/20 text-white">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Full Data</h2>
+              <button
+                onClick={() => setShowTableModal(false)}
+                className="cursor-pointer text-white/50 hover:text-red-400 text-xl"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full border-collapse text-sm text-white">
+                <thead className="bg-white/10 text-xs uppercase tracking-wider">
+                  <tr>
+                    {Object.keys(modalTableData[0] || {}).map((key) => (
+                      <th
+                        key={key}
+                        className="px-4 py-3 border-b border-white/10 text-left font-medium whitespace-nowrap"
+                      >
+                        {key.replace(/_/g, " ")}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {modalTableData.map((row, rIdx) => (
+                    <tr
+                      key={rIdx}
+                      className={
+                        rIdx % 2 === 0
+                          ? "bg-[#1B2332]"
+                          : "bg-[#232C41] hover:bg-[#2B3550] transition"
+                      }
+                    >
+                      {Object.values(row).map((val, cIdx) => (
+                        <td
+                          key={cIdx}
+                          className="px-4 py-2 border-b border-white/10 whitespace-nowrap"
+                        >
+                          {val}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-[#1B2332] border border-white/10 rounded-xl p-6 w-[300px] shadow-xl text-white text-center">

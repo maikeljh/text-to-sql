@@ -1,11 +1,8 @@
-import os
-
 from pydantic import BaseModel
 from typing import List, Optional
-from langchain_core.tools import tool
 from langgraph.graph import StateGraph, END
+from utils.enum import ENUM
 from text_to_sql.text_to_sql import TextToSQL
-from text_to_sql.core import GeneralLLM
 from text_to_sql.common import (
     Config,
     LLMConfig,
@@ -14,54 +11,11 @@ from text_to_sql.common import (
     QueryConfig,
 )
 
-# Configurations
-text_to_sql_config = Config(
-    max_retry_attempt=5,
-    rewriter_config=LLMConfig(
-        type="api",
-        model="gemini-1.5-flash",
-        provider="gemini",
-        api_key=os.getenv("API_KEY"),
-    ),
-    query_generator_config=LLMConfig(
-        type="api",
-        model="gemini-1.5-flash",
-        provider="gemini",
-        api_key=os.getenv("API_KEY"),
-    ),
-    schema_linker_config=SLConfig(
-        type="api",
-        model="gemini-1.5-flash",
-        provider="gemini",
-        api_key=os.getenv("API_KEY"),
-        schema_path="./files/metadata/sakila.json",
-    ),
-    retrieve_context_config=ContextConfig(
-        data_path="./files/dataset/dataset_sakila.csv"
-    ),
-    query_executor_config=QueryConfig(
-        host=os.getenv("DB_SOURCE_HOST"),
-        database=os.getenv("DB_SOURCE_DATABASE"),
-        user=os.getenv("DB_SOURCE_USER"),
-        password=os.getenv("DB_SOURCE_PASSWORD"),
-        port=os.getenv("DB_SOURCE_PORT"),
-    ),
-)
-
-general_config = LLMConfig(
-    type="api",
-    model="gemini-1.5-flash",
-    provider="gemini",
-    api_key=os.getenv("API_KEY"),
-)
-
-# Initialize agents
-text_to_sql = TextToSQL(config=text_to_sql_config)
-llm_agent = GeneralLLM(config=general_config)
-
 
 class AgentState(BaseModel):
     query: str
+    model: str
+    provider: str
     history: Optional[List[dict]] = []
     DetectIntent: Optional[str] = None
     CheckDetails: Optional[str] = None
@@ -80,7 +34,7 @@ def format_history(history, max_turns=5):
 
 
 # Tool: Detect if query is data-retrieval related (for text-to-SQL use case)
-def detect_intent_tool(state: AgentState) -> dict:
+def detect_intent_tool(state: AgentState, llm_agent) -> dict:
     query = state.query
 
     """
@@ -128,7 +82,7 @@ def detect_intent_tool(state: AgentState) -> dict:
 
 
 # Tool: Check if the query is specific enough for SQL generation
-def is_question_detailed_enough(state: AgentState) -> dict:
+def is_question_detailed_enough(state: AgentState, llm_agent) -> dict:
     """Check if the query is specific enough for SQL generation."""
     query = state.query
     history = state.history or []
@@ -155,6 +109,43 @@ def is_question_detailed_enough(state: AgentState) -> dict:
 def generate_sql_tool(state: AgentState) -> dict:
     """Generate SQL query from user input and update conversation history."""
     query = state.query
+
+    # Initialize text to sql model
+    text_to_sql_config = Config(
+        max_retry_attempt=5,
+        rewriter_config=LLMConfig(
+            type="api",
+            model=state.model,
+            provider=state.provider,
+            api_key=ENUM.get(state.provider, ""),
+        ),
+        query_generator_config=LLMConfig(
+            type="api",
+            model=state.model,
+            provider=state.provider,
+            api_key=ENUM.get(state.provider, ""),
+        ),
+        schema_linker_config=SLConfig(
+            type="api",
+            model=state.model,
+            provider=state.provider,
+            api_key=ENUM.get(state.provider, ""),
+            schema_path="./files/metadata/sakila.json",
+        ),
+        retrieve_context_config=ContextConfig(
+            data_path="./files/dataset/dataset_sakila.csv"
+        ),
+        query_executor_config=QueryConfig(
+            host=ENUM.get("DB_SOURCE_HOST", ""),
+            database=ENUM.get("DB_SOURCE_DATABASE", ""),
+            user=ENUM.get("DB_SOURCE_USER", ""),
+            password=ENUM.get("DB_SOURCE_PASSWORD", ""),
+            port=ENUM.get("DB_SOURCE_PORT", ""),
+        ),
+    )
+    text_to_sql = TextToSQL(config=text_to_sql_config)
+
+    # Generate SQL
     sql = text_to_sql.generate_v1(user_prompt=query, method="Multistage")
     result = text_to_sql.execute_query(sql)
 
@@ -162,7 +153,7 @@ def generate_sql_tool(state: AgentState) -> dict:
 
 
 # Tool: Summarize SQL execution result
-def summarize_data_tool(state: AgentState) -> dict:
+def summarize_data_tool(state: AgentState, llm_agent) -> dict:
     """Generate a natural language summary of the SQL result and update history."""
     query = state.query
     sql_output = state.GenerateSQL or {}
@@ -204,29 +195,30 @@ def summarize_data_tool(state: AgentState) -> dict:
 
 
 # Build workflow graph
-workflow = StateGraph(AgentState)
+def build_graph(llm_agent):
+    workflow = StateGraph(AgentState)
 
-workflow.add_node("DetectIntentTool", detect_intent_tool)
-workflow.add_node("CheckDetailsTool", is_question_detailed_enough)
-workflow.add_node("GenerateSQLTool", generate_sql_tool)
-workflow.add_node("SummarizeDataTool", summarize_data_tool)
+    workflow.add_node("DetectIntentTool", lambda state: detect_intent_tool(state, llm_agent))
+    workflow.add_node("CheckDetailsTool", lambda state: is_question_detailed_enough(state, llm_agent))
+    workflow.add_node("GenerateSQLTool", lambda state: generate_sql_tool(state))
+    workflow.add_node("SummarizeDataTool", lambda state: summarize_data_tool(state, llm_agent))
 
-workflow.add_conditional_edges(
-    "DetectIntentTool",
-    lambda x: x.DetectIntent,
-    {"data": "CheckDetailsTool", "other": END},
-)
+    workflow.add_conditional_edges(
+        "DetectIntentTool",
+        lambda x: x.DetectIntent,
+        {"data": "CheckDetailsTool", "other": END},
+    )
 
-workflow.add_conditional_edges(
-    "CheckDetailsTool",
-    lambda x: x.CheckDetails,
-    {"yes": "GenerateSQLTool", "no": END},
-)
+    workflow.add_conditional_edges(
+        "CheckDetailsTool",
+        lambda x: x.CheckDetails,
+        {"yes": "GenerateSQLTool", "no": END},
+    )
 
-workflow.add_edge("GenerateSQLTool", "SummarizeDataTool")
+    workflow.add_edge("GenerateSQLTool", "SummarizeDataTool")
 
-workflow.set_entry_point("DetectIntentTool")
-workflow.set_finish_point("SummarizeDataTool")
+    workflow.set_entry_point("DetectIntentTool")
+    workflow.set_finish_point("SummarizeDataTool")
 
-# Compile graph
-graph = workflow.compile()
+    # Compile graph
+    return workflow.compile()

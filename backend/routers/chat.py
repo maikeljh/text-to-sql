@@ -1,12 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ai_agent.ai_agent import AgentState, graph
+from ai_agent.ai_agent import AgentState, build_graph
 from models.models import User, ChatHistory, ChatMessage, ChatFeedback
 from models.schemas import QueryRequest, FeedbackRequest
 from database.db import get_db
 from utils.misc import generate_title
 from utils.auth import get_current_user_id
 from langdetect import detect
+from utils.enum import ENUM
+from text_to_sql.core import GeneralLLM
+from text_to_sql.common import LLMConfig
 
 import orjson
 
@@ -49,8 +52,20 @@ async def handle_query(
         for m in messages
     ]
 
+    # Configurations
+    general_config = LLMConfig(
+        type="api",
+        model=req.model,
+        provider=req.provider,
+        api_key=ENUM.get(req.provider, ""),
+    )
+
+    # Initialize agents
+    llm_agent = GeneralLLM(config=general_config)
+    graph = build_graph(llm_agent)
+
     # Invoke the agent graph
-    agent_input = AgentState(query=req.query, history=history)
+    agent_input = AgentState(query=req.query, history=history, model=req.model, provider=req.provider)
     result = graph.invoke(agent_input)
 
     # Extract final response and data

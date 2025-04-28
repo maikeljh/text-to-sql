@@ -15,7 +15,8 @@ class UserLogin(BaseModel):
 class QueryRequest(BaseModel):
     query: str
     chat_id: Optional[int] = None
-
+    model: str
+    provider: str
 
 class FeedbackRequest(BaseModel):
     message_id: int

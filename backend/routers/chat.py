@@ -6,7 +6,6 @@ from models.schemas import QueryRequest, FeedbackRequest
 from database.db import get_db
 from utils.misc import generate_title
 from utils.auth import get_current_user_id
-from langdetect import detect
 from utils.enum import ENUM
 from text_to_sql.core import GeneralLLM
 from text_to_sql.common import LLMConfig
@@ -69,17 +68,13 @@ async def handle_query(
     result = graph.invoke(agent_input)
 
     # Extract final response and data
+    lang = result.get("Language", "en")
     intent = result.get("DetectIntent", "")
     detail = result.get("CheckDetails", "")
     summary = result.get("Summary", "")
     data = result.get("GenerateSQL", [])
 
     # Compose final agent response
-    try:
-        lang = detect(req.query)
-    except:
-        lang = "en"
-
     if intent == "other":
         response = {
             "response": "Maaf, saya hanya bisa membantu pertanyaan terkait bisnis dan data." if lang == "id" else

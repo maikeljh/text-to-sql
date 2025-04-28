@@ -17,6 +17,7 @@ class AgentState(BaseModel):
     model: str
     provider: str
     history: Optional[List[dict]] = []
+    Language: Optional[str] = None
     DetectIntent: Optional[str] = None
     CheckDetails: Optional[str] = None
     GenerateSQL: Optional[str] = None
@@ -32,6 +33,28 @@ def format_history(history, max_turns=5):
         [f"User: {turn['user']}\nAgent: {turn['agent']}" for turn in recent_history]
     )
 
+# Tool: Detect language of query
+def detect_language_tool(state: AgentState, llm_agent) -> dict:
+    """Detect language (English or Indonesian) based on user query."""
+    query = state.query
+
+    system_prompt = """
+    You are an AI assistant specialized in language detection.
+    Your task is simple: Given a user query, return ONLY the detected language ISO code ('en' for English, 'id' for Indonesian).
+    No explanation, no decoration. Just one word output.
+
+    Examples:
+    "How are you today?" -> en
+    "Apa kabar hari ini?" -> id
+    """
+
+    result = llm_agent.generate(system_prompt=system_prompt.strip(), user_prompt=query)
+    lang = result.strip().lower()
+
+    if lang not in ["en", "id"]:
+        lang = "en"  # Default to English
+
+    return {"Language": lang}
 
 # Tool: Detect if query is data-retrieval related (for text-to-SQL use case)
 def detect_intent_tool(state: AgentState, llm_agent) -> dict:
@@ -198,26 +221,26 @@ def summarize_data_tool(state: AgentState, llm_agent) -> dict:
 def build_graph(llm_agent):
     workflow = StateGraph(AgentState)
 
+    workflow.add_node("DetectLanguageTool", lambda state: detect_language_tool(state, llm_agent))
     workflow.add_node("DetectIntentTool", lambda state: detect_intent_tool(state, llm_agent))
     workflow.add_node("CheckDetailsTool", lambda state: is_question_detailed_enough(state, llm_agent))
     workflow.add_node("GenerateSQLTool", lambda state: generate_sql_tool(state))
     workflow.add_node("SummarizeDataTool", lambda state: summarize_data_tool(state, llm_agent))
 
+    workflow.add_edge("DetectLanguageTool", "DetectIntentTool")
     workflow.add_conditional_edges(
         "DetectIntentTool",
         lambda x: x.DetectIntent,
         {"data": "CheckDetailsTool", "other": END},
     )
-
     workflow.add_conditional_edges(
         "CheckDetailsTool",
         lambda x: x.CheckDetails,
         {"yes": "GenerateSQLTool", "no": END},
     )
-
     workflow.add_edge("GenerateSQLTool", "SummarizeDataTool")
 
-    workflow.set_entry_point("DetectIntentTool")
+    workflow.set_entry_point("DetectLanguageTool")
     workflow.set_finish_point("SummarizeDataTool")
 
     # Compile graph

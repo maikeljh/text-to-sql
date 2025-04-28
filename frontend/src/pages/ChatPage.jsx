@@ -5,6 +5,12 @@ import { BiSearch, BiPlus } from "react-icons/bi";
 import { BsSoundwave } from "react-icons/bs";
 import toast from "react-hot-toast";
 
+const modelOptions = {
+  "gemini-1.5-flash": "gemini",
+  "gpt-4o": "openai",
+  "deepseek-chat": "deepseek",
+};
+
 function ChatPage() {
   const [query, setQuery] = useState("");
   const [historyList, setHistoryList] = useState([]);
@@ -16,6 +22,12 @@ function ChatPage() {
   const [targetChatId, setTargetChatId] = useState(null);
   const [showTableModal, setShowTableModal] = useState(false);
   const [modalTableData, setModalTableData] = useState([]);
+  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
+  const [selectedProvider, setSelectedProvider] = useState(
+    modelOptions["gemini-1.5-flash"]
+  );
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
   const messagesEndRef = useRef(null);
@@ -105,6 +117,8 @@ function ChatPage() {
           body: JSON.stringify({
             query,
             chat_id: selectedChat?.id || null,
+            model: selectedModel,
+            provider: selectedProvider,
           }),
         }
       );
@@ -338,6 +352,14 @@ function ChatPage() {
               ))}
             </div>
           ))}
+        </div>
+        <div className="mt-auto">
+          <button
+            onClick={() => setShowSettingsModal(true)}
+            className="cursor-pointer flex items-center justify-center w-full bg-white/10 hover:bg-white/20 text-white text-sm px-4 py-2 rounded-lg transition"
+          >
+            ⚙️ Settings
+          </button>
         </div>
       </aside>
 
@@ -652,6 +674,51 @@ function ChatPage() {
                 className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded text-sm cursor-pointer"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showSettingsModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#1B2332] border border-white/10 rounded-xl p-6 w-[300px] text-white shadow-xl">
+            <h3 className="text-lg font-semibold mb-4 text-center">Settings</h3>
+
+            <div className="mb-6">
+              <label className="block text-sm mb-1">Model</label>
+              <select
+                value={selectedModel}
+                onChange={(e) => {
+                  const model = e.target.value;
+                  setSelectedModel(model);
+                  setSelectedProvider(modelOptions[model]);
+                }}
+                className="cursor-pointer border-2 bg-[#1B2332] w-full p-2 rounded text-sm"
+              >
+                {Object.keys(modelOptions).map((modelKey) => (
+                  <option
+                    key={modelKey}
+                    value={modelKey}
+                  >
+                    {modelKey.replace(/-/g, " ")}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4 text-sm text-center text-white/60">
+              Provider:{" "}
+              <span className="text-white font-semibold">
+                {selectedProvider}
+              </span>
+            </div>
+
+            <div className="flex justify-center gap-4">
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                className="cursor-pointer bg-white/10 hover:bg-white/20 px-4 py-2 rounded text-sm"
+              >
+                Close
               </button>
             </div>
           </div>

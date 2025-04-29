@@ -32,7 +32,11 @@ class QueryExecutor:
         """
         cursor = self.connection.cursor()
         try:
-            cursor.execute(query, params)
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+
             if cursor.description is None:
                 return []
 

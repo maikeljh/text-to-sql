@@ -429,8 +429,7 @@ function ChatPage() {
                       }
                     }}
                     placeholder="Type here"
-                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-none"
-                    rows={1}
+                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-y min-h-[44px] max-h-[200px] overflow-y-auto"
                   />
                   <button
                     onClick={handleSend}
@@ -462,9 +461,15 @@ function ChatPage() {
                         msg.sender === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
-                      <div className="flex flex-col items-end max-w-[75%]">
+                      <div
+                        className={`flex flex-col ${
+                          msg.sender === "user"
+                            ? "items-end max-w-full sm:max-w-[75%]"
+                            : "items-start sm:max-w-[75%]"
+                        }`}
+                      >
                         <div
-                          className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-line text-left ${
+                          className={`px-4 py-3 rounded-2xl text-sm whitespace-pre-line break-words text-left ${
                             msg.sender === "user"
                               ? "bg-cyan-600"
                               : "bg-gray-700"
@@ -582,8 +587,7 @@ function ChatPage() {
                       }
                     }}
                     placeholder="Type here"
-                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-none"
-                    rows={1}
+                    className="flex-1 bg-transparent outline-none text-white placeholder:text-white/50 px-3 py-3 text-base resize-y min-h-[44px] max-h-[200px] overflow-y-auto"
                   />
                   <button
                     onClick={handleSend}
@@ -696,10 +700,7 @@ function ChatPage() {
                 className="cursor-pointer border-2 bg-[#1B2332] w-full p-2 rounded text-sm"
               >
                 {Object.keys(modelOptions).map((modelKey) => (
-                  <option
-                    key={modelKey}
-                    value={modelKey}
-                  >
+                  <option key={modelKey} value={modelKey}>
                     {modelKey.replace(/-/g, " ")}
                   </option>
                 ))}

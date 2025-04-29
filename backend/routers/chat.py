@@ -73,6 +73,7 @@ async def handle_query(
     detail = result.get("CheckDetails", "")
     summary = result.get("Summary", "")
     data = result.get("GenerateSQL", [])
+    generated_sql_query = result.get("GeneratedQueryRaw", None)
 
     # Compose final agent response
     if intent == "other":
@@ -99,6 +100,7 @@ async def handle_query(
         chat_id=chat.id,
         user_input=req.query,
         agent_response=orjson.dumps(response, default=str).decode(),
+        generated_query=generated_sql_query,
     )
     db.add(chat_msg)
     db.commit()

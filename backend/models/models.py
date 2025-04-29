@@ -33,6 +33,7 @@ class ChatMessage(Base):
     chat_id = Column(Integer, ForeignKey("chat_histories.id", ondelete="CASCADE"), nullable=False)
     user_input = Column(Text)
     agent_response = Column(Text)
+    generated_query = Column(Text, nullable=True)
     timestamp = Column(DateTime, server_default=func.now())
 
     chat = relationship("ChatHistory", back_populates="messages")

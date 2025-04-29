@@ -22,9 +22,9 @@ function ChatPage() {
   const [targetChatId, setTargetChatId] = useState(null);
   const [showTableModal, setShowTableModal] = useState(false);
   const [modalTableData, setModalTableData] = useState([]);
-  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useState("gemini-1.5-pro");
   const [selectedProvider, setSelectedProvider] = useState(
-    modelOptions["gemini-1.5-flash"]
+    modelOptions["gemini-1.5-pro"]
   );
   const [selectedDatabase, setSelectedDatabase] = useState("sakila");
   const [showSettingsModal, setShowSettingsModal] = useState(false);

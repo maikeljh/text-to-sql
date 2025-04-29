@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from langgraph.graph import StateGraph, END
 from utils.enum import ENUM
 from text_to_sql.text_to_sql import TextToSQL
@@ -21,8 +21,9 @@ class AgentState(BaseModel):
     Language: Optional[str] = None
     DetectIntent: Optional[str] = None
     CheckDetails: Optional[str] = None
-    GenerateSQL: Optional[str] = None
+    GenerateSQL: Optional[Dict[str, Any]] = None
     Summary: Optional[str] = None
+    GeneratedQueryRaw: Optional[str] = None
 
 
 # Format conversation history for context
@@ -207,7 +208,7 @@ def generate_sql_tool(state: AgentState) -> dict:
     sql = text_to_sql.generate_v1(user_prompt=query, method="Multistage")
     result = text_to_sql.execute_query(sql)
 
-    return {"GenerateSQL": result}
+    return {"GenerateSQL": result, "GeneratedQueryRaw": sql}
 
 
 # Tool: Summarize SQL execution result

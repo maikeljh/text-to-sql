@@ -6,8 +6,8 @@ import { BsSoundwave } from "react-icons/bs";
 import toast from "react-hot-toast";
 
 const modelOptions = {
-  "gemini-1.5-flash": "gemini",
-  "gpt-4o": "openai",
+  "gemini-1.5-pro": "gemini",
+  "gpt-4.1-mini": "openai",
   "deepseek-chat": "deepseek",
 };
 

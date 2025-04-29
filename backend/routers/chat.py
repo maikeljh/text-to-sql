@@ -64,7 +64,7 @@ async def handle_query(
     graph = build_graph(llm_agent)
 
     # Invoke the agent graph
-    agent_input = AgentState(query=req.query, history=history, model=req.model, provider=req.provider)
+    agent_input = AgentState(query=req.query, history=history, model=req.model, provider=req.provider, database=req.database)
     result = graph.invoke(agent_input)
 
     # Extract final response and data

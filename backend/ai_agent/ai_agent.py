@@ -16,6 +16,7 @@ class AgentState(BaseModel):
     query: str
     model: str
     provider: str
+    database: str
     history: Optional[List[dict]] = []
     Language: Optional[str] = None
     DetectIntent: Optional[str] = None
@@ -158,13 +159,13 @@ def generate_sql_tool(state: AgentState) -> dict:
         retrieve_context_config=ContextConfig(
             data_path="./files/dataset/dataset_sakila.csv"
         ),
-        query_executor_config=QueryConfig(
-            host=ENUM.get("DB_SOURCE_HOST", ""),
-            database=ENUM.get("DB_SOURCE_DATABASE", ""),
-            user=ENUM.get("DB_SOURCE_USER", ""),
-            password=ENUM.get("DB_SOURCE_PASSWORD", ""),
-            port=ENUM.get("DB_SOURCE_PORT", ""),
-        ),
+        query_executor_config = QueryConfig(
+            host=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_HOST", ""),
+            database=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_DATABASE", ""),
+            user=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_USER", ""),
+            password=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_PASSWORD", ""),
+            port=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_PORT", ""),
+        )
     )
     text_to_sql = TextToSQL(config=text_to_sql_config)
 

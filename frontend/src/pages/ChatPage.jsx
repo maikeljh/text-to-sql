@@ -26,6 +26,7 @@ function ChatPage() {
   const [selectedProvider, setSelectedProvider] = useState(
     modelOptions["gemini-1.5-flash"]
   );
+  const [selectedDatabase, setSelectedDatabase] = useState("sakila");
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const navigate = useNavigate();
@@ -119,6 +120,7 @@ function ChatPage() {
             chat_id: selectedChat?.id || null,
             model: selectedModel,
             provider: selectedProvider,
+            database: selectedDatabase,
           }),
         }
       );
@@ -687,6 +689,22 @@ function ChatPage() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-[#1B2332] border border-white/10 rounded-xl p-6 w-[300px] text-white shadow-xl">
             <h3 className="text-lg font-semibold mb-4 text-center">Settings</h3>
+
+            <div className="mb-6">
+              <label className="block text-sm mb-1">Database</label>
+              <select
+                value={selectedDatabase}
+                onChange={(e) => setSelectedDatabase(e.target.value)}
+                className="cursor-pointer border-2 bg-[#1B2332] w-full p-2 rounded text-sm"
+              >
+                <option value="sakila">Sakila</option>
+                <option value="northwind">Northwind</option>
+                <option value="academic">Academic</option>
+                <option value="soccer">Soccer</option>
+                <option value="tpc-ds">TPC-DS</option>
+                <option value="adventureworks">AdventureWorks</option>
+              </select>
+            </div>
 
             <div className="mb-6">
               <label className="block text-sm mb-1">Model</label>

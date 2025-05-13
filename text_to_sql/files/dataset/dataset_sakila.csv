@@ -108,21 +108,17 @@ GROUP BY
     a.last_name
 ORDER BY 
     total_revenue DESC;","This SQL query calculates and ranks actors by their total revenue generated from film rentals, joining five tables ('actor', 'film_actor', 'inventory', 'rental', and 'payment') through a series of INNER JOINs on key IDs. The primary operation is a SUM aggregation of payment amounts grouped by actor, with results ordered by total revenue in descending order. The query outputs each actor's ID, name, and cumulative revenue, providing valuable insights into which actors drive the most rental income. This analysis could inform contract negotiations, marketing strategies, or content acquisition decisions. The query could be modified to: 1) filter by date range to analyze revenue trends over time, 2) add average revenue per film to identify particularly valuable actors, or 3) include film categories to determine which genres generate the most revenue per actor. Potential business questions include identifying top-performing actors for contract renewals, understanding revenue distribution across the actor roster, or evaluating the financial return on actor investments.","How much total revenue has each actor generated from the movies they've appeared in by looking from the payments of all store? Show the actor ID, first name, last name, and total revenue, sorted from highest to lowest.","Berapa total pemasukan yang dihasilkan tiap aktor dari film yang mereka bintangi dengan melihat pembayaran di seluruh toko? Tampilkan ID aktor, nama depan, nama belakang, dan total pendapatannya, diurutkan dari yang paling besar.","['actor_id', 'first_name', 'last_name', 'total_revenue']"
-"Which store has the highest total revenue, and what is the name of the staff member managing that store?","SELECT 
-    s.store_id, 
-    CONCAT(st.first_name, ' ', st.last_name) AS manager_name, 
-    SUM(p.amount) AS total_revenue
+Which staff member has processed the highest total payment amount? Show their staff ID and the total amount.,"SELECT 
+    st.staff_id,
+    SUM(p.amount) AS total_amount_processed
 FROM 
-    store s
-JOIN staff st ON s.manager_staff_id = st.staff_id
-JOIN inventory i ON s.store_id = i.store_id
-JOIN rental r ON i.inventory_id = r.inventory_id
-JOIN payment p ON r.rental_id = p.rental_id
+    staff st
+JOIN payment p ON st.staff_id = p.staff_id
 GROUP BY 
-    s.store_id, manager_name
+    st.staff_id
 ORDER BY 
-    total_revenue DESC
-LIMIT 1;","This SQL query identifies the store with the highest total revenue by aggregating payment amounts across all transactions. It joins the 'store' table with 'staff' to retrieve the store manager's name and further joins 'inventory', 'rental', and 'payment' tables to track revenue. The result provides the store ID, manager's full name, and total revenue, sorted in descending order, returning only the top-performing store. Potential modifications include removing the LIMIT clause to rank all stores by revenue, filtering by date range to analyze revenue trends over time, or incorporating additional metrics such as average transaction value. This query is useful for answering questions about store performance, revenue distribution, and managerial impact on sales.","Which store has earned the most revenue, and what is the name of the staff member managing it?","Toko mana yang penghasilannya paling tinggi, dan siapa nama staf yang megang toko itu?","['store_id', 'manager_name']"
+    total_amount_processed DESC
+LIMIT 1;","This SQL query identifies the staff member who processed the highest total payment amount by joining the 'staff' and 'payment' tables on 'staff_id', then aggregating and summing payment amounts per staff member. The query groups results by staff_id, orders them by the total amount processed in descending order, and returns only the top performer. This is useful for performance analysis or incentive calculations. Key modifications could include: 1) adding a date filter to analyze performance for a specific period, 2) including staff names in the output for readability, or 3) calculating average transaction amounts alongside totals. The query could help answer questions like 'Which staff member handles the most payment volume?' or 'How does payment processing performance vary among staff?'",Which staff member handled the highest total payment? Just show their staff ID and the total amount they processed.,Siapa staf yang memproses pembayaran dengan total terbesar? Tampilkan ID staf dan total jumlah yang mereka proses.,"['staff_id', 'total_amount_processed']"
 "Which customers have rented the same film more than once? Show the customer ID, first name, last name, film title, and the number of times they rented it.","WITH customer_film_rentals AS (
     SELECT 
         r.customer_id, 

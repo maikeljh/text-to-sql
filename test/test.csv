@@ -1,0 +1,343 @@
+Question,Answer,Summary,Alternative Prompt 1 (English),Alternative Prompt 2 (Bahasa Indonesia),Expected Result
+"Find the top 5 products with the highest total sales revenue (unitprice * orderqty - unitpricediscount) across all sales, including productid, Name, total_revenue.","SELECT p.productid, p.""Name"", 
+  SUM(sod.unitprice * sod.orderqty - sod.unitpricediscount) AS total_revenue
+ FROM product p
+ JOIN salesorderdetail sod ON p.productid = sod.productid
+ GROUP BY p.productid, p.""Name""
+ ORDER BY total_revenue DESC
+ LIMIT 5;",,,,"['productid', 'Name', 'total_revenue']"
+"Get all customers who made more than 5 purchases with total spending over 5000, showing customerid, total_orders, total_spending.","SELECT c.customerid, COUNT(soh.salesorderid) AS total_orders,
+  SUM(soh.totaldue) AS total_spending
+ FROM customer c
+ JOIN salesorderheader soh ON c.customerid = soh.customerid
+ GROUP BY c.customerid
+ HAVING COUNT(soh.salesorderid) > 5 AND SUM(soh.totaldue) > 5000;",,,,"['customerid', 'total_orders', 'total_spending']"
+"Find the average cost and price difference per product category, including categoryid, categoryname, avg_cost, avg_price, and avg_diff.","SELECT pc.productcategoryid, pc.""Name"" AS categoryname,
+  AVG(p.standardcost) AS avg_cost,
+  AVG(p.listprice) AS avg_price,
+  AVG(p.listprice - p.standardcost) AS avg_diff
+ FROM product p
+ JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+ JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+ GROUP BY pc.productcategoryid, pc.""Name"";",,,,"['productcategoryid', 'categoryname', 'avg_cost', 'avg_price', 'avg_diff']"
+"Show top 3 vendors with the shortest average lead time for products, including vendor id, name, and avg_lead_time.","SELECT v.businessentityid, v.""Name"", AVG(pv.averageleadtime) AS avg_lead_time
+ FROM vendor v
+ JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+ GROUP BY v.businessentityid, v.""Name""
+ ORDER BY avg_lead_time ASC
+ LIMIT 3;",,,,"['businessentityid', 'Name', 'avg_lead_time']"
+"List all sales territories with sales difference between current and previous year greater than 10%, including territoryid, name, difference_percent.","SELECT st.territoryid, st.""Name"",
+  ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+ FROM salesterritory st
+ WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;",,,,"['territoryid', 'Name', 'difference_percent']"
+"Which product models have more than 2 associated product descriptions across cultures and include model id, model name, and description count? (Columns: productmodelid, Name, description_count)","SELECT pm.productmodelid, pm.""Name"", COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+ FROM productmodel pm
+ JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+ GROUP BY pm.productmodelid, pm.""Name""
+ HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;",,,,"['productmodelid', 'Name', 'description_count']"
+"List top 5 products that appear in both purchase and sales with the greatest price spread between purchase (max unitprice in purchaseorderdetail) and sales (min unitprice in salesorderdetail). (Columns: productid, max_purchase_price, min_sales_price, price_spread)","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+ ),
+ sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+ )
+ SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+ FROM purchase p
+ JOIN sales s ON p.productid = s.productid
+ ORDER BY price_spread DESC
+ LIMIT 5;",,,,"['productid', 'max_purchase_price', 'min_sales_price', 'price_spread']"
+"Determine which territories have the most consistent sales over years based on standard deviation of salespersonquotahistory. (Columns: territoryid, stddev_salesquota)","SELECT sp.territoryid,
+  STDDEV(sq.salesquota) AS stddev_salesquota
+ FROM salesperson sp
+ JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+ GROUP BY sp.territoryid
+ ORDER BY stddev_salesquota ASC
+ LIMIT 5;",,,,"['territoryid', 'stddev_salesquota']"
+Find all products whose cost has been steadily increasing in every historical record (monotonic increase). (Columns: productid),"SELECT productid
+ FROM (
+  SELECT productid,
+  standardcost,
+  LAG(standardcost) OVER (PARTITION BY productid ORDER BY startdate) AS prev_cost
+  FROM productcosthistory
+ ) t
+ GROUP BY productid
+ HAVING BOOL_AND(standardcost >= prev_cost);",,,,['productid']
+"List top 3 work orders that used the most actual resource hours per unit of stocked quantity. (Columns: workorderid, productid, ratio)","SELECT wr.workorderid, wr.productid,
+  SUM(wr.actualresourcehrs) / NULLIF(w.stockedqty, 0) AS ratio
+ FROM workorderrouting wr
+ JOIN workorder w ON wr.workorderid = w.workorderid AND wr.productid = w.productid
+ GROUP BY wr.workorderid, wr.productid, w.stockedqty
+ ORDER BY ratio DESC
+ LIMIT 3;",,,,"['workorderid', 'productid', 'ratio']"
+"Get the 3 ship methods with the highest average freight charge relative to subtotal in salesorderheader. (Columns: shipmethodid, avg_ratio)","SELECT shipmethodid,
+  AVG(freight / NULLIF(subtotal, 0)) AS avg_ratio
+ FROM salesorderheader
+ GROUP BY shipmethodid
+ ORDER BY avg_ratio DESC
+ LIMIT 3;",,,,"['shipmethodid', 'avg_ratio']"
+"Find top 5 credit cards by usage frequency, showing creditcardid and usage_count from personcreditcard. (Columns: creditcardid, usage_count)","SELECT creditcardid, COUNT(*) AS usage_count
+ FROM personcreditcard
+ GROUP BY creditcardid
+ ORDER BY usage_count DESC
+ LIMIT 5;",,,,"['creditcardid', 'usage_count']"
+"Identify product models that are linked to more than 1 illustration. Show productmodelid and illustration_count. (Columns: productmodelid, illustration_count)","SELECT productmodelid, COUNT(*) AS illustration_count
+ FROM productmodelillustration
+ GROUP BY productmodelid
+ HAVING COUNT(*) > 1;",,,,"['productmodelid', 'illustration_count']"
+"List employees who worked continuously in the same department for more than 2 years without a break. Show businessentityid, departmentid, total_days. (Columns: businessentityid, departmentid, total_days)","SELECT businessentityid, departmentid, 
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+FROM employeedepartmenthistory
+GROUP BY businessentityid, departmentid
+HAVING SUM(COALESCE(enddate, CURRENT_DATE) - startdate) > 730;",,,,
+"Identify vendors whose supplied products have the highest average unitprice in purchase order details. Show vendorid, avg_unitprice. (Columns: vendorid, avg_unitprice)","SELECT poh.vendorid, AVG(pod.unitprice) AS avg_unitprice
+ FROM purchaseorderheader poh
+ JOIN purchaseorderdetail pod ON poh.purchaseorderid = pod.purchaseorderid
+ GROUP BY poh.vendorid
+ ORDER BY avg_unitprice DESC
+ LIMIT 5;",,,,"['vendorid', 'avg_unitprice']"
+"List all products that have never been sold, never reviewed, and never appeared in a work order. (Columns: productid, Name)","SELECT p.productid, p.""Name""
+ FROM product p
+ LEFT JOIN salesorderdetail sod ON p.productid = sod.productid
+ LEFT JOIN productreview pr ON p.productid = pr.productid
+ LEFT JOIN workorder wo ON p.productid = wo.productid
+ WHERE sod.productid IS NULL AND pr.productid IS NULL AND wo.productid IS NULL;",,,,"['productid', 'Name']"
+"Find the top 5 product models with the widest average price range (difference between min and max list price across all history). (Columns: productmodelid, price_range)","SELECT p.productmodelid,
+  MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+ FROM product p
+ JOIN productlistpricehistory plph ON p.productid = plph.productid
+ GROUP BY p.productmodelid
+ ORDER BY price_range DESC
+ LIMIT 5;",,,,"['productmodelid', 'price_range']"
+"Which 5 currencies have the most volatile exchange rate (based on standard deviation of endofdayrate)? (Columns: currencycode, volatility)","SELECT currencycode, STDDEV(rate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+ ) AS rates
+ GROUP BY currencycode
+ ORDER BY volatility DESC
+ LIMIT 5;",,,,"['currencycode', 'volatility']"
+"List the top 3 employees with the most number of distinct jobtitles over time. (Columns: businessentityid, jobtitle_count)","SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count
+ FROM (
+  SELECT e.businessentityid, e.jobtitle, edh.startdate
+  FROM employee e
+  JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid
+ ) AS t
+ GROUP BY businessentityid
+ ORDER BY jobtitle_count DESC
+ LIMIT 3;",,,,"['businessentityid', 'jobtitle_count']"
+"Get the total number of documents grouped by their status and folderflag. (Columns: status, folderflag, total_docs)","SELECT status, folderflag, COUNT(*) AS total_docs
+ FROM ""Document""
+ GROUP BY status, folderflag;",,,,"['status', 'folderflag', 'total_docs']"
+"Find stores that are linked to employees who received the highest bonuses (Top 3). (Columns: store_name, employeeid, bonus)","SELECT s.""Name"" AS store_name, e.businessentityid AS employeeid, sp.bonus
+ FROM store s
+ JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+ JOIN employee e ON sp.businessentityid = e.businessentityid
+ ORDER BY sp.bonus DESC
+ LIMIT 3;",,,,"['store_name', 'employeeid', 'bonus']"
+"List products where weight is above average of their sizeunitmeasure group. (Columns: productid, Name, weight, avg_group_weight)","SELECT p.productid, p.""Name"", p.weight, avg_group.avg_weight AS avg_group_weight
+ FROM product p
+ JOIN (
+  SELECT sizeunitmeasurecode, AVG(weight) AS avg_weight
+  FROM product
+  WHERE weight IS NOT NULL
+  GROUP BY sizeunitmeasurecode
+ ) AS avg_group ON p.sizeunitmeasurecode = avg_group.sizeunitmeasurecode
+ WHERE p.weight > avg_group.avg_weight;",,,,"['productid', 'Name', 'weight', 'avg_group_weight']"
+"Identify top 5 products with the highest standard cost volatility over time using productcosthistory. Show productid, name, standardcost stddev, and count of records.","SELECT p.productid, p.""Name"",
+  STDDEV(pch.standardcost) AS cost_stddev,
+  COUNT(*) AS record_count
+FROM product p
+JOIN productcosthistory pch ON p.productid = pch.productid
+GROUP BY p.productid, p.""Name""
+ORDER BY cost_stddev DESC
+LIMIT 5;",,,,
+"List the top 10 products with the highest cumulative transaction cost from transactionhistory and transactionhistoryarchive. Show productid, name, total_cost.","SELECT p.productid, p.""Name"",
+  SUM(COALESCE(t.actualcost, 0)) + SUM(COALESCE(ta.actualcost, 0)) AS total_cost
+FROM product p
+LEFT JOIN transactionhistory t ON p.productid = t.productid
+LEFT JOIN transactionhistoryarchive ta ON p.productid = ta.productid
+GROUP BY p.productid, p.""Name""
+ORDER BY total_cost DESC
+LIMIT 10;",,,,
+Find employees who have changed departments the most throughout their employment. Show businessentityid and change_count.,"SELECT businessentityid,
+  COUNT(DISTINCT departmentid) AS change_count
+ FROM employeedepartmenthistory
+ GROUP BY businessentityid
+ ORDER BY change_count DESC
+ LIMIT 10;",,,,"['businessentityid', 'change_count']"
+Determine vendors who supplied the largest number of different products. Show businessentityid and product_count.,"SELECT businessentityid,
+  COUNT(DISTINCT productid) AS product_count
+ FROM productvendor
+ GROUP BY businessentityid
+ ORDER BY product_count DESC
+ LIMIT 10;",,,,"['businessentityid', 'product_count']"
+"Get average review rating and total reviews per product model. Show productmodelid, name, avg_rating, total_reviews.","SELECT pm.productmodelid, pm.""Name"",
+  AVG(pr.rating) AS avg_rating,
+  COUNT(pr.productreviewid) AS total_reviews
+FROM productmodel pm
+JOIN product p ON pm.productmodelid = p.productmodelid
+JOIN productreview pr ON p.productid = pr.productid
+GROUP BY pm.productmodelid, pm.""Name""
+ORDER BY avg_rating DESC
+LIMIT 10;",,,,
+"Find locations with the highest total actual cost from workorderrouting. Show locationid, name, total_actual_cost.","SELECT l.locationid, l.""Name"",
+  SUM(wr.actualcost) AS total_actual_cost
+FROM workorderrouting wr
+JOIN ""Location"" l ON wr.locationid = l.locationid
+GROUP BY l.locationid, l.""Name""
+ORDER BY total_actual_cost DESC
+LIMIT 10;",,,,
+Determine the average lead time per product category from productvendor and productsubcategory. Show category name and avg_leadtime.,"SELECT pc.""Name"" AS category_name,
+  AVG(pv.averageleadtime) AS avg_leadtime
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+JOIN productvendor pv ON p.productid = pv.productid
+GROUP BY pc.""Name""
+ORDER BY avg_leadtime DESC;",,,,
+Identify the top 5 customers with the highest number of sales orders. Show customerid and total_orders.,"SELECT customerid,
+  COUNT(*) AS total_orders
+ FROM salesorderheader
+ GROUP BY customerid
+ ORDER BY total_orders DESC
+ LIMIT 5;",,,,"['customerid', 'total_orders']"
+"List the most frequently used ship methods and their total usage count in sales orders. Show shipmethodid, name, usage_count.","SELECT s.shipmethodid, s.""Name"",
+  COUNT(*) AS usage_count
+FROM salesorderheader soh
+JOIN shipmethod s ON soh.shipmethodid = s.shipmethodid
+GROUP BY s.shipmethodid, s.""Name""
+ORDER BY usage_count DESC;",,,,
+"Find which product categories have products with the largest weight range. Show category name, min_weight, max_weight, weight_diff.","SELECT pc.""Name"" AS category_name,
+  MIN(p.weight) AS min_weight,
+  MAX(p.weight) AS max_weight,
+  MAX(p.weight) - MIN(p.weight) AS weight_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+WHERE p.weight IS NOT NULL
+GROUP BY pc.""Name""
+ORDER BY weight_diff DESC
+LIMIT 5;",,,,
+"List each salesperson’s full name and their highest single order total (totaldue), only for orders above 10000. Show salesperson_name and max_order_total.","SELECT 
+  CONCAT(p.firstname, ' ', p.lastname) AS salesperson_name,
+  MAX(soh.totaldue) AS max_order_total
+ FROM salesorderheader soh
+ JOIN salesperson sp ON soh.salespersonid = sp.businessentityid
+ JOIN person p ON sp.businessentityid = p.businessentityid
+ WHERE soh.totaldue > 10000
+ GROUP BY salesperson_name;",,,,"['salesperson_name', 'max_order_total']"
+Find the top 5 products with the highest average sales order quantity. Show product_id and avg_quantity.,"SELECT 
+  sod.productid,
+  AVG(sod.orderqty) AS avg_quantity
+ FROM salesorderdetail sod
+ GROUP BY sod.productid
+ ORDER BY avg_quantity DESC
+ LIMIT 5;",,,,"['productid', 'avg_quantity']"
+Show vendors who have provided more than 3 different products. Show vendor_id and num_products_supplied.,"SELECT 
+  pv.businessentityid AS vendor_id,
+  COUNT(DISTINCT pv.productid) AS num_products_supplied
+ FROM productvendor pv
+ GROUP BY vendor_id
+ HAVING COUNT(DISTINCT pv.productid) > 3;",,,,"['vendor_id', 'num_products_supplied']"
+Find employees who have changed departments at least twice. Show employee_id and department_change_count.,"SELECT 
+  edh.businessentityid AS employee_id,
+  COUNT(DISTINCT edh.departmentid) AS department_change_count
+ FROM employeedepartmenthistory edh
+ GROUP BY edh.businessentityid
+ HAVING COUNT(DISTINCT edh.departmentid) >= 2;",,,,"['employee_id', 'department_change_count']"
+List the customers whose sales orders include more than 3 different products. Show customer_id and num_distinct_products.,"SELECT 
+  soh.customerid,
+  COUNT(DISTINCT sod.productid) AS num_distinct_products
+ FROM salesorderheader soh
+ JOIN salesorderdetail sod ON soh.salesorderid = sod.salesorderid
+ GROUP BY soh.customerid
+ HAVING COUNT(DISTINCT sod.productid) > 3;",,,,"['customerid', 'num_distinct_products']"
+Show the most common ship methods for orders over 5000 totaldue. Show shipmethod_name and num_orders.,"SELECT 
+  sm.""Name"" AS shipmethod_name,
+  COUNT(*) AS num_orders
+FROM salesorderheader soh
+JOIN shipmethod sm ON soh.shipmethodid = sm.shipmethodid
+WHERE soh.totaldue > 5000
+GROUP BY sm.""Name""
+ORDER BY num_orders DESC;",,,,
+Identify the top 5 products with the highest cost fluctuations. Show product_id and cost_variance.,"SELECT 
+  pch.productid,
+  MAX(pch.standardcost) - MIN(pch.standardcost) AS cost_variance
+ FROM productcosthistory pch
+ GROUP BY pch.productid
+ ORDER BY cost_variance DESC
+ LIMIT 5;",,,,"['productid', 'cost_variance']"
+"Find the top 5 employees with the longest cumulative duration across all departments they've worked in. Show businessentityid, total_days.","SELECT businessentityid,
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+  FROM employeedepartmenthistory
+  GROUP BY businessentityid
+  ORDER BY total_days DESC
+  LIMIT 5;",,,,
+"List the top 5 products with the highest discrepancy between standard cost and average purchase unit price. Show productid, standard_cost, avg_purchase_price, cost_diff.","SELECT p.productid, p.standardcost, AVG(pod.unitprice) AS avg_purchase_price,
+  ABS(p.standardcost - AVG(pod.unitprice)) AS cost_diff
+  FROM product p
+  JOIN purchaseorderdetail pod ON p.productid = pod.productid
+  GROUP BY p.productid, p.standardcost
+  ORDER BY cost_diff DESC
+  LIMIT 5;",,,,
+Find products that appear in work orders and sales orders but not in purchase orders. Show productid and total_workorders.,"SELECT wo.productid, COUNT(*) AS total_workorders
+  FROM workorder wo
+  WHERE wo.productid IN (
+  SELECT sod.productid FROM salesorderdetail sod
+  ) AND wo.productid NOT IN (
+  SELECT pod.productid FROM purchaseorderdetail pod
+  )
+  GROUP BY wo.productid;",,,,
+"Find top 5 customers with most frequently used credit cards. Show customerid, creditcardid, usage_count.","SELECT soh.customerid, soh.creditcardid, COUNT(*) AS usage_count
+  FROM salesorderheader soh
+  WHERE soh.creditcardid IS NOT NULL
+  GROUP BY soh.customerid, soh.creditcardid
+  ORDER BY usage_count DESC
+  LIMIT 5;",,,,
+List top 5 product categories with the most diverse subcategories. Show productcategoryid and subcategory_count.,"SELECT productcategoryid, COUNT(*) AS subcategory_count
+  FROM productsubcategory
+  GROUP BY productcategoryid
+  ORDER BY subcategory_count DESC
+  LIMIT 5;",,,,
+"Find top 5 products with the longest time span between list price changes. Show productid, days_span.","SELECT productid,
+  MAX(startdate) - MIN(startdate) AS days_span
+  FROM productlistpricehistory
+  GROUP BY productid
+  ORDER BY days_span DESC
+  LIMIT 5;",,,,
+"List the top 5 employees who have the longest cumulative department tenure (total days worked across all departments). Show businessentityid and total_days_worked. (Columns: businessentityid, total_days_worked)","SELECT edh.businessentityid,
+  SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days_worked
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.businessentityid
+  ORDER BY total_days_worked DESC
+  LIMIT 5;",,,,
+List top 5 departments with the longest cumulative employee tenure. Show departmentid and total_days.,"SELECT edh.departmentid,
+       SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days
+FROM employeedepartmenthistory edh
+GROUP BY edh.departmentid
+ORDER BY total_days DESC
+LIMIT 5;",,,,
+List the top 5 most active employees based on the number of work orders they handled. Show businessentityid and workorder_count.,"SELECT e.businessentityid, COUNT(DISTINCT wo.workorderid) AS workorder_count
+FROM employee e
+JOIN workorder wo ON e.businessentityid = wo.productid
+GROUP BY e.businessentityid
+ORDER BY workorder_count DESC
+LIMIT 5;",,,,
+"List the product categories with the highest number of distinct products sold in sales orders. Show productcategoryid, Name, product_count.","SELECT pc.productcategoryid, pc.""Name"", COUNT(DISTINCT sod.productid) AS product_count
+  FROM salesorderdetail sod
+  JOIN product p ON sod.productid = p.productid
+  JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+  JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+  GROUP BY pc.productcategoryid, pc.""Name""
+  ORDER BY product_count DESC
+  LIMIT 5;",,,,
+Find the top 5 departments with the most total employment history records. Show departmentid and total_records.,"SELECT edh.departmentid, COUNT(*) AS total_records
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.departmentid
+  ORDER BY total_records DESC
+  LIMIT 5;",,,,

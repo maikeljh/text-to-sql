@@ -1,0 +1,256 @@
+--
+-- Name: asst_referee_mast; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE asst_referee_mast (
+ID smallint,
+ass_ref_id numeric(6,1) DEFAULT NULL::numeric,
+ass_ref_name character varying(24) DEFAULT NULL::character varying,
+country_id numeric(5,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: coach_mast; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE coach_mast (
+ID smallint,
+coach_id numeric(5,1) DEFAULT NULL::numeric,
+coach_name character varying(19) DEFAULT NULL::character varying
+);
+
+
+--
+-- Name: goal_details; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE goal_details (
+ID smallint,
+goal_id numeric(4,1) DEFAULT NULL::numeric,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+player_id numeric(7,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+goal_time numeric(4,1) DEFAULT NULL::numeric,
+goal_type character varying(1) DEFAULT NULL::character varying,
+play_stage character varying(1) DEFAULT NULL::character varying,
+goal_schedule character varying(2) DEFAULT NULL::character varying,
+goal_half numeric(2,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: match_captain; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE match_captain (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+player_captain numeric(7,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: match_details; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE match_details (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+play_stage character varying(1) DEFAULT NULL::character varying,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+win_lose character varying(1) DEFAULT NULL::character varying,
+decided_by character varying(1) DEFAULT NULL::character varying,
+goal_score numeric(2,1) DEFAULT NULL::numeric,
+penalty_score character varying(1) DEFAULT NULL::character varying,
+ass_ref numeric(6,1) DEFAULT NULL::numeric,
+player_gk numeric(7,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: match_mast; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE match_mast (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+play_stage character varying(1) DEFAULT NULL::character varying,
+play_date character varying(19) DEFAULT NULL::character varying,
+results character varying(4) DEFAULT NULL::character varying,
+decided_by character varying(1) DEFAULT NULL::character varying,
+goal_score character varying(6) DEFAULT NULL::character varying,
+venue_id numeric(6,1) DEFAULT NULL::numeric,
+referee_id numeric(6,1) DEFAULT NULL::numeric,
+audence numeric(6,1) DEFAULT NULL::numeric,
+plr_of_match numeric(7,1) DEFAULT NULL::numeric,
+stop1_sec numeric(4,1) DEFAULT NULL::numeric,
+stop2_sec numeric(4,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: penalty_gk; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE penalty_gk (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+player_gk numeric(7,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: penalty_shootout; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE penalty_shootout (
+ID smallint,
+kick_id numeric(3,1) DEFAULT NULL::numeric,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+player_id numeric(7,1) DEFAULT NULL::numeric,
+score_goal character varying(1) DEFAULT NULL::character varying,
+kick_no numeric(3,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: player_booked; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE player_booked (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+player_id numeric(7,1) DEFAULT NULL::numeric,
+booking_time numeric(4,1) DEFAULT NULL::numeric,
+sent_off character varying(1) DEFAULT NULL::character varying,
+play_schedule character varying(2) DEFAULT NULL::character varying,
+play_half numeric(2,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: player_in_out; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE player_in_out (
+ID smallint,
+match_no numeric(3,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+player_id numeric(7,1) DEFAULT NULL::numeric,
+in_out character varying(1) DEFAULT NULL::character varying,
+time_in_out numeric(4,1) DEFAULT NULL::numeric,
+play_schedule character varying(2) DEFAULT NULL::character varying,
+play_half numeric(2,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: player_mast; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE player_mast (
+ID smallint,
+player_id numeric(7,1) DEFAULT NULL::numeric,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+jersey_no numeric(3,1) DEFAULT NULL::numeric,
+player_name character varying(22) DEFAULT NULL::character varying,
+posi_to_play character varying(2) DEFAULT NULL::character varying,
+dt_of_bir character varying(19) DEFAULT NULL::character varying,
+age numeric(3,1) DEFAULT NULL::numeric,
+playing_club character varying(19) DEFAULT NULL::character varying
+);
+
+
+--
+-- Name: playing_position; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE playing_position (
+position_id character varying(3) NOT NULL,
+position_desc character varying(50) NOT NULL
+);
+
+
+--
+-- Name: referee_mast; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE referee_mast (
+ID smallint,
+referee_id numeric(6,1) DEFAULT NULL::numeric,
+referee_name character varying(23) DEFAULT NULL::character varying,
+country_id numeric(5,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: soccer_city; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE soccer_city (
+ID smallint,
+city_id numeric(6,1) DEFAULT NULL::numeric,
+city character varying(13) DEFAULT NULL::character varying,
+country_id numeric(5,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: soccer_country; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE soccer_country (
+ID smallint,
+country_id numeric(5,1) DEFAULT NULL::numeric,
+country_abbr character varying(3) DEFAULT NULL::character varying,
+country_name character varying(19) DEFAULT NULL::character varying
+);
+
+
+--
+-- Name: soccer_team; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE soccer_team (
+ID smallint,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+team_group character varying(1) DEFAULT NULL::character varying,
+match_played numeric(2,1) DEFAULT NULL::numeric,
+won numeric(2,1) DEFAULT NULL::numeric,
+draw numeric(2,1) DEFAULT NULL::numeric,
+lost numeric(2,1) DEFAULT NULL::numeric,
+goal_for numeric(2,1) DEFAULT NULL::numeric,
+goal_agnst numeric(2,1) DEFAULT NULL::numeric,
+goal_diff numeric(2,1) DEFAULT NULL::numeric,
+points numeric(2,1) DEFAULT NULL::numeric,
+group_position numeric(2,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: soccer_venue; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE soccer_venue (
+ID smallint,
+venue_id numeric(6,1) DEFAULT NULL::numeric,
+venue_name character varying(23) DEFAULT NULL::character varying,
+city_id numeric(6,1) DEFAULT NULL::numeric,
+aud_capacity numeric(6,1) DEFAULT NULL::numeric
+);
+
+
+--
+-- Name: team_coaches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE team_coaches (
+ID smallint,
+team_id numeric(5,1) DEFAULT NULL::numeric,
+coach_id numeric(5,1) DEFAULT NULL::numeric
+);

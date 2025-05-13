@@ -1,4 +1,4 @@
-from text_to_sql.common import ContextConfig
+from common import ContextConfig
 from typing import Dict, List, Any
 from sentence_transformers import SentenceTransformer, util
 

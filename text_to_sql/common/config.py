@@ -36,16 +36,18 @@ class SLConfig(LLMConfig):
         model: str = "",
         provider: str = "",
         schema_path: Dict = None,
+        metadata_path: Dict = None,
     ):
         super().__init__(type, api_key, model_path, use_gpu, model, provider)
-        self.schema_path = schema_path if schema_path is not None else {}
+        self.schema_path = schema_path if schema_path is not None else ""
+        self.metadata_path = metadata_path if metadata_path is not None else ""
 
     def __repr__(self):
         return (
             f"SLConfig(type={self.type}, provider={self.provider}, "
             f"model={self.model}, use_gpu={self.use_gpu}, "
             f"model_path={self.model_path}, api_key={'****' if self.api_key else 'None'}, "
-            f"schema_path={self.schema_path})"
+            f"schema_path={self.schema_path}, metadata_path={self.metadata_path})"
         )
 
 

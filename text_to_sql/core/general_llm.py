@@ -1,4 +1,4 @@
-from text_to_sql.common import LLMConfig, APIModel, LocalModel
+from common import LLMConfig, APIModel, LocalModel
 
 
 class GeneralLLM:

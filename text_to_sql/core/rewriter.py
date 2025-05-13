@@ -1,4 +1,4 @@
-from text_to_sql.common import LLMConfig
+from common import LLMConfig
 from .base_llm import BaseLLM
 
 

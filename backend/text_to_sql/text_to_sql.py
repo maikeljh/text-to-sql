@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -190,15 +191,33 @@ class TextToSQL:
             )
         return query
 
-    def evaluate(self, query, true_query):
+    def clean_sql_query(self, query: str) -> str:
+        query = re.sub(r"```sql|```", "", query, flags=re.IGNORECASE)
+        query = re.sub(r"--.*", "", query)
+        query = re.sub(r"\n\s*\n", "\n", query).strip()
+        
+        return query
+
+    def evaluate(self, query, true_query, expected_columns):
         try:
+            query = self.clean_sql_query(query)
+            true_query = self.clean_sql_query(true_query)
+
             predicted_result = self.query_executor.execute_query(query)
             expected_result = self.query_executor.execute_query(true_query)
+
+            filtered_expected_result = [
+                {col: row[col] for col in expected_columns if col in row}
+                for row in expected_result
+            ]
+
             acc = self.evaluator.calculate_accuracy(
-                expected=expected_result, actual=predicted_result
+                expected=filtered_expected_result,
+                actual=predicted_result
             )
             return acc
-        except:
+        except Exception as e:
+            print(f"Evaluation error: {e}")
             return 0.0
 
     def execute_query(self, query: str):

@@ -1,0 +1,1513 @@
+Processing Question 1.1: Can you give me actors whose first name is Scarlett?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT * FROM actor WHERE first_name = 'Scarlett';
+Execution Accuracy: 1.0000
+
+Processing Question 1.2: Aktor siapa aja yang nama depannya 'Scarlett'?
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Generated SQL Query: SELECT first_name, last_name FROM actor WHERE first_name = 'Scarlett';
+Execution Accuracy: 1.0000
+
+Processing Question 2.1: Hey, how many unique last names do we have among actors?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT COUNT(DISTINCT last_name) FROM actor;
+Execution Accuracy: 1.0000
+
+Processing Question 2.2: Ada berapa banyak nama belakang aktor yang berbeda?
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Generated SQL Query: SELECT COUNT(DISTINCT last_name) FROM actor;
+Execution Accuracy: 1.0000
+
+Processing Question 3.1: Who is the actor that shows up in the most movies?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a.first_name, a.last_name FROM actor a JOIN film_actor fa ON a.actor_id = fa.actor_id GROUP BY a.actor_id ORDER BY count(*) DESC LIMIT 1;
+Execution Accuracy: 1.0000
+
+Processing Question 3.2: Aktor mana yang muncul di film paling banyak?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a.first_name, a.last_name FROM actor a JOIN film_actor fa ON a.actor_id = fa.actor_id GROUP BY a.actor_id ORDER BY count(*) DESC LIMIT 1;
+Execution Accuracy: 1.0000
+
+Processing Question 4.1: What are the top 5 movie genres based on total revenue?
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Generated SQL Query: SELECT c.name, SUM(p.amount) AS total_revenue
+FROM payment p
+JOIN rental r ON p.rental_id = r.rental_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+GROUP BY c.name
+ORDER BY total_revenue DESC
+LIMIT 5;
+Execution Accuracy: 1.0000
+
+Processing Question 4.2: Genre film apa yang paling besar total penghasilannya? Kasih 5 teratas ya.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.name, SUM(p.amount) AS total_revenue
+FROM payment p
+JOIN rental r ON p.rental_id = r.rental_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+GROUP BY c.name
+ORDER BY total_revenue DESC
+LIMIT 5;
+Execution Accuracy: 1.0000
+
+Processing Question 5.1: How much money has each store made from rentals?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN staff st ON s.manager_staff_id = st.staff_id
+JOIN rental r ON st.staff_id = r.staff_id
+JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY s.store_id;
+Execution Accuracy: 0.0000
+
+Processing Question 5.2: Tiap toko dapet pemasukan berapa dari rental?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN rental r ON s.store_id = r.staff_id
+JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY s.store_id;
+Execution Accuracy: 0.0000
+
+Processing Question 6.1: What language is most commonly used in our movies?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT name FROM language WHERE language_id = (SELECT language_id FROM film GROUP BY language_id ORDER BY COUNT(*) DESC LIMIT 1);
+Execution Accuracy: 1.0000
+
+Processing Question 6.2: Bahasa apa yang paling sering dipakai di film?
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT l.name
+FROM film f
+JOIN language l ON f.language_id = l.language_id
+GROUP BY l.name
+ORDER BY COUNT(*) DESC
+LIMIT 1;
+Execution Accuracy: 1.0000
+
+Processing Question 7.1: Who are the top 5 customers based on how many movies they've rented? Show the customer ID, first name, last name, and number of rented movies.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) AS number_of_rentals
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+GROUP BY 
+    c.customer_id, c.first_name, c.last_name
+ORDER BY 
+    number_of_rentals DESC
+LIMIT 5;
+Execution Accuracy: 1.0000
+
+Processing Question 7.2: Siapa 5 pelanggan yang paling sering nyewa film? Tampilkan ID pelanggan, nama depan, nama belakang, dan jumlah film yang disewa.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) AS total_rentals
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+GROUP BY 
+    c.customer_id, c.first_name, c.last_name
+ORDER BY 
+    total_rentals DESC
+LIMIT 5;
+Execution Accuracy: 1.0000
+
+Processing Question 8.1: Which customers have rented from more than 3 categories? Show the customer ID, first name, last name, and the number of categories they've rented from.
+Related Tables: {'staff', 'category', 'store', 'film', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(DISTINCT fc.category_id) AS num_categories_rented
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    film f ON i.film_id = f.film_id
+JOIN 
+    film_category fc ON f.film_id = fc.film_id
+GROUP BY 
+    c.customer_id, c.first_name, c.last_name
+HAVING 
+    COUNT(DISTINCT fc.category_id) > 3;
+Execution Accuracy: 1.0000
+
+Processing Question 8.2: Pelanggan mana aja yang udah nyewa film dari lebih dari 3 kategori? Tampilkan ID pelanggan, nama depan, nama belakang, dan jumlah kategori yang disewa.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(DISTINCT fc.category_id) AS total_categories_rented
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT fc.category_id) > 3;
+Execution Accuracy: 1.0000
+
+Processing Question 9.1: Are there any movies in our collection that no one has ever rented? I need the film ID, title, and release year.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.film_id, f.title, f.release_year FROM film f LEFT JOIN inventory i ON f.film_id = i.film_id LEFT JOIN rental r ON i.inventory_id = r.inventory_id WHERE r.rental_id IS NULL;
+Execution Accuracy: 1.0000
+
+Processing Question 9.2: Film apa aja yang belum pernah disewa sama sekali? Aku butuh film ID, judul, dan tahun rilis
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, EXTRACT(YEAR FROM f.last_update) AS release_year
+FROM film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL;
+Execution Accuracy: 1.0000
+
+Processing Question 10.1: How much total revenue has each actor generated based on the movies they were in? Show the actor ID, first name, last name, and total revenue.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    a.actor_id,
+    a.first_name,
+    a.last_name,
+    SUM(f.rental_rate) as total_revenue
+FROM 
+    actor a
+JOIN 
+    film_actor fa ON a.actor_id = fa.actor_id
+JOIN 
+    film f ON fa.film_id = f.film_id
+GROUP BY 
+    a.actor_id, a.first_name, a.last_name
+ORDER BY 
+    total_revenue DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 10.2: Berapa total pemasukan dari tiap aktor, berdasarkan film yang mereka bintangi? Tampilkan ID aktor, nama depan, nama belakang, dan total pendapatan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    a.actor_id,
+    a.first_name,
+    a.last_name,
+    SUM(f.rental_rate) AS total_revenue
+FROM 
+    actor a
+JOIN 
+    film_actor fa ON a.actor_id = fa.actor_id
+JOIN 
+    film f ON fa.film_id = f.film_id
+GROUP BY 
+    a.actor_id, a.first_name, a.last_name
+ORDER BY 
+    a.actor_id;
+Execution Accuracy: 0.0000
+
+Processing Question 11.1: Which store has earned the most revenue, and what is the name of the staff member managing it?
+Related Tables: {'staff', 'store', 'address', 'country', 'city'}
+Generated SQL Query: SELECT s.store_id, s.first_name, s.last_name
+FROM staff s
+JOIN store st ON s.staff_id = st.manager_staff_id
+ORDER BY st.store_id DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 11.2: Toko mana yang penghasilannya paling tinggi, dan siapa nama staf yang megang toko itu?
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Generated SQL Query: SELECT s.first_name, s.last_name, SUM(p.amount) AS total_revenue
+FROM staff s
+JOIN store st ON s.staff_id = st.manager_staff_id
+JOIN payment p ON st.store_id = p.staff_id
+GROUP BY s.staff_id, s.first_name, s.last_name
+ORDER BY total_revenue DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 12.1: Which customers have rented the same film more than once? Show the customer ID, first name, last name, film title, and the number of times they rented it.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name, f.title, COUNT(*) AS rental_count
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+GROUP BY c.customer_id, c.first_name, c.last_name, f.title
+HAVING COUNT(*) > 1
+ORDER BY c.customer_id, rental_count DESC;
+Execution Accuracy: 1.0000
+
+Processing Question 12.2: Siapa aja pelanggan yang nyewa film yang sama lebih dari sekali? Tampilkan ID pelanggan, nama depan, nama belakang, judul film, dan jumlah penyewaan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    f.title,
+    COUNT(*) AS rental_count
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    film f ON i.film_id = f.film_id
+GROUP BY 
+    c.customer_id, c.first_name, c.last_name, f.title
+HAVING 
+    COUNT(*) > 1;
+Execution Accuracy: 1.0000
+
+Processing Question 13.1: Which high replacement cost movies are also in the top 5 most rented categories? Show the film ID, title, replacement cost, and category name.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: WITH Top5Categories AS (
+  SELECT
+    category_id,
+    COUNT(*) AS rental_count
+  FROM rental
+  JOIN inventory
+    ON rental.inventory_id = inventory.inventory_id
+  JOIN film_category
+    ON inventory.film_id = film_category.film_id
+  GROUP BY
+    category_id
+  ORDER BY
+    rental_count DESC
+  LIMIT 5
+), HighReplacementCostFilms AS (
+  SELECT
+    film_id,
+    title,
+    replacement_cost
+  FROM film
+  WHERE
+    replacement_cost > (
+      SELECT
+        AVG(replacement_cost)
+      FROM film
+    )
+)
+SELECT
+  hrcf.film_id,
+  hrcf.title,
+  hrcf.replacement_cost,
+  c.name AS category_name
+FROM HighReplacementCostFilms AS hrcf
+JOIN film_category AS fc
+  ON hrcf.film_id = fc.film_id
+JOIN category AS c
+  ON fc.category_id = c.category_id
+JOIN Top5Categories AS t5c
+  ON fc.category_id = t5c.category_id
+ORDER BY
+  hrcf.replacement_cost DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 13.2: Film apa yang biaya gantinya paling mahal dan masuk 5 kategori film yang paling sering disewa? Tampilkan ID film, judul, biaya ganti, dan nama kategori.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, f.replacement_cost, c.name AS category_name
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+WHERE c.category_id IN (SELECT category_id FROM film_category GROUP BY category_id ORDER BY COUNT(*) DESC LIMIT 5)
+ORDER BY f.replacement_cost DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 14.1: Which pairs of actors have worked together in the most films? Show the pairs of actors and the number of films they've appeared in together.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a1.first_name || ' ' || a1.last_name AS actor1, a2.first_name || ' ' || a2.last_name AS actor2, COUNT(*) AS films_together
+FROM film_actor AS fa1
+JOIN actor AS a1 ON fa1.actor_id = a1.actor_id
+JOIN film AS f ON fa1.film_id = f.film_id
+JOIN film_actor AS fa2 ON f.film_id = fa2.film_id
+JOIN actor AS a2 ON fa2.actor_id = a2.actor_id
+WHERE a1.actor_id < a2.actor_id
+GROUP BY actor1, actor2
+ORDER BY films_together DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 14.2: Pasangan aktor mana aja yang paling sering main bareng? Tampilkan pasangan aktor dan jumlah film yang mereka mainkan bersama.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a1.first_name || ' ' || a1.last_name AS actor1, a2.first_name || ' ' || a2.last_name AS actor2, COUNT(*) AS num_films FROM film_actor AS fa1 JOIN actor AS a1 ON fa1.actor_id = a1.actor_id JOIN film_actor AS fa2 ON fa1.film_id = fa2.film_id JOIN actor AS a2 ON fa2.actor_id = a2.actor_id WHERE fa1.actor_id < fa2.actor_id GROUP BY actor1, actor2 ORDER BY num_films DESC LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 15.1: Which movies are in the top 10% by total revenue? Show the film ID, title, and total revenue.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: column reference "film_id" is ambiguous
+LINE 3:     film_id,
+            ^
+
+Generated SQL Query: WITH FilmRevenue AS (
+  SELECT
+    film_id,
+    title,
+    SUM(amount) AS total_revenue
+  FROM film
+  JOIN inventory
+    ON film.film_id = inventory.film_id
+  JOIN rental
+    ON inventory.inventory_id = rental.inventory_id
+  GROUP BY
+    film_id,
+    title
+), Top10PercentRevenue AS (
+  SELECT
+    total_revenue
+  FROM FilmRevenue
+  ORDER BY
+    total_revenue DESC
+  LIMIT
+    (
+      SELECT
+        CAST(COUNT(*) AS REAL) * 0.1
+      FROM FilmRevenue
+    )
+)
+SELECT
+  fr.film_id,
+  fr.title,
+  fr.total_revenue
+FROM FilmRevenue fr
+JOIN Top10PercentRevenue tpr
+  ON fr.total_revenue >= tpr.total_revenue
+ORDER BY
+  fr.total_revenue DESC;
+Error executing query: column reference "film_id" is ambiguous
+LINE 3:     film_id,
+            ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 15.2: Film apa aja yang masuk 10% teratas berdasarkan pendapatan? Tampilkan ID film, judul, dan total pendapatan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: column reference "film_id" is ambiguous
+LINE 1: SELECT film_id, title, SUM(amount) AS total_revenue
+               ^
+
+Generated SQL Query: SELECT film_id, title, SUM(amount) AS total_revenue
+FROM film
+JOIN inventory ON film.film_id = inventory.film_id
+JOIN rental ON inventory.inventory_id = rental.inventory_id
+GROUP BY film_id, title
+ORDER BY total_revenue DESC
+LIMIT (SELECT COUNT(*) FROM film) / 10;
+Error executing query: column reference "film_id" is ambiguous
+LINE 1: SELECT film_id, title, SUM(amount) AS total_revenue
+               ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 16.1: Which customers have rented every film in a specific category (e.g., 'Action')? Show the customer ID, first name, and last name.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+WHERE cat.name = 'Action'
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT f.film_id) = (SELECT COUNT(DISTINCT film_id) FROM film_category WHERE category_id = (SELECT category_id FROM category WHERE name = 'Action'));
+Execution Accuracy: 1.0000
+
+Processing Question 16.2: Siapa pelanggan yang sudah menyewa semua film dalam satu genre (misalnya genre 'Action')? Tampilkan ID pelanggan, nama depan, dan nama belakang.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+WHERE cat.name = 'Action'
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT f.film_id) = (SELECT COUNT(*) FROM film f2 JOIN film_category fc2 ON f2.film_id = fc2.film_id JOIN category cat2 ON fc2.category_id = cat2.category_id WHERE cat2.name = 'Action');
+Execution Accuracy: 1.0000
+
+Processing Question 17.1: Which movies have the highest average rental duration per customer? Show the film ID, title, and average rental duration.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Error executing query: function datediff(unknown, timestamp without time zone, timestamp without time zone) does not exist
+LINE 1: SELECT f.film_id, f.title, AVG(DATEDIFF('day', r.rental_date...
+                                       ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Generated SQL Query: SELECT f.film_id, f.title, AVG(DATEDIFF('day', r.rental_date, r.return_date)) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC;
+Error executing query: function datediff(unknown, timestamp without time zone, timestamp without time zone) does not exist
+LINE 1: SELECT f.film_id, f.title, AVG(DATEDIFF('day', r.rental_date...
+                                       ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Execution Accuracy: 0.0000
+
+Processing Question 17.2: Film mana yang rata-rata waktu sewanya paling lama per pelanggan? Tampilkan ID film, judul, dan rata-rata durasi sewa.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Error executing query: column "day" does not exist
+LINE 1: SELECT f.film_id, f.title, AVG(DATEDIFF(day, r.rental_date, ...
+                                                ^
+
+Generated SQL Query: SELECT f.film_id, f.title, AVG(DATEDIFF(day, r.rental_date, r.return_date)) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC
+LIMIT 1;
+Error executing query: column "day" does not exist
+LINE 1: SELECT f.film_id, f.title, AVG(DATEDIFF(day, r.rental_date, ...
+                                                ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 18.1: Which staff members have processed the most payments, and what is the total amount they've processed? Show the staff ID, first name, last name, and total amount.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'payment', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT s.staff_id, s.first_name, s.last_name, SUM(p.amount) AS total_amount_processed
+FROM staff s
+JOIN payment p ON s.staff_id = p.staff_id
+GROUP BY s.staff_id, s.first_name, s.last_name
+ORDER BY total_amount_processed DESC;
+Execution Accuracy: 1.0000
+
+Processing Question 18.2: Staf mana yang paling banyak memproses pembayaran, dan berapa total yang mereka proses? Tampilkan ID staf, nama depan, nama belakang, dan total jumlahnya.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'payment', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT staff.staff_id, first_name, last_name, COUNT(*) AS total_payments
+FROM staff
+JOIN payment ON staff.staff_id = payment.staff_id
+GROUP BY staff.staff_id, first_name, last_name
+ORDER BY total_payments DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 19.1: Which films have never been rented but are in the top 5 most popular categories? Show the film ID, title, and category name.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.film_id, f.title, c.name AS category_name
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL
+AND c.category_id IN (SELECT category_id FROM film_category GROUP BY category_id ORDER BY COUNT(*) DESC LIMIT 5)
+ORDER BY c.name;
+Execution Accuracy: 0.0000
+
+Processing Question 19.2: Film apa saja yang belum pernah disewa tapi termasuk dalam 5 kategori paling populer? Tampilkan ID film, judul, dan nama kategori.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, c.name
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+WHERE i.inventory_id IS NULL
+AND c.category_id IN (SELECT category_id FROM film_category GROUP BY category_id ORDER BY COUNT(*) DESC LIMIT 5);
+Execution Accuracy: 0.0000
+
+Processing Question 20.1: Which customers have rented films from all categories? Show the customer ID, first name, and last name.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT cat.category_id) = (SELECT COUNT(*) FROM category);
+Execution Accuracy: 1.0000
+
+Processing Question 20.2: Siapa aja pelanggan yang sudah nyewa film dari semua kategori? Tampilkan ID pelanggan, nama depan, dan nama belakang.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film_category fc ON i.film_id = fc.film_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT fc.category_id) = (SELECT COUNT(*) FROM category);
+Execution Accuracy: 1.0000
+
+Processing Question 21.1: Which films have the highest revenue per day of rental? Show the film ID, title, and revenue per day.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: WITH FilmRentals AS (
+  SELECT
+    f.film_id,
+    f.title,
+    COUNT(r.rental_id) AS total_rentals,
+    SUM(p.amount) AS total_revenue,
+    MAX(r.rental_date) - MIN(r.rental_date) AS rental_period
+  FROM film AS f
+  JOIN inventory AS i
+    ON f.film_id = i.film_id
+  JOIN rental AS r
+    ON i.inventory_id = r.inventory_id
+  JOIN payment AS p
+    ON r.rental_id = p.rental_id
+  GROUP BY
+    f.film_id,
+    f.title
+), RevenuePerDay AS (
+  SELECT
+    film_id,
+    title,
+    total_revenue / EXTRACT(DAY FROM rental_period) AS revenue_per_day
+  FROM FilmRentals
+  WHERE
+    EXTRACT(DAY FROM rental_period) > 0
+)
+SELECT
+  film_id,
+  title,
+  revenue_per_day
+FROM RevenuePerDay
+ORDER BY
+  revenue_per_day DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 21.2: Film mana yang penghasilannya paling tinggi per hari sewa? Tampilkan ID film, judul, dan pendapatan per hari.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, SUM(p.amount) / COUNT(DISTINCT r.rental_date) AS average_daily_revenue
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY f.film_id, f.title
+ORDER BY average_daily_revenue DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 22.1: Which films have the longest and shortest rental durations in each category? Show the category name, film title, and rental duration.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: WITH FilmRentalDuration AS (
+  SELECT
+    fc.category_id,
+    f.title,
+    f.rental_duration
+  FROM film AS f
+  JOIN film_category AS fc
+    ON f.film_id = fc.film_id
+), RankedRentalDuration AS (
+  SELECT
+    fr.category_id,
+    fr.title,
+    fr.rental_duration,
+    RANK() OVER (PARTITION BY fr.category_id ORDER BY fr.rental_duration DESC) AS longest_rank,
+    RANK() OVER (PARTITION BY fr.category_id ORDER BY fr.rental_duration ASC) AS shortest_rank
+  FROM FilmRentalDuration AS fr
+)
+SELECT
+  c.name AS category_name,
+  rrd.title AS film_title,
+  rrd.rental_duration
+FROM RankedRentalDuration AS rrd
+JOIN category AS c
+  ON rrd.category_id = c.category_id
+WHERE
+  rrd.longest_rank = 1
+  OR rrd.shortest_rank = 1
+ORDER BY
+  c.name,
+  rrd.longest_rank;
+Execution Accuracy: 1.0000
+
+Processing Question 22.2: Untuk tiap kategori, film mana yang punya durasi sewa terpanjang dan terpendek? Tampilkan nama kategori, judul film, dan durasi sewa.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: WITH FilmDurations AS (
+  SELECT
+    c.name AS category_name,
+    f.title AS film_title,
+    f.rental_rate AS rental_duration
+  FROM category AS c
+  JOIN film_category AS fc
+    ON c.category_id = fc.category_id
+  JOIN film AS f
+    ON fc.film_id = f.film_id
+), RankedDurations AS (
+  SELECT
+    category_name,
+    film_title,
+    rental_duration,
+    ROW_NUMBER() OVER (PARTITION BY category_name ORDER BY rental_duration ASC) AS rn_asc,
+    ROW_NUMBER() OVER (PARTITION BY category_name ORDER BY rental_duration DESC) AS rn_desc
+  FROM FilmDurations
+)
+SELECT
+  category_name,
+  MAX(CASE WHEN rn_asc = 1 THEN film_title END) AS shortest_film,
+  MIN(CASE WHEN rn_asc = 1 THEN rental_duration END) AS shortest_duration,
+  MAX(CASE WHEN rn_desc = 1 THEN film_title END) AS longest_film,
+  MAX(CASE WHEN rn_desc = 1 THEN rental_duration END) AS longest_duration
+FROM RankedDurations
+GROUP BY
+  category_name
+ORDER BY
+  category_name;
+Execution Accuracy: 0.0000
+
+Processing Question 23.1: Which customers have rented films from exactly 2 categories? Show the customer ID, first name, last name, and the categories they've rented from.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name, GROUP_CONCAT(DISTINCT cat.name) AS categories_rented
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT cat.category_id) = 2;
+Execution Accuracy: 1.0000
+
+Processing Question 23.2: Ada gak pelanggan yang nyewa film dari tepat 2 kategori? Tampilkan ID pelanggan, nama depan, nama belakang, dan daftar kategorinya.
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Generated SQL Query: SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    string_agg(cat.name, ', ') AS categories
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    film f ON i.film_id = f.film_id
+JOIN 
+    film_category fc ON f.film_id = fc.film_id
+JOIN 
+    category cat ON fc.category_id = cat.category_id
+GROUP BY 
+    c.customer_id, c.first_name, c.last_name
+HAVING 
+    COUNT(DISTINCT cat.category_id) = 2;
+Execution Accuracy: 1.0000
+
+Processing Question 24.1: Which films have been rented more than the average number of rentals for their category? Show the film ID, title, category name, and rental count.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.film_id, f.title, c.name AS category_name, COUNT(r.rental_id) AS rental_count
+FROM film f
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title, c.name
+HAVING COUNT(r.rental_id) > (
+    SELECT AVG(rental_count) FROM (
+        SELECT COUNT(r.rental_id) AS rental_count
+        FROM film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        GROUP BY f.film_id
+    ) AS AverageRentalCounts
+);
+Execution Accuracy: 0.0000
+
+Processing Question 24.2: Film mana yang disewa lebih banyak dari rata-rata di kategori-nya? Tampilkan ID film, judul, nama kategori, dan jumlah penyewaannya.
+Related Tables: {'staff', 'category', 'film', 'store', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: WITH CategoryRentalCounts AS (
+  SELECT
+    fc.category_id,
+    f.film_id,
+    f.title,
+    COUNT(r.rental_id) AS rental_count,
+    AVG(COUNT(r.rental_id)) OVER (PARTITION BY fc.category_id) AS avg_rental_count
+  FROM film_category AS fc
+  JOIN film AS f
+    ON fc.film_id = f.film_id
+  JOIN inventory AS i
+    ON f.film_id = i.film_id
+  JOIN rental AS r
+    ON i.inventory_id = r.inventory_id
+  GROUP BY
+    fc.category_id,
+    f.film_id,
+    f.title
+)
+SELECT
+  crc.film_id,
+  crc.title,
+  c.name AS category_name,
+  crc.rental_count
+FROM CategoryRentalCounts AS crc
+JOIN category AS c
+  ON crc.category_id = c.category_id
+WHERE
+  crc.rental_count > crc.avg_rental_count
+ORDER BY
+  crc.category_id,
+  crc.rental_count DESC;
+Execution Accuracy: 1.0000
+
+Processing Question 25.1: Which actors have never appeared in a film with a rating of 'R'? Show the actor ID, first name, and last name.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a.actor_id, a.first_name, a.last_name
+FROM actor a
+LEFT JOIN film_actor fa ON a.actor_id = fa.actor_id
+LEFT JOIN film f ON fa.film_id = f.film_id
+WHERE f.rating <> 'R'
+GROUP BY a.actor_id, a.first_name, a.last_name
+HAVING COUNT(CASE WHEN f.rating = 'R' THEN 1 END) = 0;
+Execution Accuracy: 0.0000
+
+Processing Question 25.2: Aktor mana yang belum pernah main di film dengan rating 'R'? Tampilkan ID aktor, nama depan, dan nama belakang.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT a.actor_id, a.first_name, a.last_name
+FROM actor a
+LEFT JOIN film_actor fa ON a.actor_id = fa.actor_id
+LEFT JOIN film f ON fa.film_id = f.film_id
+WHERE f.rating <> 'R'
+GROUP BY a.actor_id, a.first_name, a.last_name
+HAVING count(CASE WHEN f.rating = 'R' THEN 1 END) = 0;
+Execution Accuracy: 0.0000
+
+Processing Question 26.1: Which films have the highest replacement cost but have never been rented? Show the film ID, title, and replacement cost.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.film_id, f.title, f.replacement_cost
+FROM film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL
+ORDER BY f.replacement_cost DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 26.2: Film apa yang biaya gantinya paling mahal tapi belum pernah disewa? Tampilkan ID film, judul, dan biaya ganti.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT film_id, title, replacement_cost
+FROM film
+WHERE film_id NOT IN (SELECT film_id FROM inventory)
+ORDER BY replacement_cost DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 27.1: Which customers have rented films from all stores? Show the customer ID, first name, and last name.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN store s ON i.store_id = s.store_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT s.store_id) = (SELECT COUNT(*) FROM store);
+Execution Accuracy: 1.0000
+
+Processing Question 27.2: Siapa pelanggan yang sudah nyewa dari semua toko? Tampilkan ID pelanggan, nama depan, dan nama belakang.
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'inventory', 'payment', 'film_text', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Error executing query: column r.store_id does not exist
+LINE 5: HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM st...
+                              ^
+HINT:  Perhaps you meant to reference the column "c.store_id".
+
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM store);
+Error executing query: column r.store_id does not exist
+LINE 5: HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM st...
+                              ^
+HINT:  Perhaps you meant to reference the column "c.store_id".
+
+Execution Accuracy: 0.0000
+
+Processing Question 28.1: Which films have been rented in all stores? Show the film ID, title, and the number of stores it was rented in.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, COUNT(DISTINCT i.store_id) AS num_stores_rented
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+HAVING COUNT(DISTINCT i.store_id) = (SELECT COUNT(*) FROM store);
+Execution Accuracy: 1.0000
+
+Processing Question 28.2: Film mana yang sudah pernah disewa di semua toko? Tampilkan ID film, judul, dan jumlah toko tempat film itu disewa.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, COUNT(DISTINCT i.store_id) AS total_stores
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+GROUP BY f.film_id, f.title
+HAVING COUNT(DISTINCT i.store_id) = (SELECT COUNT(*) FROM store);
+Execution Accuracy: 1.0000
+
+Processing Question 29.1: Which films have the highest revenue per minute of runtime? Show the film ID, title, runtime, and revenue per minute.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT film_id, title, length, rental_rate / length AS revenue_per_minute
+FROM film
+ORDER BY revenue_per_minute DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 29.2: Film mana yang punya pendapatan paling tinggi per menit durasi? Tampilkan ID film, judul, durasi, dan pendapatan per menit.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT film_id, title, length, rental_rate / length AS revenue_per_minute
+FROM film
+ORDER BY revenue_per_minute DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 30.1: Which customers have rented films from every actor in a specific film (e.g., film_id = 1)? Show the customer ID, first name, and last name.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_actor fa ON f.film_id = fa.film_id
+WHERE f.film_id = 1
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT fa.actor_id) = (SELECT COUNT(DISTINCT actor_id) FROM film_actor WHERE film_id = 1);
+Execution Accuracy: 0.0000
+
+Processing Question 30.2: Siapa pelanggan yang nyewa dari semua aktor di film tertentu (misalnya ID film = 1)? Tampilkan ID pelanggan, nama depan, dan nama belakang.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.customer_id, c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film_actor fa ON i.film_id = fa.film_id
+WHERE i.film_id = 1
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT fa.actor_id) = (SELECT COUNT(*) FROM film_actor WHERE film_id = 1);
+Execution Accuracy: 0.0000
+
+Processing Question 31.1: Which films have the highest number of actors but have never been rented? Show the film ID, title, and number of actors.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'customer', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.film_id, f.title, COUNT(fa.actor_id) AS num_actors
+FROM film f
+JOIN film_actor fa ON f.film_id = fa.film_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL
+GROUP BY f.film_id, f.title
+ORDER BY num_actors DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 31.2: Film mana yang punya jumlah aktor terbanyak tapi belum pernah disewa? Tampilkan ID film, judul, dan jumlah aktor.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.film_id, f.title, COUNT(fa.actor_id) AS actor_count
+FROM film f
+LEFT JOIN film_actor fa ON f.film_id = fa.film_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+WHERE i.inventory_id IS NULL
+GROUP BY f.film_id, f.title
+ORDER BY actor_count DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 32.1: Which movies have the longest runtime but have never been rented? Show the movie title and runtime.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, f.length FROM film f LEFT JOIN inventory i ON f.film_id = i.film_id LEFT JOIN rental r ON i.inventory_id = r.inventory_id WHERE r.rental_id IS NULL ORDER BY f.length DESC LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 32.2: Film apa yang durasinya paling panjang tapi belum pernah disewa? Tampilkan judul film dan durasi.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, f.length FROM film f LEFT JOIN inventory i ON f.film_id = i.film_id WHERE i.inventory_id IS NULL ORDER BY f.length DESC LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 33.1: Which customers have rented the most movies in a single day? Show the customer name and the number of movies rented on that day.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: WITH DailyRentals AS (
+  SELECT 
+    customer_id,
+    rental_date::DATE AS rental_day,
+    COUNT(*) AS movies_rented
+  FROM rental
+  GROUP BY customer_id, rental_day
+),
+MaxDailyRentals AS (
+  SELECT 
+    customer_id,
+    MAX(movies_rented) AS max_movies_rented
+  FROM DailyRentals
+  GROUP BY customer_id
+)
+SELECT 
+  c.first_name || ' ' || c.last_name AS customer_name,
+  mdr.max_movies_rented AS max_movies_rented_in_a_day
+FROM customer c
+JOIN MaxDailyRentals mdr ON c.customer_id = mdr.customer_id
+ORDER BY mdr.max_movies_rented DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 33.2: Siapa pelanggan yang nyewa film terbanyak dalam satu hari? Tampilkan nama pelanggan dan jumlah film yang disewa hari itu.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.first_name, c.last_name, COUNT(r.rental_id) AS total_rentals
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+ORDER BY total_rentals DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 34.1: Which movies have been rented more than 10 times but have never been returned late? Show the movie title and number of rentals.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Error executing query: subquery uses ungrouped column "i.inventory_id" from outer query
+LINE 7: ... (SELECT 1 FROM rental r2 WHERE r2.inventory_id = i.inventor...
+                                                             ^
+
+Generated SQL Query: SELECT f.title, COUNT(r.rental_id) AS num_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.title
+HAVING COUNT(r.rental_id) > 10
+AND NOT EXISTS (SELECT 1 FROM rental r2 WHERE r2.inventory_id = i.inventory_id AND r2.return_date > r2.rental_date + INTERVAL '7 day');
+Error executing query: subquery uses ungrouped column "i.inventory_id" from outer query
+LINE 7: ... (SELECT 1 FROM rental r2 WHERE r2.inventory_id = i.inventor...
+                                                             ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 34.2: Film apa yang disewa lebih dari 10 kali tapi gak pernah telat dikembalikan? Tampilkan judul film dan jumlah penyewaannya.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: subquery uses ungrouped column "f.film_id" from outer query
+LINE 11:     WHERE i2.film_id = f.film_id
+                                ^
+
+Generated SQL Query: SELECT f.title, COUNT(r.rental_id) AS total_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.title
+HAVING COUNT(r.rental_id) > 10
+AND NOT EXISTS (
+    SELECT 1
+    FROM rental r2
+    JOIN inventory i2 ON r2.inventory_id = i2.inventory_id
+    WHERE i2.film_id = f.film_id
+    AND r2.return_date IS NULL
+);
+Error executing query: subquery uses ungrouped column "f.film_id" from outer query
+LINE 11:     WHERE i2.film_id = f.film_id
+                                ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 35.1: Which staff members have processed the most payments on weekends? Show the staff name and the number of payments processed.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'payment', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT s.first_name || ' ' || s.last_name AS staff_name, COUNT(*) AS num_payments
+FROM staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY staff_name
+ORDER BY num_payments DESC;
+Execution Accuracy: 1.0000
+
+Processing Question 35.2: Staf mana yang paling banyak memproses pembayaran saat akhir pekan? Tampilkan nama staf dan jumlah pembayaran yang diproses.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'payment', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT s.first_name, s.last_name, COUNT(p.payment_id) AS total_payments
+FROM staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE EXTRACT(DOW FROM p.payment_date) IN (0, 6) -- 0: Sunday, 6: Saturday
+GROUP BY s.staff_id, s.first_name, s.last_name
+ORDER BY total_payments DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 36.1: Which movies have the highest revenue but the lowest rental rate? Show the movie title, rental rate, and total revenue.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Error executing query: column p.inventory_id does not exist
+LINE 4: JOIN payment p ON i.inventory_id = p.inventory_id
+                                           ^
+HINT:  Perhaps you meant to reference the column "i.inventory_id".
+
+Generated SQL Query: SELECT f.title, f.rental_rate, SUM(p.amount) AS total_revenue
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN payment p ON i.inventory_id = p.inventory_id
+GROUP BY f.film_id, f.title, f.rental_rate
+ORDER BY f.rental_rate ASC, total_revenue DESC
+LIMIT 1;
+Error executing query: column p.inventory_id does not exist
+LINE 4: JOIN payment p ON i.inventory_id = p.inventory_id
+                                           ^
+HINT:  Perhaps you meant to reference the column "i.inventory_id".
+
+Execution Accuracy: 0.0000
+
+Processing Question 36.2: Film mana yang pendapatannya tinggi tapi harga sewanya rendah? Tampilkan judul film, harga sewa, dan total pendapatan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, f.rental_rate, SUM(p.amount) AS total_revenue
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY f.film_id, f.title, f.rental_rate
+HAVING f.rental_rate < (SELECT AVG(rental_rate) FROM film)
+ORDER BY total_revenue DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 37.1: Which customers have rented movies from every store but have never rented a movie with a rating of 'R'? Show the customer full name.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT cu.first_name, cu.last_name
+FROM customer cu
+JOIN rental r ON cu.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+WHERE f.rating != 'R'
+GROUP BY cu.customer_id, cu.first_name, cu.last_name
+HAVING COUNT(DISTINCT i.store_id) = (SELECT COUNT(*) FROM store);
+Execution Accuracy: 0.0000
+
+Processing Question 37.2: Ada pelanggan yang sudah nyewa dari semua toko tapi gak pernah nyewa film dengan rating 'R'? Tampilkan nama lengkap pelanggan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    customer.first_name || ' ' || customer.last_name AS full_name
+FROM 
+    customer
+JOIN
+    rental ON customer.customer_id = rental.customer_id
+JOIN
+    inventory ON rental.inventory_id = inventory.inventory_id
+JOIN
+    film ON inventory.film_id = film.film_id
+GROUP BY 
+    full_name
+HAVING 
+    COUNT(DISTINCT rental.staff_id) = (SELECT COUNT(*) FROM staff) AND SUM(CASE WHEN film.rating = 'R' THEN 1 ELSE 0 END) = 0;
+Execution Accuracy: 1.0000
+
+Processing Question 38.1: Which movies have been rented by customers from more than 5 different cities? Show the movie title and the number of cities.
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'film_text', 'inventory', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Error executing query: relation "film_text" does not exist
+LINE 2: FROM film_text ft
+             ^
+
+Generated SQL Query: SELECT ft.title, COUNT(DISTINCT c.city_id) AS number_of_cities
+FROM film_text ft
+JOIN inventory i ON ft.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer cu ON r.customer_id = cu.customer_id
+JOIN address a ON cu.address_id = a.address_id
+JOIN city c ON a.city_id = c.city_id
+GROUP BY ft.title
+HAVING COUNT(DISTINCT c.city_id) > 5;
+Error executing query: relation "film_text" does not exist
+LINE 2: FROM film_text ft
+             ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 38.2: Film mana yang disewa oleh pelanggan dari lebih dari 5 kota? Tampilkan judul film dan jumlah kotanya.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: table name "c" specified more than once
+
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.city_id) AS city_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+JOIN address a ON c.address_id = a.address_id
+JOIN city c ON a.city_id = c.city_id
+GROUP BY f.title
+HAVING COUNT(DISTINCT c.city_id) > 5;
+Error executing query: table name "c" specified more than once
+
+Execution Accuracy: 0.0000
+
+Processing Question 39.1: Which movies have the highest number of actors but have never been rented? Show the movie title and number of actors.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, COUNT(fa.actor_id) AS num_actors
+FROM film f
+JOIN film_actor fa ON f.film_id = fa.film_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE r.rental_id IS NULL
+GROUP BY f.title
+ORDER BY num_actors DESC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 39.2: Film mana yang punya banyak aktor tapi belum pernah disewa? Tampilkan judul film dan jumlah aktor.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, COUNT(fa.actor_id) AS actor_count
+FROM film f
+LEFT JOIN film_actor fa ON f.film_id = fa.film_id
+LEFT JOIN inventory i ON f.film_id = i.film_id
+WHERE i.inventory_id IS NULL
+GROUP BY f.title
+HAVING COUNT(fa.actor_id) > 1;
+Execution Accuracy: 0.0000
+
+Processing Question 40.1: Which customers have rented the same movie more than once in a single month? Show the customer name, movie title, and the number of times rented.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Error executing query: function strftime(unknown, timestamp without time zone) does not exist
+LINE 8: GROUP BY customer_name, movie_title, strftime('%Y-%m', r.ren...
+                                             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Generated SQL Query: SELECT c.first_name || ' ' || c.last_name AS customer_name,
+       f.title AS movie_title,
+       COUNT(*) AS rental_count
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+GROUP BY customer_name, movie_title, strftime('%Y-%m', r.rental_date)
+HAVING COUNT(*) > 1
+ORDER BY customer_name, movie_title;
+Error executing query: function strftime(unknown, timestamp without time zone) does not exist
+LINE 8: GROUP BY customer_name, movie_title, strftime('%Y-%m', r.ren...
+                                             ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Execution Accuracy: 0.0000
+
+Processing Question 40.2: Ada pelanggan yang nyewa film yang sama lebih dari sekali dalam bulan yang sama? Tampilkan nama pelanggan, judul film, dan jumlah penyewaan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT c.first_name || ' ' || c.last_name AS customer_name,
+       f.title AS film_title,
+       COUNT(*) AS rental_count
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+GROUP BY customer_name, film_title
+HAVING COUNT(*) > 1;
+Execution Accuracy: 0.0000
+
+Processing Question 41.1: Which movies have been rented by customers from every country? Show the movie title and the number of countries.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.country_id) AS num_countries
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer cu ON r.customer_id = cu.customer_id
+JOIN address a ON cu.address_id = a.address_id
+JOIN city ci ON a.city_id = ci.city_id
+JOIN country c ON ci.country_id = c.country_id
+GROUP BY f.title
+HAVING COUNT(DISTINCT c.country_id) = (SELECT COUNT(*) FROM country);
+Execution Accuracy: 1.0000
+
+Processing Question 41.2: Film mana yang disewa oleh pelanggan dari semua negara? Tampilkan judul film dan jumlah negara.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.country_id) AS number_of_countries
+FROM film AS f
+JOIN inventory AS i ON f.film_id = i.film_id
+JOIN rental AS r ON i.inventory_id = r.inventory_id
+JOIN customer AS cu ON r.customer_id = cu.customer_id
+JOIN address AS a ON cu.address_id = a.address_id
+JOIN city AS ci ON a.city_id = ci.city_id
+JOIN country AS c ON ci.country_id = c.country_id
+GROUP BY f.title
+ORDER BY number_of_countries DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 42.1: Which movies have been rented the most during holidays (e.g., December)? Show the movie title and the number of rentals.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, COUNT(r.rental_id) AS num_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY f.title
+ORDER BY num_rentals DESC;
+Execution Accuracy: 1.0000
+
+Processing Question 42.2: Film mana yang paling sering disewa saat libur (misalnya bulan Desember)? Tampilkan judul film dan jumlah penyewaan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, COUNT(r.rental_id) AS total_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY f.title
+ORDER BY total_rentals DESC
+LIMIT 1;
+Execution Accuracy: 1.0000
+
+Processing Question 43.1: Which customers have rented movies from every category but have never rented a movie with a replacement cost over $20? Show the customer full name.
+Related Tables: {'staff', 'category', 'store', 'film', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT cat.category_id) = (SELECT COUNT(*) FROM category)
+AND MAX(f.replacement_cost) <= 20;
+Execution Accuracy: 1.0000
+
+Processing Question 43.2: Ada pelanggan yang nyewa dari semua kategori tapi gak pernah nyewa film dengan biaya ganti di atas $20? Tampilkan nama lengkap pelanggan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    customer.first_name || ' ' || customer.last_name AS full_name
+FROM 
+    customer
+JOIN 
+    rental ON customer.customer_id = rental.customer_id
+JOIN 
+    inventory ON rental.inventory_id = inventory.inventory_id
+JOIN 
+    film ON inventory.film_id = film.film_id
+JOIN 
+    film_category ON film.film_id = film_category.film_id
+JOIN 
+    category ON film_category.category_id = category.category_id
+GROUP BY 
+    full_name
+HAVING 
+    COUNT(DISTINCT category.category_id) = (SELECT COUNT(*) FROM category)
+    AND MAX(film.replacement_cost) <= 20;
+Execution Accuracy: 1.0000
+
+Processing Question 44.1: Which movies have the highest number of rentals but the lowest replacement cost? Show the movie title, replacement cost, and number of rentals.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: WITH MovieRentalCounts AS (
+  SELECT 
+    f.title,
+    f.replacement_cost,
+    COUNT(r.rental_id) AS rental_count
+  FROM film f
+  JOIN inventory i ON f.film_id = i.film_id
+  JOIN rental r ON i.inventory_id = r.inventory_id
+  GROUP BY f.film_id, f.title, f.replacement_cost
+)
+SELECT 
+  title, 
+  replacement_cost, 
+  rental_count
+FROM MovieRentalCounts
+ORDER BY rental_count DESC, replacement_cost ASC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 44.2: Film apa yang paling sering disewa tapi biaya gantinya rendah? Tampilkan judul film, biaya ganti, dan jumlah penyewaan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, f.rental_rate, COUNT(r.rental_id) AS total_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title, f.rental_rate
+ORDER BY total_rentals DESC, f.rental_rate ASC
+LIMIT 1;
+Execution Accuracy: 0.0000
+
+Processing Question 45.1: Which customers have rented movies from every store but have never rented a movie with a runtime over 2 hours? Show the customer full name.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT 
+    c.first_name || ' ' || c.last_name AS customer_full_name
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    film f ON i.film_id = f.film_id
+GROUP BY 
+    customer_full_name
+HAVING 
+    COUNT(DISTINCT i.store_id) = (SELECT COUNT(*) FROM store) AND MAX(f.length) <= 120;
+Execution Accuracy: 1.0000
+
+Processing Question 45.2: Siapa pelanggan yang nyewa dari semua toko tapi gak pernah nyewa film berdurasi lebih dari 2 jam? Tampilkan nama lengkap pelanggan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: column r.store_id does not exist
+LINE 8: HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM st...
+                              ^
+HINT:  Perhaps you meant to reference the column "c.store_id" or the column "i.store_id".
+
+Generated SQL Query: SELECT CONCAT(c.first_name, ' ', c.last_name) AS customer_full_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+WHERE f.rental_duration <= 120
+GROUP BY customer_full_name
+HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM store);
+Error executing query: column r.store_id does not exist
+LINE 8: HAVING COUNT(DISTINCT r.store_id) = (SELECT COUNT(*) FROM st...
+                              ^
+HINT:  Perhaps you meant to reference the column "c.store_id" or the column "i.store_id".
+
+Execution Accuracy: 1.0000
+
+Processing Question 46.1: Which movies have been rented by customers from more than 10 different cities? Show the movie title and the number of cities.
+Related Tables: {'staff', 'store', 'film_category', 'film_actor', 'customer', 'film_text', 'inventory', 'actor', 'language', 'category', 'film', 'address', 'country', 'city', 'rental'}
+Error executing query: relation "film_text" does not exist
+LINE 2: FROM film_text ft
+             ^
+
+Generated SQL Query: SELECT ft.title, COUNT(DISTINCT c.city_id) AS number_of_cities
+FROM film_text ft
+JOIN inventory i ON ft.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer cu ON r.customer_id = cu.customer_id
+JOIN address a ON cu.address_id = a.address_id
+JOIN city c ON a.city_id = c.city_id
+GROUP BY ft.title
+HAVING COUNT(DISTINCT c.city_id) > 10;
+Error executing query: relation "film_text" does not exist
+LINE 2: FROM film_text ft
+             ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 46.2: Film mana yang disewa oleh pelanggan dari lebih dari 10 kota? Tampilkan judul film dan jumlah kotanya.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: table name "c" specified more than once
+
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.city_id) AS num_cities
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+JOIN address a ON c.address_id = a.address_id
+JOIN city c ON a.city_id = c.city_id
+GROUP BY f.title
+HAVING COUNT(DISTINCT c.city_id) > 10;
+Error executing query: table name "c" specified more than once
+
+Execution Accuracy: 0.0000
+
+Processing Question 47.1: Which movies have been rented the most by customers under the age of 25? Show the movie title and the number of rentals.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Error executing query: can't execute an empty query
+Generated SQL Query: -- Unable to provide an adequate query for the request.  The provided schema does not contain customer age information.  Additional information is needed in the database schema to answer this question.
+Error executing query: can't execute an empty query
+Execution Accuracy: 0.0000
+
+Processing Question 47.2: Film mana yang paling banyak disewa oleh pelanggan berusia di bawah 25 tahun? Tampilkan judul film dan jumlah penyewaan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: column c.age does not exist
+LINE 6: WHERE c.age < 25
+              ^
+
+Generated SQL Query: SELECT f.title, COUNT(r.rental_id) AS total_rentals
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+WHERE c.age < 25
+GROUP BY f.title
+ORDER BY total_rentals DESC
+LIMIT 1;
+Error executing query: column c.age does not exist
+LINE 6: WHERE c.age < 25
+              ^
+
+Execution Accuracy: 0.0000
+
+Processing Question 48.1: Which movies have the highest revenue but have never been rented on weekends? Show the movie title and total revenue.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, SUM(p.amount) AS total_revenue
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN payment p ON r.rental_id = p.rental_id
+WHERE EXTRACT(DOW FROM r.rental_date) NOT IN (0, 6)
+GROUP BY f.title
+ORDER BY total_revenue DESC;
+Execution Accuracy: 0.0000
+
+Processing Question 48.2: Film mana yang pendapatannya tinggi tapi tidak pernah disewa saat akhir pekan? Tampilkan judul film dan total pendapatan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Error executing query: function dayofweek(timestamp without time zone) does not exist
+LINE 6: WHERE r.rental_date IS NULL OR DAYOFWEEK(r.rental_date) NOT ...
+                                       ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Generated SQL Query: SELECT f.title, SUM(p.amount) AS total_revenue
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+LEFT JOIN payment p ON r.rental_id = p.rental_id
+WHERE r.rental_date IS NULL OR DAYOFWEEK(r.rental_date) NOT IN (1,7)
+GROUP BY f.title
+HAVING SUM(p.amount) > (SELECT AVG(amount) FROM payment)
+;
+Error executing query: function dayofweek(timestamp without time zone) does not exist
+LINE 6: WHERE r.rental_date IS NULL OR DAYOFWEEK(r.rental_date) NOT ...
+                                       ^
+HINT:  No function matches the given name and argument types. You might need to add explicit type casts.
+
+Execution Accuracy: 0.0000
+
+Processing Question 49.1: Which customers have rented movies from every category but have never rented a movie with a rating of 'PG-13'? Show the customer full name.
+Related Tables: {'staff', 'category', 'store', 'film', 'film_category', 'film_actor', 'address', 'country', 'customer', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT c.first_name, c.last_name
+FROM customer c
+JOIN rental r ON c.customer_id = r.customer_id
+JOIN inventory i ON r.inventory_id = i.inventory_id
+JOIN film f ON i.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category cat ON fc.category_id = cat.category_id
+GROUP BY c.customer_id, c.first_name, c.last_name
+HAVING COUNT(DISTINCT cat.category_id) = (SELECT COUNT(*) FROM category) AND SUM(CASE WHEN f.rating = 'PG-13' THEN 1 ELSE 0 END) = 0;
+Execution Accuracy: 1.0000
+
+Processing Question 49.2: Ada pelanggan yang nyewa dari semua kategori tapi gak pernah nyewa film dengan rating 'PG-13'? Tampilkan nama lengkap pelanggan.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT 
+    c.first_name || ' ' || c.last_name AS full_name
+FROM 
+    customer c
+JOIN 
+    rental r ON c.customer_id = r.customer_id
+JOIN 
+    inventory i ON r.inventory_id = i.inventory_id
+JOIN 
+    film f ON i.film_id = f.film_id
+JOIN 
+    film_category fc ON f.film_id = fc.film_id
+JOIN 
+    category cat ON fc.category_id = cat.category_id
+GROUP BY 
+    full_name
+HAVING 
+    COUNT(DISTINCT cat.category_id) = (SELECT COUNT(*) FROM category) AND SUM(CASE WHEN f.rating = 'PG-13' THEN 1 ELSE 0 END) = 0;
+Execution Accuracy: 1.0000
+
+Processing Question 50.1: Which movies have been rented by customers from more than 5 different countries? Show the movie title and the number of countries.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'customer', 'film_text', 'inventory', 'city', 'actor', 'language', 'rental'}
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.country_id) AS number_of_countries
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer cu ON r.customer_id = cu.customer_id
+JOIN address a ON cu.address_id = a.address_id
+JOIN city ci ON a.city_id = ci.city_id
+JOIN country c ON ci.country_id = c.country_id
+GROUP BY f.title
+HAVING COUNT(DISTINCT c.country_id) > 5;
+Execution Accuracy: 1.0000
+
+Processing Question 50.2: Film mana yang disewa oleh pelanggan dari lebih dari 5 negara? Tampilkan judul film dan jumlah negara.
+Related Tables: {'staff', 'store', 'film', 'category', 'film_category', 'film_actor', 'address', 'country', 'inventory', 'city', 'actor', 'language'}
+Generated SQL Query: SELECT f.title, COUNT(DISTINCT c.country_id) AS number_of_countries
+FROM film AS f
+JOIN inventory AS i ON f.film_id = i.film_id
+JOIN rental AS r ON i.inventory_id = r.inventory_id
+JOIN customer AS cu ON r.customer_id = cu.customer_id
+JOIN address AS a ON cu.address_id = a.address_id
+JOIN city AS ci ON a.city_id = ci.city_id
+JOIN country AS c ON ci.country_id = c.country_id
+GROUP BY f.title
+HAVING COUNT(DISTINCT c.country_id) > 5;
+Execution Accuracy: 1.0000
+
+Final Execution Accuracy: 0.4300

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from text_to_sql.common import LLMConfig, APIModel, LocalModel
+from common import LLMConfig, APIModel, LocalModel
 from typing import Optional
 import os
 

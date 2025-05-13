@@ -1,0 +1,1052 @@
+--
+-- Name: Document; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Document" (
+documentnode character varying(255),
+documentlevel smallint,
+title character varying(50),
+Owner integer NOT NULL,
+folderflag integer NOT NULL,
+filename character varying(400),
+fileextension character varying(8),
+revision character varying(5),
+changenumber integer NOT NULL,
+status integer NOT NULL,
+documentsummary text,
+Document bytea,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: Location; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Location" (
+locationid smallint NOT NULL,
+Name character varying(100),
+costrate numeric(10,4),
+availability numeric(8,2),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: Password; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE "Password" (
+businessentityid integer NOT NULL,
+passwordhash character varying(128),
+passwordsalt character varying(10),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: address; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE address (
+addressid integer NOT NULL,
+addressline1 character varying(60),
+addressline2 character varying(60),
+city character varying(30),
+stateprovinceid integer NOT NULL,
+postalcode character varying(15),
+spatiallocation bytea,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: addresstype; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE addresstype (
+addresstypeid integer NOT NULL,
+Name character varying(100),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: awbuildversion; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE awbuildversion (
+systeminformationid integer NOT NULL,
+Database Version character varying(25),
+versiondate timestamp without time zone NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: billofmaterials; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE billofmaterials (
+billofmaterialsid integer NOT NULL,
+productassemblyid integer,
+componentid integer NOT NULL,
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone,
+unitmeasurecode character varying(3),
+bomlevel smallint NOT NULL,
+perassemblyqty numeric(8,2),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: businessentity; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE businessentity (
+businessentityid integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: businessentityaddress; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE businessentityaddress (
+businessentityid integer NOT NULL,
+addressid integer NOT NULL,
+addresstypeid integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: businessentitycontact; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE businessentitycontact (
+businessentityid integer NOT NULL,
+personid integer NOT NULL,
+contacttypeid integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: contacttype; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE contacttype (
+contacttypeid integer NOT NULL,
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: countryregion; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE countryregion (
+countryregioncode character varying(3),
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: countryregioncurrency; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE countryregioncurrency (
+countryregioncode character varying(3),
+currencycode character varying(3),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: creditcard; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE creditcard (
+creditcardid integer NOT NULL,
+cardtype character varying(50),
+cardnumber character varying(25),
+expmonth integer NOT NULL,
+expyear smallint NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: culture; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE culture (
+cultureid character varying(6),
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: currency; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE currency (
+currencycode character varying(3),
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: currencyrate; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE currencyrate (
+currencyrateid integer NOT NULL,
+currencyratedate timestamp without time zone NOT NULL,
+fromcurrencycode character varying(3),
+tocurrencycode character varying(3),
+averagerate numeric(19,4),
+endofdayrate numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: customer; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE customer (
+customerid integer NOT NULL,
+personid integer,
+storeid integer,
+territoryid integer,
+accountnumber character varying(10),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: databaselog; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE databaselog (
+databaselogid integer NOT NULL,
+posttime timestamp without time zone NOT NULL,
+databaseuser character varying(160),
+Event character varying(160),
+Schema character varying(160),
+Object character varying(160),
+tsql text,
+xmlevent text
+);
+
+
+--
+-- Name: department; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE department (
+departmentid smallint NOT NULL,
+Name character varying(100),
+groupname character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: emailaddress; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE emailaddress (
+businessentityid integer NOT NULL,
+emailaddressid integer NOT NULL,
+emailaddress character varying(50),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: employee; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE employee (
+businessentityid integer NOT NULL,
+nationalidnumber character varying(15),
+loginid character varying(256),
+organizationnode character varying(255),
+organizationlevel smallint,
+jobtitle character varying(50),
+birthdate date NOT NULL,
+maritalstatus character varying(1),
+gender character varying(1),
+hiredate date NOT NULL,
+salariedflag integer NOT NULL,
+vacationhours smallint NOT NULL,
+sickleavehours smallint NOT NULL,
+currentflag integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: employeedepartmenthistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE employeedepartmenthistory (
+businessentityid integer NOT NULL,
+departmentid smallint NOT NULL,
+shiftid integer NOT NULL,
+startdate date NOT NULL,
+enddate date,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: employeepayhistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE employeepayhistory (
+businessentityid integer NOT NULL,
+ratechangedate timestamp without time zone NOT NULL,
+rate numeric(19,4),
+payfrequency integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: errorlog; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE errorlog (
+errorlogid integer NOT NULL,
+errortime timestamp without time zone NOT NULL,
+username character varying(160),
+errornumber integer NOT NULL,
+errorseverity integer,
+errorstate integer,
+errorprocedure character varying(126),
+errorline integer,
+errormessage character varying(4000)
+);
+
+
+--
+-- Name: illustration; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE illustration (
+illustrationid integer NOT NULL,
+diagram text,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: jobcandidate; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE jobcandidate (
+jobcandidateid integer NOT NULL,
+businessentityid integer,
+resume text,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: person; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE person (
+businessentityid integer NOT NULL,
+persontype character varying(2),
+namestyle integer NOT NULL,
+title character varying(8),
+firstname character varying(100),
+middlename character varying(100),
+lastname character varying(100),
+suffix character varying(10),
+emailpromotion integer NOT NULL,
+additionalcontactinfo text,
+demographics text,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: personcreditcard; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE personcreditcard (
+businessentityid integer NOT NULL,
+creditcardid integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: personphone; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE personphone (
+businessentityid integer NOT NULL,
+phonenumber character varying(50),
+phonenumbertypeid integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: phonenumbertype; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE phonenumbertype (
+phonenumbertypeid integer NOT NULL,
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: product; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE product (
+productid integer NOT NULL,
+Name character varying(100),
+productnumber character varying(25),
+makeflag integer NOT NULL,
+finishedgoodsflag integer NOT NULL,
+color character varying(15),
+safetystocklevel smallint NOT NULL,
+reorderpoint smallint NOT NULL,
+standardcost numeric(19,4),
+listprice numeric(19,4),
+Size character varying(5),
+sizeunitmeasurecode character varying(3),
+weightunitmeasurecode character varying(3),
+weight numeric(8,2),
+daystomanufacture integer NOT NULL,
+productline character varying(2),
+Class character varying(2),
+Style character varying(2),
+productsubcategoryid integer,
+productmodelid integer,
+sellstartdate timestamp without time zone NOT NULL,
+sellenddate timestamp without time zone,
+discontinueddate timestamp without time zone,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productcategory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productcategory (
+productcategoryid integer NOT NULL,
+Name character varying(100),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productcosthistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productcosthistory (
+productid integer NOT NULL,
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone,
+standardcost numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productdescription; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productdescription (
+productdescriptionid integer NOT NULL,
+description character varying(400),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productdocument; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productdocument (
+productid integer NOT NULL,
+documentnode character varying(255),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productinventory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productinventory (
+productid integer NOT NULL,
+locationid smallint NOT NULL,
+shelf character varying(10),
+bin integer NOT NULL,
+quantity smallint NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productlistpricehistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productlistpricehistory (
+productid integer NOT NULL,
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone,
+listprice numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productmodel; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productmodel (
+productmodelid integer NOT NULL,
+Name character varying(100),
+catalogdescription text,
+instructions text,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productmodelillustration; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productmodelillustration (
+productmodelid integer NOT NULL,
+illustrationid integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productmodelproductdescriptionculture; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productmodelproductdescriptionculture (
+productmodelid integer NOT NULL,
+productdescriptionid integer NOT NULL,
+cultureid character varying(6),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productphoto; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productphoto (
+productphotoid integer NOT NULL,
+thumbnailphoto bytea,
+thumbnailphotofilename character varying(50),
+largephoto bytea,
+largephotofilename character varying(50),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productproductphoto; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productproductphoto (
+productid integer NOT NULL,
+productphotoid integer NOT NULL,
+Primary integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productreview; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productreview (
+productreviewid integer NOT NULL,
+productid integer NOT NULL,
+reviewername character varying(100),
+reviewdate timestamp without time zone NOT NULL,
+emailaddress character varying(50),
+rating integer NOT NULL,
+Comments character varying(3850),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productsubcategory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productsubcategory (
+productsubcategoryid integer NOT NULL,
+productcategoryid integer NOT NULL,
+Name character varying(100),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: productvendor; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE productvendor (
+productid integer NOT NULL,
+businessentityid integer NOT NULL,
+averageleadtime integer NOT NULL,
+standardprice numeric(19,4),
+lastreceiptcost numeric(19,4),
+lastreceiptdate timestamp without time zone,
+minorderqty integer NOT NULL,
+maxorderqty integer NOT NULL,
+onorderqty integer,
+unitmeasurecode character varying(3),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: purchaseorderdetail; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE purchaseorderdetail (
+purchaseorderid integer NOT NULL,
+purchaseorderdetailid integer NOT NULL,
+duedate timestamp without time zone NOT NULL,
+orderqty smallint NOT NULL,
+productid integer NOT NULL,
+unitprice numeric(19,4),
+linetotal numeric(19,4),
+receivedqty numeric(8,2),
+rejectedqty numeric(8,2),
+stockedqty numeric(9,2),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: purchaseorderheader; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE purchaseorderheader (
+purchaseorderid integer NOT NULL,
+revisionnumber integer NOT NULL,
+status integer NOT NULL,
+employeeid integer NOT NULL,
+vendorid integer NOT NULL,
+shipmethodid integer NOT NULL,
+orderdate timestamp without time zone NOT NULL,
+shipdate timestamp without time zone,
+subtotal numeric(19,4),
+taxamt numeric(19,4),
+freight numeric(19,4),
+totaldue numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesorderdetail; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesorderdetail (
+salesorderid integer NOT NULL,
+salesorderdetailid integer NOT NULL,
+carriertrackingnumber character varying(25),
+orderqty smallint NOT NULL,
+productid integer NOT NULL,
+specialofferid integer NOT NULL,
+unitprice numeric(19,4),
+unitpricediscount numeric(19,4),
+linetotal numeric(38,6),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesorderheader; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesorderheader (
+salesorderid integer NOT NULL,
+revisionnumber integer NOT NULL,
+orderdate timestamp without time zone NOT NULL,
+duedate timestamp without time zone NOT NULL,
+shipdate timestamp without time zone,
+status integer NOT NULL,
+onlineorderflag integer NOT NULL,
+salesordernumber character varying(25),
+purchaseordernumber character varying(50),
+accountnumber character varying(30),
+customerid integer NOT NULL,
+salespersonid integer,
+territoryid integer,
+billtoaddressid integer NOT NULL,
+shiptoaddressid integer NOT NULL,
+shipmethodid integer NOT NULL,
+creditcardid integer,
+creditcardapprovalcode character varying(15),
+currencyrateid integer,
+subtotal numeric(19,4),
+taxamt numeric(19,4),
+freight numeric(19,4),
+totaldue numeric(19,4),
+Comment character varying(128),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesorderheadersalesreason; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesorderheadersalesreason (
+salesorderid integer NOT NULL,
+salesreasonid integer NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesperson; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesperson (
+businessentityid integer NOT NULL,
+territoryid integer,
+salesquota numeric(19,4),
+bonus numeric(19,4),
+commissionpct numeric(10,4),
+salesytd numeric(19,4),
+saleslastyear numeric(19,4),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salespersonquotahistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salespersonquotahistory (
+businessentityid integer NOT NULL,
+quotadate timestamp without time zone NOT NULL,
+salesquota numeric(19,4),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesreason; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesreason (
+salesreasonid integer NOT NULL,
+Name character varying(100),
+reasontype character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salestaxrate; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salestaxrate (
+salestaxrateid integer NOT NULL,
+stateprovinceid integer NOT NULL,
+taxtype integer NOT NULL,
+taxrate numeric(10,4),
+Name character varying(100),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesterritory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesterritory (
+territoryid integer NOT NULL,
+Name character varying(100),
+countryregioncode character varying(3),
+Group character varying(50),
+salesytd numeric(19,4),
+saleslastyear numeric(19,4),
+costytd numeric(19,4),
+costlastyear numeric(19,4),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: salesterritoryhistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE salesterritoryhistory (
+businessentityid integer NOT NULL,
+territoryid integer NOT NULL,
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: scrapreason; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE scrapreason (
+scrapreasonid smallint NOT NULL,
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: shift; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE shift (
+shiftid integer NOT NULL,
+Name character varying(100),
+starttime time without time zone NOT NULL,
+endtime time without time zone NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: shipmethod; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE shipmethod (
+shipmethodid integer NOT NULL,
+Name character varying(100),
+shipbase numeric(19,4),
+shiprate numeric(19,4),
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: shoppingcartitem; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE shoppingcartitem (
+shoppingcartitemid integer NOT NULL,
+shoppingcartid character varying(50),
+quantity integer NOT NULL,
+productid integer NOT NULL,
+datecreated timestamp without time zone NOT NULL,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: specialoffer; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE specialoffer (
+specialofferid integer NOT NULL,
+description character varying(255),
+discountpct numeric(10,4),
+Type character varying(50),
+category character varying(50),
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone NOT NULL,
+minqty integer NOT NULL,
+maxqty integer,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: specialofferproduct; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE specialofferproduct (
+specialofferid integer NOT NULL,
+productid integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: stateprovince; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE stateprovince (
+stateprovinceid integer NOT NULL,
+stateprovincecode character varying(3),
+countryregioncode character varying(3),
+isonlystateprovinceflag integer NOT NULL,
+Name character varying(100),
+territoryid integer NOT NULL,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: store; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE store (
+businessentityid integer NOT NULL,
+Name character varying(100),
+salespersonid integer,
+demographics text,
+rowguid character varying(64),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: transactionhistory; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE transactionhistory (
+transactionid integer NOT NULL,
+productid integer NOT NULL,
+referenceorderid integer NOT NULL,
+referenceorderlineid integer NOT NULL,
+transactiondate timestamp without time zone NOT NULL,
+transactiontype character varying(1),
+quantity integer NOT NULL,
+actualcost numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: transactionhistoryarchive; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE transactionhistoryarchive (
+transactionid integer NOT NULL,
+productid integer NOT NULL,
+referenceorderid integer NOT NULL,
+referenceorderlineid integer NOT NULL,
+transactiondate timestamp without time zone NOT NULL,
+transactiontype character varying(1),
+quantity integer NOT NULL,
+actualcost numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: unitmeasure; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE unitmeasure (
+unitmeasurecode character varying(3),
+Name character varying(100),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: vendor; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE vendor (
+businessentityid integer NOT NULL,
+accountnumber character varying(30),
+Name character varying(100),
+creditrating integer NOT NULL,
+preferredvendorstatus integer NOT NULL,
+activeflag integer NOT NULL,
+purchasingwebserviceurl character varying(1024),
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: workorder; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE workorder (
+workorderid integer NOT NULL,
+productid integer NOT NULL,
+orderqty integer NOT NULL,
+stockedqty integer NOT NULL,
+scrappedqty smallint NOT NULL,
+startdate timestamp without time zone NOT NULL,
+enddate timestamp without time zone,
+duedate timestamp without time zone NOT NULL,
+scrapreasonid smallint,
+modifieddate timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: workorderrouting; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE workorderrouting (
+workorderid integer NOT NULL,
+productid integer NOT NULL,
+operationsequence smallint NOT NULL,
+locationid smallint NOT NULL,
+scheduledstartdate timestamp without time zone NOT NULL,
+scheduledenddate timestamp without time zone NOT NULL,
+actualstartdate timestamp without time zone,
+actualenddate timestamp without time zone,
+actualresourcehrs numeric(9,4),
+plannedcost numeric(19,4),
+actualcost numeric(19,4),
+modifieddate timestamp without time zone NOT NULL
+);

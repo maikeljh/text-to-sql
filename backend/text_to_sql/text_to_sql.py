@@ -32,12 +32,16 @@ class TextToSQL:
         self.evaluator = QueryEvaluator()
 
     def generate_baseline(self, user_prompt, method):
-        filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
+        # Baseline:
+        # 1. No schema filter
+        # 2. No relevant retrieval
+        # 3. No prompt rewriter
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         if method == "Multistage":
             attempts_left = self.config.max_retry_attempt
             query = self.query_generator.generate_baseline(
                 user_prompt=user_prompt,
-                schema=filtered_schema,
+                schema=schema,
             )
             while attempts_left > 0:
                 try:
@@ -49,14 +53,14 @@ class TextToSQL:
                         user_prompt=user_prompt,
                         sql_query=query,
                         error_message=str(e),
-                        schema=filtered_schema,
+                        schema=schema,
                     )
         elif method == "Incremental":
             step_split_prompt = (
                 f"You are given a complex natural language question about a database.\n"
                 f"Your task is to break this question into a series of step-by-step sub-questions "
                 f"that build towards the final answer.\n\n"
-                f"Database Schema:\n{filtered_schema}\n\n"
+                f"Database Schema:\n{schema}\n\n"
                 f"Question: {user_prompt}\n\n"
                 f"Return a list of step-by-step sub-questions."
             )
@@ -79,7 +83,7 @@ class TextToSQL:
             for step in subquestions:
                 step_sql = self.query_generator.generate_baseline(
                     user_prompt=step,
-                    schema=filtered_schema,
+                    schema=schema,
                 )
                 intermediate_queries.append({"step": step, "sql": step_sql})
 
@@ -96,26 +100,30 @@ class TextToSQL:
 
             final_query = self.query_generator.generate_baseline(
                 user_prompt=final_sql_prompt,
-                schema=filtered_schema,
+                schema=schema,
             )
 
             return final_query.strip()
         else:
             query = self.query_generator.generate_baseline(
                 user_prompt=user_prompt,
-                schema=filtered_schema,
+                schema=schema,
             )
         return query
 
     def generate_v1(self, user_prompt, method):
+        # Baseline:
+        # 1. No schema filter
+        # 2. Yes relevant retrieval
+        # 3. Yes prompt rewriter
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        filtered_schema = self.schema_linker.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         if method == "Multistage":
             relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
             attempts_left = self.config.max_retry_attempt
             query = self.query_generator.generate_v1(
                 user_prompt=rewritten_prompt,
-                schema=filtered_schema,
+                schema=schema,
                 example=relevant_example,
             )
             while attempts_left > 0:
@@ -128,14 +136,14 @@ class TextToSQL:
                         user_prompt=user_prompt,
                         sql_query=query,
                         error_message=str(e),
-                        schema=filtered_schema,
+                        schema=schema,
                     )
         elif method == "Incremental":
             step_split_prompt = (
                 f"You are given a complex natural language question about a database.\n"
                 f"Your task is to break this question into a series of step-by-step sub-questions "
                 f"that build towards the final answer.\n\n"
-                f"Database Schema:\n{filtered_schema}\n\n"
+                f"Database Schema:\n{schema}\n\n"
                 f"Question: {user_prompt}\n\n"
                 f"Return a list of step-by-step sub-questions."
             )
@@ -159,7 +167,7 @@ class TextToSQL:
                 relevant_example = self.retrieve_context.generate(user_prompt=step)
                 step_sql = self.query_generator.generate_v1(
                     user_prompt=step,
-                    schema=filtered_schema,
+                    schema=schema,
                     example=relevant_example,
                 )
                 intermediate_queries.append({"step": step, "sql": step_sql})
@@ -178,7 +186,7 @@ class TextToSQL:
             relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
             final_query = self.query_generator.generate_v1(
                 user_prompt=final_sql_prompt,
-                schema=filtered_schema,
+                schema=schema,
                 example=relevant_example,
             )
 
@@ -186,7 +194,7 @@ class TextToSQL:
         else:
             query = self.query_generator.generate_v1(
                 user_prompt=rewritten_prompt,
-                schema=filtered_schema,
+                schema=schema,
                 example=relevant_example,
             )
         return query

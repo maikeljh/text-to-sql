@@ -7,6 +7,7 @@ Instructions:
 3. Do not alter the logical intent or rephrase in a way that changes the focus.
 4. Return only the rewritten query. Do not include explanations, system messages, or any other text.
 5. Do not reorder information unless necessary for clarity.
+6. If the input query is not in english, please translate it into english.
 
 Examples:
 

@@ -1,6 +1,5 @@
 from common import LLMConfig
 from .base_llm import BaseLLM
-from typing import Any
 
 
 class Summarization(BaseLLM):

@@ -20,22 +20,42 @@ class SchemaLinker(BaseLLM):
             config=config, system_prompt_path="files/prompt/schema_linker_system_prompt.txt"
         )
         self.schema_path = config.schema_path
+        self.metadata_path = config.metadata_path
         self.embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-        self._load_schema()
+
+        # Load configurations
+        if self.metadata_path:
+            self._load_metadata()
+        
+        if self.schema_path:
+            self._load_schema()
 
     def _load_schema(self):
         """
-        Loads schema details from a JSON file into instance attributes.
+        Loads schema query from a txt file into the schema attribute.
         """
         try:
             with open(self.schema_path, "r", encoding="utf-8") as file:
-                self.schema = json.load(file)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
+                content = file.read().strip()
+                if not content:
+                    raise ValueError(f"Schema file at {self.schema_path} is empty.")
+                self.schema = content
+        except FileNotFoundError as e:
             raise ValueError(f"Error loading schema from {self.schema_path}: {e}")
 
-        self.database = self.schema.get("database", "Unknown Database")
-        self.tables = {table["name"]: table for table in self.schema.get("tables", [])}
-        self.knowledge_base = self.generate_knowledge_base_text(self.schema)
+    def _load_metadata(self):
+        """
+        Loads metadata details from a JSON file into instance attributes.
+        """
+        try:
+            with open(self.metadata_path, "r", encoding="utf-8") as file:
+                self.metadata = json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            raise ValueError(f"Error loading metadata from {self.metadata_path}: {e}")
+
+        self.database = self.metadata.get("database", "Unknown Database")
+        self.tables = {table["name"]: table for table in self.metadata.get("tables", [])}
+        self.knowledge_base = self.generate_knowledge_base_text(self.metadata)
         self.table_embeddings = self._generate_table_embeddings()
 
     def _generate_table_embeddings(self) -> Dict[str, Any]:
@@ -59,7 +79,7 @@ class SchemaLinker(BaseLLM):
         self, database_structure: Dict[str, Any]
     ) -> Dict[str, str]:
         """
-        Generates a textual knowledge base from the database schema.
+        Generates a textual knowledge base from the database metadata.
         """
         knowledge_base_mapping = {}
 
@@ -110,26 +130,33 @@ class SchemaLinker(BaseLLM):
 
         return related_tables
 
-    def generate(self, user_prompt: str) -> Dict[str, Any]:
+    def generate(self, user_prompt: str, filter: bool = False) -> Dict[str, Any]:
         """
         Links user query with the provided schema and generates a structured representation.
 
         :param user_prompt: The natural language query.
-        :return: The structured schema-linked query.
+        :param filter: If True, return only the raw schema info.
+        :return: A dictionary containing the database and relevant tables.
         """
+        if not filter:
+            return {
+                "schema": self.schema
+            }
+
         if not user_prompt or not isinstance(user_prompt, str):
             raise ValueError("User prompt cannot be empty and must be a string.")
 
         entities = self.predict_entities(user_prompt)
         initial_tables = self.vector_search(entities)
         related_tables = self.get_related_tables(initial_tables)
+
         print(f"Related Tables: {related_tables}")
 
         linked_schema = {
             "database": self.database,
             "tables": [
                 self.tables[table] for table in related_tables if table in self.tables
-            ],
+            ]
         }
 
         return linked_schema

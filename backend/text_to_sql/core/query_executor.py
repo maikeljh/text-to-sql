@@ -1,3 +1,5 @@
+from contextlib import closing
+
 import psycopg2
 
 
@@ -22,7 +24,7 @@ class QueryExecutor:
         )
         self.connection.autocommit = True
 
-    def execute_query(self, query: str, params: tuple = ()):
+    def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
         """
         Executes an SQL query and returns the results as a list of dictionaries.
 
@@ -30,23 +32,18 @@ class QueryExecutor:
         :param params: Optional tuple of query parameters.
         :return: Query result as a list of dictionaries.
         """
-        cursor = self.connection.cursor()
-        try:
-            if params:
-                cursor.execute(query, params)
-            else:
-                cursor.execute(query)
+        with closing(self.connection.cursor()) as cursor:
+            try:
+                cursor.execute(query, params) if params else cursor.execute(query)
 
-            if cursor.description is None:
-                return []
+                if cursor.description is None:
+                    return []
 
-            columns = [desc[0] for desc in cursor.description]
-            return [dict(zip(columns, row)) for row in cursor.fetchall()]
-        except psycopg2.Error as e:
-            print(f"Error executing query: {e}")
-            return []
-        finally:
-            cursor.close()
+                columns = [desc[0] for desc in cursor.description]
+                return [dict(zip(columns, row)) for row in cursor.fetchall()]
+            except psycopg2.Error as e:
+                print(f"Error executing query: {e}")
+                raise
 
     def close_connection(self):
         """Closes the database connection."""

@@ -223,16 +223,17 @@ def summarize_data_tool(state: AgentState, llm_agent) -> dict:
     error_msg = sql_output.get("error") if isinstance(sql_output, dict) else None
 
     # Format the data (or error) for summarization
-    data_str = str(raw_data[:10]) if raw_data else (error_msg or "No data returned.")
+    data_str = str(raw_data) if raw_data else (error_msg or "No data returned.")
 
     system_prompt = f"""
     You are an AI assistant that helps users understand SQL results.
-    
-    The user asked: "{query}"
+
+    The user asked (in their language): "{query}"
     The SQL result is:
     {data_str}
-    
-    Please summarize the result in natural language as if explaining to a non-technical user.
+
+    Please summarize the result using the same language as the user query. 
+    Explain it clearly and naturally, as if you're talking to a non-technical user.
     """
 
     summary = llm_agent.generate(

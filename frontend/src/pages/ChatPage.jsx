@@ -4,6 +4,8 @@ import { FiUser } from "react-icons/fi";
 import { BiSearch, BiPlus } from "react-icons/bi";
 import { BsSoundwave } from "react-icons/bs";
 import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const modelOptions = {
   "gemini-1.5-pro": "gemini",
@@ -491,7 +493,9 @@ function ChatPage() {
                               </span>
                             </div>
                           ) : (
-                            msg.message
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {msg.message}
+                            </ReactMarkdown>
                           )}
 
                           {msg.sender === "bot" && msg.data?.length > 0 && (

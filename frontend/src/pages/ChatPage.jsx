@@ -702,7 +702,7 @@ function ChatPage() {
                 <option value="academic">Academic</option>
                 <option value="soccer">Soccer</option>
                 <option value="tpc-ds">TPC-DS</option>
-                <option value="adventureworks">AdventureWorks</option>
+                <option value="adventure-works">AdventureWorks</option>
               </select>
             </div>
 

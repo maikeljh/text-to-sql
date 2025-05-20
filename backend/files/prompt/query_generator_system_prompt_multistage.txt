@@ -19,3 +19,4 @@ Instructions:
 - Ensure proper SQL syntax and capitalization.
 - Do **not** include explanations or additional text.
 - Apply SQL best practices and make the minimal necessary changes to correct the query.
+- Do not provide any comments in the SQL query.

@@ -1,12 +1,12 @@
 --
--- Name: Document; Type: TABLE; Schema: public; Owner: -
+-- Name: document; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Document" (
+CREATE TABLE document (
 documentnode character varying(255),
 documentlevel smallint,
 title character varying(50),
-Owner integer NOT NULL,
+owner integer NOT NULL,
 folderflag integer NOT NULL,
 filename character varying(400),
 fileextension character varying(8),
@@ -14,19 +14,19 @@ revision character varying(5),
 changenumber integer NOT NULL,
 status integer NOT NULL,
 documentsummary text,
-Document bytea,
+document bytea,
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
 
 
 --
--- Name: Location; Type: TABLE; Schema: public; Owner: -
+-- Name: location; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Location" (
+CREATE TABLE location (
 locationid smallint NOT NULL,
-Name character varying(100),
+name character varying(100),
 costrate numeric(10,4),
 availability numeric(8,2),
 modifieddate timestamp without time zone NOT NULL
@@ -34,10 +34,10 @@ modifieddate timestamp without time zone NOT NULL
 
 
 --
--- Name: Password; Type: TABLE; Schema: public; Owner: -
+-- Name: password; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE "Password" (
+CREATE TABLE password (
 businessentityid integer NOT NULL,
 passwordhash character varying(128),
 passwordsalt character varying(10),
@@ -69,7 +69,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE addresstype (
 addresstypeid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -81,7 +81,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE awbuildversion (
 systeminformationid integer NOT NULL,
-Database Version character varying(25),
+databaseversion character varying(25),
 versiondate timestamp without time zone NOT NULL,
 modifieddate timestamp without time zone NOT NULL
 );
@@ -147,7 +147,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE contacttype (
 contacttypeid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -158,7 +158,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE countryregion (
 countryregioncode character varying(3),
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -194,7 +194,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE culture (
 cultureid character varying(6),
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -205,7 +205,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE currency (
 currencycode character varying(3),
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -248,9 +248,9 @@ CREATE TABLE databaselog (
 databaselogid integer NOT NULL,
 posttime timestamp without time zone NOT NULL,
 databaseuser character varying(160),
-Event character varying(160),
-Schema character varying(160),
-Object character varying(160),
+event character varying(160),
+schema character varying(160),
+object character varying(160),
 tsql text,
 xmlevent text
 );
@@ -262,7 +262,7 @@ xmlevent text
 
 CREATE TABLE department (
 departmentid smallint NOT NULL,
-Name character varying(100),
+name character varying(100),
 groupname character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -422,7 +422,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE phonenumbertype (
 phonenumbertypeid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -433,7 +433,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE product (
 productid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 productnumber character varying(25),
 makeflag integer NOT NULL,
 finishedgoodsflag integer NOT NULL,
@@ -442,14 +442,14 @@ safetystocklevel smallint NOT NULL,
 reorderpoint smallint NOT NULL,
 standardcost numeric(19,4),
 listprice numeric(19,4),
-Size character varying(5),
+size character varying(5),
 sizeunitmeasurecode character varying(3),
 weightunitmeasurecode character varying(3),
 weight numeric(8,2),
 daystomanufacture integer NOT NULL,
 productline character varying(2),
-Class character varying(2),
-Style character varying(2),
+class character varying(2),
+style character varying(2),
 productsubcategoryid integer,
 productmodelid integer,
 sellstartdate timestamp without time zone NOT NULL,
@@ -466,7 +466,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE productcategory (
 productcategoryid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -542,7 +542,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE productmodel (
 productmodelid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 catalogdescription text,
 instructions text,
 rowguid character varying(64),
@@ -594,7 +594,7 @@ modifieddate timestamp without time zone NOT NULL
 CREATE TABLE productproductphoto (
 productid integer NOT NULL,
 productphotoid integer NOT NULL,
-Primary integer NOT NULL,
+primary integer NOT NULL,
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -610,7 +610,7 @@ reviewername character varying(100),
 reviewdate timestamp without time zone NOT NULL,
 emailaddress character varying(50),
 rating integer NOT NULL,
-Comments character varying(3850),
+comments character varying(3850),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -622,7 +622,7 @@ modifieddate timestamp without time zone NOT NULL
 CREATE TABLE productsubcategory (
 productsubcategoryid integer NOT NULL,
 productcategoryid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -734,7 +734,7 @@ subtotal numeric(19,4),
 taxamt numeric(19,4),
 freight numeric(19,4),
 totaldue numeric(19,4),
-Comment character varying(128),
+comment character varying(128),
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -787,7 +787,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE salesreason (
 salesreasonid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 reasontype character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -802,7 +802,7 @@ salestaxrateid integer NOT NULL,
 stateprovinceid integer NOT NULL,
 taxtype integer NOT NULL,
 taxrate numeric(10,4),
-Name character varying(100),
+name character varying(100),
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
 );
@@ -814,9 +814,9 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE salesterritory (
 territoryid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 countryregioncode character varying(3),
-Group character varying(50),
+group character varying(50),
 salesytd numeric(19,4),
 saleslastyear numeric(19,4),
 costytd numeric(19,4),
@@ -846,7 +846,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE scrapreason (
 scrapreasonid smallint NOT NULL,
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -857,7 +857,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE shift (
 shiftid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 starttime time without time zone NOT NULL,
 endtime time without time zone NOT NULL,
 modifieddate timestamp without time zone NOT NULL
@@ -870,7 +870,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE shipmethod (
 shipmethodid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 shipbase numeric(19,4),
 shiprate numeric(19,4),
 rowguid character varying(64),
@@ -900,7 +900,7 @@ CREATE TABLE specialoffer (
 specialofferid integer NOT NULL,
 description character varying(255),
 discountpct numeric(10,4),
-Type character varying(50),
+type character varying(50),
 category character varying(50),
 startdate timestamp without time zone NOT NULL,
 enddate timestamp without time zone NOT NULL,
@@ -932,7 +932,7 @@ stateprovinceid integer NOT NULL,
 stateprovincecode character varying(3),
 countryregioncode character varying(3),
 isonlystateprovinceflag integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 territoryid integer NOT NULL,
 rowguid character varying(64),
 modifieddate timestamp without time zone NOT NULL
@@ -945,7 +945,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE store (
 businessentityid integer NOT NULL,
-Name character varying(100),
+name character varying(100),
 salespersonid integer,
 demographics text,
 rowguid character varying(64),
@@ -993,7 +993,7 @@ modifieddate timestamp without time zone NOT NULL
 
 CREATE TABLE unitmeasure (
 unitmeasurecode character varying(3),
-Name character varying(100),
+name character varying(100),
 modifieddate timestamp without time zone NOT NULL
 );
 
@@ -1005,7 +1005,7 @@ modifieddate timestamp without time zone NOT NULL
 CREATE TABLE vendor (
 businessentityid integer NOT NULL,
 accountnumber character varying(30),
-Name character varying(100),
+name character varying(100),
 creditrating integer NOT NULL,
 preferredvendorstatus integer NOT NULL,
 activeflag integer NOT NULL,

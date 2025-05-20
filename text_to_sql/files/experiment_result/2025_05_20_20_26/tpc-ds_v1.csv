@@ -1,0 +1,1306 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,"Which call centers handled the most catalog returns, and how much did they process in total? Show cc_call_center_id, cc_name, total_returns, and total_return_amount.","SELECT cc.cc_call_center_id, cc.cc_name, COUNT(cr.cr_call_center_sk) AS total_returns, SUM(cr.cr_return_amount) AS total_return_amount
+FROM call_center cc
+JOIN catalog_returns cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_call_center_sk, cc.cc_call_center_id, cc.cc_name
+ORDER BY total_returns DESC;","SELECT 
+  cc.cc_call_center_id, 
+  cc.cc_name, 
+  COUNT(cr.cr_order_number) AS total_returns,
+  SUM(cr.cr_return_amount) AS total_return_amount
+  FROM catalog_returns cr
+  JOIN call_center cc ON cc.cc_call_center_sk = cr.cr_call_center_sk
+  GROUP BY cc.cc_call_center_id, cc.cc_name
+  ORDER BY total_return_amount DESC
+  LIMIT 10;",0.0
+1.2,"Pusat panggilan mana yang paling banyak terima retur katalog dan berapa total nominalnya? Tampilkan cc_call_center_id, cc_name, total_returns, dan total_return_amount.","SELECT cc.cc_call_center_id, cc.cc_name, COUNT(cr.cr_call_center_sk) AS total_returns, SUM(cr.cr_return_amount) AS total_return_amount
+FROM call_center cc
+JOIN catalog_returns cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_call_center_sk, cc.cc_call_center_id, cc.cc_name
+ORDER BY total_returns DESC
+LIMIT 1;","SELECT 
+  cc.cc_call_center_id, 
+  cc.cc_name, 
+  COUNT(cr.cr_order_number) AS total_returns,
+  SUM(cr.cr_return_amount) AS total_return_amount
+  FROM catalog_returns cr
+  JOIN call_center cc ON cc.cc_call_center_sk = cr.cr_call_center_sk
+  GROUP BY cc.cc_call_center_id, cc.cc_name
+  ORDER BY total_return_amount DESC
+  LIMIT 10;",0.0
+2.1,"What are the 5 items that made the most net profit from catalog sales? Show i_item_id, i_item_desc, and total_net_profit.","SELECT i_item_id, i_item_desc, SUM(cs_net_profit) AS total_net_profit
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_net_profit DESC
+LIMIT 5;","SELECT 
+  i.i_item_id, 
+  i.i_item_desc, 
+  SUM(cs.cs_net_profit) AS total_net_profit
+  FROM catalog_sales cs
+  JOIN item i ON cs.cs_item_sk = i.i_item_sk
+  GROUP BY i.i_item_id, i.i_item_desc
+  ORDER BY total_net_profit DESC
+  LIMIT 5;",1.0
+2.2,"Apa aja 5 barang yang kasih untung bersih paling gede dari penjualan katalog? Tampilkan i_item_id, i_item_desc, dan total_net_profit.","SELECT i_item_id, i_item_desc, SUM(cs_net_profit) AS total_net_profit
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_net_profit DESC
+LIMIT 5;","SELECT 
+  i.i_item_id, 
+  i.i_item_desc, 
+  SUM(cs.cs_net_profit) AS total_net_profit
+  FROM catalog_sales cs
+  JOIN item i ON cs.cs_item_sk = i.i_item_sk
+  GROUP BY i.i_item_id, i.i_item_desc
+  ORDER BY total_net_profit DESC
+  LIMIT 5;",1.0
+3.1,"Who are the customers that bought stuff from store, catalog, and web? Show c_customer_id and c_first_name.","SELECT DISTINCT c.c_customer_id, c.c_first_name
+FROM customer c
+JOIN store_sales ss ON c.c_customer_sk = ss.ss_customer_sk
+JOIN catalog_sales cs ON c.c_customer_sk = cs.cs_bill_customer_sk
+JOIN web_sales ws ON c.c_customer_sk = ws.ws_bill_customer_sk;","SELECT DISTINCT c.c_customer_id, c.c_first_name
+  FROM customer c
+  WHERE EXISTS (SELECT 1 FROM store_sales ss WHERE ss.ss_customer_sk = c.c_customer_sk)
+  AND EXISTS (SELECT 1 FROM catalog_sales cs WHERE cs.cs_bill_customer_sk = c.c_customer_sk)
+  AND EXISTS (SELECT 1 FROM web_sales ws WHERE ws.ws_bill_customer_sk = c.c_customer_sk);",1.0
+3.2,"Siapa aja pelanggan yang pernah belanja di toko, katalog, dan web? Tampilkan c_customer_id dan c_first_name.","SELECT DISTINCT c_customer_id, c_first_name
+FROM customer
+WHERE c_customer_sk IN (SELECT DISTINCT ss_customer_sk FROM store_sales)
+  AND c_customer_sk IN (SELECT DISTINCT cs_bill_customer_sk FROM catalog_sales)
+  AND c_customer_sk IN (SELECT DISTINCT ws_bill_customer_sk FROM web_sales);","SELECT DISTINCT c.c_customer_id, c.c_first_name
+  FROM customer c
+  WHERE EXISTS (SELECT 1 FROM store_sales ss WHERE ss.ss_customer_sk = c.c_customer_sk)
+  AND EXISTS (SELECT 1 FROM catalog_sales cs WHERE cs.cs_bill_customer_sk = c.c_customer_sk)
+  AND EXISTS (SELECT 1 FROM web_sales ws WHERE ws.ws_bill_customer_sk = c.c_customer_sk);",1.0
+4.1,"Which warehouses send out the most shipments across all channels? Show w_warehouse_id, w_warehouse_name, and total_shipments.","WITH warehouse_shipments AS (
+  SELECT 
+  	ws_warehouse_sk AS warehouse_sk,
+  	COUNT(*) AS total_web_shipments,
+        0 AS total_catalog_shipments
+  FROM web_sales
+  GROUP BY ws_warehouse_sk
+  UNION ALL
+  SELECT 
+  	cs_warehouse_sk AS warehouse_sk,
+  	0 AS total_web_shipments,
+  	COUNT(*) AS total_catalog_shipments
+  FROM catalog_sales
+  GROUP BY cs_warehouse_sk
+)
+SELECT 
+	w.w_warehouse_id,
+    w.w_warehouse_name,
+    SUM(ws.total_web_shipments + ws.total_catalog_shipments) AS total_shipments
+FROM warehouse w
+LEFT JOIN warehouse_shipments ws ON w.w_warehouse_sk = ws.warehouse_sk
+GROUP BY w.w_warehouse_sk, w.w_warehouse_id, w.w_warehouse_name
+ORDER BY total_shipments DESC;","SELECT 
+  w.w_warehouse_id, 
+  w.w_warehouse_name, 
+  COUNT(*) AS total_shipments
+  FROM warehouse w
+  LEFT JOIN catalog_sales cs ON cs.cs_warehouse_sk = w.w_warehouse_sk
+  LEFT JOIN web_sales ws ON ws.ws_warehouse_sk = w.w_warehouse_sk
+  GROUP BY w.w_warehouse_id, w.w_warehouse_name
+  ORDER BY total_shipments DESC
+  LIMIT 10;",0.0
+4.2,"Gudang mana yang paling banyak kirim barang ke semua channel? Tampilkan w_warehouse_id, w_warehouse_name, dan total_shipments.","WITH warehouse_shipments AS (
+  SELECT
+  	ws_warehouse_sk,
+  	COUNT(*) AS total_shipments
+  FROM
+  	web_sales
+  GROUP BY
+  	ws_warehouse_sk
+  UNION ALL
+  SELECT
+  	cs_warehouse_sk,
+  	COUNT(*) AS total_shipments
+  FROM
+  	catalog_sales
+  GROUP BY
+  	cs_warehouse_sk
+),
+ranked_warehouse_shipments AS (
+  SELECT
+  	ws_warehouse_sk,
+  	total_shipments,
+  	RANK() OVER (ORDER BY total_shipments DESC) as rank
+  FROM
+  	warehouse_shipments
+)
+SELECT
+  w.w_warehouse_id,
+  w.w_warehouse_name,
+  r.total_shipments
+FROM
+  warehouse w
+JOIN
+  ranked_warehouse_shipments r ON w.w_warehouse_sk = r.ws_warehouse_sk
+WHERE r.rank = 1;","SELECT 
+  w.w_warehouse_id, 
+  w.w_warehouse_name, 
+  COUNT(*) AS total_shipments
+  FROM warehouse w
+  LEFT JOIN catalog_sales cs ON cs.cs_warehouse_sk = w.w_warehouse_sk
+  LEFT JOIN web_sales ws ON ws.ws_warehouse_sk = w.w_warehouse_sk
+  GROUP BY w.w_warehouse_id, w.w_warehouse_name
+  ORDER BY total_shipments DESC
+  LIMIT 10;",0.0
+5.1,"What are the 5 items that got returned the most across all types of returns? Show i_item_id, i_item_desc, and total_returns.","WITH item_return_counts AS (
+  SELECT
+  	cr_item_sk,
+  	COUNT(*) AS return_count
+  FROM
+  	catalog_returns
+  GROUP BY
+  	cr_item_sk
+  UNION ALL
+  SELECT
+  	sr_item_sk,
+  	COUNT(*) AS return_count
+  FROM
+  	store_returns
+  GROUP BY
+  	sr_item_sk
+  UNION ALL
+  SELECT
+  	wr_item_sk,
+  	COUNT(*) AS return_count
+  FROM
+  	web_returns
+  GROUP BY
+  	wr_item_sk
+)
+SELECT
+    i.i_item_id,
+    i.i_item_desc,
+    SUM(irc.return_count) AS total_returns
+FROM
+    item_return_counts irc
+JOIN
+    item i ON irc.cr_item_sk = i.i_item_sk
+GROUP BY
+    i.i_item_id, i.i_item_desc
+ORDER BY
+    total_returns DESC
+LIMIT 5;","SELECT 
+  i.i_item_id,
+  i.i_item_desc,
+  SUM(COALESCE(sr.sr_return_quantity,0) + COALESCE(cr.cr_return_quantity,0) + COALESCE(wr.wr_return_quantity,0)) AS total_returns
+  FROM item i
+  LEFT JOIN store_returns sr ON sr.sr_item_sk = i.i_item_sk
+  LEFT JOIN catalog_returns cr ON cr.cr_item_sk = i.i_item_sk
+  LEFT JOIN web_returns wr ON wr.wr_item_sk = i.i_item_sk
+  GROUP BY i.i_item_id, i.i_item_desc
+  ORDER BY total_returns DESC
+  LIMIT 5;",0.0
+5.2,"Barang apa aja yang paling sering diretur di semua channel? Tampilkan i_item_id, i_item_desc, dan total_returns.","SELECT i_item_id, i_item_desc, SUM(return_quantity) AS total_returns
+FROM (
+    SELECT cr_item_sk, cr_return_quantity AS return_quantity
+    FROM catalog_returns
+    UNION ALL
+    SELECT sr_item_sk, sr_return_quantity
+    FROM store_returns
+    UNION ALL
+    SELECT wr_item_sk, wr_return_quantity
+    FROM web_returns
+) AS all_returns
+JOIN item ON all_returns.cr_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_returns DESC;","SELECT 
+  i.i_item_id,
+  i.i_item_desc,
+  SUM(COALESCE(sr.sr_return_quantity,0) + COALESCE(cr.cr_return_quantity,0) + COALESCE(wr.wr_return_quantity,0)) AS total_returns
+  FROM item i
+  LEFT JOIN store_returns sr ON sr.sr_item_sk = i.i_item_sk
+  LEFT JOIN catalog_returns cr ON cr.cr_item_sk = i.i_item_sk
+  LEFT JOIN web_returns wr ON wr.wr_item_sk = i.i_item_sk
+  GROUP BY i.i_item_id, i.i_item_desc
+  ORDER BY total_returns DESC
+  LIMIT 5;",0.0
+6.1,Which states spend the most per customer in store purchases? Show ca_state and avg_spending.,"SELECT ca_state, AVG(ss_net_paid) AS avg_spending
+FROM store_sales
+JOIN customer_address ON ss_addr_sk = ca_address_sk
+GROUP BY ca_state
+ORDER BY avg_spending DESC;","SELECT 
+  ca.ca_state,
+  AVG(ss.ss_net_paid) AS avg_spending
+  FROM store_sales ss
+  JOIN customer_address ca ON ss.ss_addr_sk = ca.ca_address_sk
+  GROUP BY ca.ca_state
+  ORDER BY avg_spending DESC
+  LIMIT 10;",0.0
+6.2,Negara bagian mana yang rata-rata pelanggannya belanja paling banyak di toko? Tampilkan ca_state dan avg_spending.,"SELECT ca_state, AVG(ss_ext_sales_price) AS avg_spending
+FROM store_sales
+JOIN customer
+ON ss_customer_sk = c_customer_sk
+JOIN customer_address
+ON c_current_addr_sk = ca_address_sk
+GROUP BY ca_state
+ORDER BY avg_spending DESC
+LIMIT 1;","SELECT 
+  ca.ca_state,
+  AVG(ss.ss_net_paid) AS avg_spending
+  FROM store_sales ss
+  JOIN customer_address ca ON ss.ss_addr_sk = ca.ca_address_sk
+  GROUP BY ca.ca_state
+  ORDER BY avg_spending DESC
+  LIMIT 10;",0.0
+7.1,Which shipping methods are used the most across all sales types? Show sm_type and total_usages.,"SELECT sm_type, COUNT(*) AS total_usages FROM ship_mode AS sm
+JOIN catalog_sales AS cs ON sm.sm_ship_mode_sk = cs.cs_ship_mode_sk
+JOIN web_sales AS ws ON sm.sm_ship_mode_sk = ws.ws_ship_mode_sk
+GROUP BY sm_type
+ORDER BY total_usages DESC;","SELECT 
+  sm.sm_type,
+  COUNT(*) AS total_usages
+  FROM ship_mode sm
+  LEFT JOIN catalog_sales cs ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+  LEFT JOIN web_sales ws ON ws.ws_ship_mode_sk = sm.sm_ship_mode_sk
+  GROUP BY sm.sm_type
+  ORDER BY total_usages DESC;",1.0
+7.2,Cara kirim apa yang paling sering dipake di semua jenis penjualan? Tampilkan sm_type dan total_usages.,"SELECT sm_type, COUNT(*) AS total_usages FROM ship_mode JOIN catalog_sales ON sm_ship_mode_sk = cs_ship_mode_sk JOIN web_sales ON sm_ship_mode_sk = ws_ship_mode_sk GROUP BY sm_type ORDER BY total_usages DESC LIMIT 1;","SELECT 
+  sm.sm_type,
+  COUNT(*) AS total_usages
+  FROM ship_mode sm
+  LEFT JOIN catalog_sales cs ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+  LEFT JOIN web_sales ws ON ws.ws_ship_mode_sk = sm.sm_ship_mode_sk
+  GROUP BY sm.sm_type
+  ORDER BY total_usages DESC;",0.0
+8.1,"Which web pages are linked to the highest number of product returns? Show wp_web_page_id, wp_url, and total_web_returns.","SELECT wp.wp_web_page_id, wp.wp_url, COUNT(wr.wr_order_number) AS total_web_returns
+FROM web_page wp
+JOIN web_returns wr ON wp.wp_web_page_sk = wr.wr_web_page_sk
+GROUP BY wp.wp_web_page_id, wp.wp_url
+ORDER BY total_web_returns DESC
+LIMIT 1;","SELECT 
+  wp.wp_web_page_id,
+  wp.wp_url,
+  COUNT(wr.wr_order_number) AS total_web_returns
+  FROM web_returns wr
+  JOIN web_page wp ON wr.wr_web_page_sk = wp.wp_web_page_sk
+  GROUP BY wp.wp_web_page_id, wp.wp_url
+  ORDER BY total_web_returns DESC
+  LIMIT 10;",0.0
+8.2,"Halaman web mana yang paling banyak nyebabin retur? Tampilkan wp_web_page_id, wp_url, dan total_web_returns.","SELECT wp_web_page_id, wp_url, COUNT(*) AS total_web_returns
+FROM web_returns
+JOIN web_page ON web_returns.wr_web_page_sk = web_page.wp_web_page_sk
+GROUP BY wp_web_page_id, wp_url
+ORDER BY total_web_returns DESC
+LIMIT 1;","SELECT 
+  wp.wp_web_page_id,
+  wp.wp_url,
+  COUNT(wr.wr_order_number) AS total_web_returns
+  FROM web_returns wr
+  JOIN web_page wp ON wr.wr_web_page_sk = wp.wp_web_page_sk
+  GROUP BY wp.wp_web_page_id, wp.wp_url
+  ORDER BY total_web_returns DESC
+  LIMIT 10;",0.0
+9.1,Which shipping types cost the most on average in catalog sales? Show sm_type and avg_ship_cost.,"SELECT sm_type, AVG(cs_ext_ship_cost) AS avg_ship_cost
+FROM catalog_sales
+JOIN ship_mode ON cs_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_type
+ORDER BY avg_ship_cost DESC;","
+SELECT sm.sm_type, AVG(cs.cs_ext_ship_cost) AS avg_ship_cost
+FROM catalog_sales cs
+JOIN ship_mode sm ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+GROUP BY sm.sm_type
+ORDER BY avg_ship_cost DESC
+LIMIT 5;
+",0.0
+9.2,Jenis pengiriman apa yang rata-rata ongkosnya paling mahal di penjualan katalog? Tampilkan sm_type dan avg_ship_cost.,"SELECT sm_type, AVG(cs_ext_ship_cost) AS avg_ship_cost
+FROM catalog_sales
+JOIN ship_mode ON cs_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_type
+ORDER BY avg_ship_cost DESC
+LIMIT 1;","
+SELECT sm.sm_type, AVG(cs.cs_ext_ship_cost) AS avg_ship_cost
+FROM catalog_sales cs
+JOIN ship_mode sm ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+GROUP BY sm.sm_type
+ORDER BY avg_ship_cost DESC
+LIMIT 5;
+",0.0
+10.1,What are the 5 item categories that sold the most in total quantity? Show i_category and total_quantity_sold.,"SELECT i_category, SUM(cs_quantity) AS total_quantity_sold
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_category
+ORDER BY total_quantity_sold DESC
+LIMIT 5;","SELECT 
+  i.i_category,
+  SUM(COALESCE(ss.ss_quantity,0) + COALESCE(cs.cs_quantity,0) + COALESCE(ws.ws_quantity,0)) AS total_quantity_sold
+  FROM item i
+  LEFT JOIN store_sales ss ON ss.ss_item_sk = i.i_item_sk
+  LEFT JOIN catalog_sales cs ON cs.cs_item_sk = i.i_item_sk
+  LEFT JOIN web_sales ws ON ws.ws_item_sk = i.i_item_sk
+  GROUP BY i.i_category
+  ORDER BY total_quantity_sold DESC
+  LIMIT 5;",0.0
+10.2,Kategori barang apa yang jumlah terjualnya paling tinggi? Tampilkan i_category dan total_quantity_sold.,"SELECT i_category, SUM(cs_quantity) AS total_quantity_sold
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_category
+ORDER BY total_quantity_sold DESC
+LIMIT 1;","SELECT 
+  i.i_category,
+  SUM(COALESCE(ss.ss_quantity,0) + COALESCE(cs.cs_quantity,0) + COALESCE(ws.ws_quantity,0)) AS total_quantity_sold
+  FROM item i
+  LEFT JOIN store_sales ss ON ss.ss_item_sk = i.i_item_sk
+  LEFT JOIN catalog_sales cs ON cs.cs_item_sk = i.i_item_sk
+  LEFT JOIN web_sales ws ON ws.ws_item_sk = i.i_item_sk
+  GROUP BY i.i_category
+  ORDER BY total_quantity_sold DESC
+  LIMIT 5;",0.0
+11.1,Which 5 customers have earned the most total profit from buying through the catalog? Show c_customer_id and total_profit.,"SELECT c_customer_id, SUM(cs_net_profit) AS total_profit
+FROM catalog_sales
+JOIN customer ON cs_bill_customer_sk = c_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_profit DESC
+LIMIT 5;","SELECT
+  c.c_customer_id,
+  SUM(cs.cs_net_profit) AS total_profit
+ FROM
+  catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_profit DESC
+ LIMIT 5;",1.0
+11.2,Siapa aja 5 pelanggan yang hasil belanjanya di katalog ngasih untung paling banyak? Tampilkan c_customer_id dan total_profit.,"SELECT c_customer_id, SUM(cs_net_profit) AS total_profit
+FROM catalog_sales
+JOIN customer ON cs_bill_customer_sk = c_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_profit DESC
+LIMIT 5;","SELECT
+  c.c_customer_id,
+  SUM(cs.cs_net_profit) AS total_profit
+ FROM
+  catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_profit DESC
+ LIMIT 5;",1.0
+12.1,"Which 5 items were returned the most in physical store purchases? Show i_item_id, i_item_desc, and total_return_quantity.","SELECT i_item_id, i_item_desc, SUM(sr_return_quantity) AS total_return_quantity
+FROM store_returns
+JOIN item ON sr_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_return_quantity DESC
+LIMIT 5;","SELECT
+  i.i_item_id,
+  i.i_item_desc,
+  SUM(sr.sr_return_quantity) AS total_return_quantity
+ FROM
+  store_returns sr
+ JOIN item i ON sr.sr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_return_quantity DESC
+ LIMIT 5;",1.0
+12.2,"Barang apa aja yang paling sering dikembalikan di toko fisik? Tampilkan i_item_id, i_item_desc, dan total_return_quantity.","SELECT i_item_id, i_item_desc, SUM(sr_return_quantity) AS total_return_quantity
+FROM store_returns
+JOIN item ON store_returns.sr_item_sk = item.i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_return_quantity DESC;","SELECT
+  i.i_item_id,
+  i.i_item_desc,
+  SUM(sr.sr_return_quantity) AS total_return_quantity
+ FROM
+  store_returns sr
+ JOIN item i ON sr.sr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_return_quantity DESC
+ LIMIT 5;",0.0
+13.1,Which shipping methods cause the biggest average losses in catalog returns? Show sm_ship_mode_id and avg_net_loss.,"SELECT sm_ship_mode_id, AVG(cr_net_loss) AS avg_net_loss
+FROM catalog_returns cr
+JOIN ship_mode sm ON cr.cr_ship_mode_sk = sm.sm_ship_mode_sk
+GROUP BY sm_ship_mode_id
+ORDER BY avg_net_loss DESC;","SELECT
+  sm.sm_ship_mode_id,
+  AVG(cr.cr_net_loss) AS avg_net_loss
+ FROM
+  catalog_returns cr
+ JOIN ship_mode sm ON cr.cr_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_ship_mode_id
+ ORDER BY avg_net_loss DESC
+ LIMIT 5;",0.0
+13.2,Cara pengiriman mana yang bikin rugi paling gede rata-ratanya dari retur katalog? Tampilkan sm_ship_mode_id dan avg_net_loss.,"SELECT sm_ship_mode_id, AVG(cr_net_loss) AS avg_net_loss
+FROM catalog_returns
+JOIN ship_mode ON cr_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_ship_mode_id
+ORDER BY avg_net_loss DESC;","SELECT
+  sm.sm_ship_mode_id,
+  AVG(cr.cr_net_loss) AS avg_net_loss
+ FROM
+  catalog_returns cr
+ JOIN ship_mode sm ON cr.cr_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_ship_mode_id
+ ORDER BY avg_net_loss DESC
+ LIMIT 5;",0.0
+14.1,Which 5 brands earned the most from web sales? Show i_brand and total_revenue.,"SELECT i_brand, SUM(ws_ext_sales_price) AS total_revenue
+FROM web_sales
+JOIN item ON ws_item_sk = i_item_sk
+GROUP BY i_brand
+ORDER BY total_revenue DESC
+LIMIT 5;","SELECT
+  i.i_brand,
+  SUM(ws.ws_net_paid) AS total_revenue
+ FROM
+  web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_brand
+ ORDER BY total_revenue DESC
+ LIMIT 5;",0.0
+14.2,Merek apa aja yang dapet pemasukan paling tinggi dari penjualan online? Tampilkan i_brand dan total_revenue.,"SELECT i_brand, SUM(ws_ext_sales_price) AS total_revenue
+FROM web_sales
+JOIN item ON ws_item_sk = i_item_sk
+GROUP BY i_brand
+ORDER BY total_revenue DESC;","SELECT
+  i.i_brand,
+  SUM(ws.ws_net_paid) AS total_revenue
+ FROM
+  web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_brand
+ ORDER BY total_revenue DESC
+ LIMIT 5;",0.0
+15.1,Which 5 store managers oversaw stores with the highest overall sales? Show s_manager and total_sales.,"SELECT s_manager, SUM(ss_ext_sales_price) AS total_sales
+FROM store_sales
+JOIN store ON store_sales.ss_store_sk = store.s_store_sk
+GROUP BY s_manager
+ORDER BY total_sales DESC
+LIMIT 5;","SELECT
+  s.s_manager,
+  SUM(ss.ss_net_paid) AS total_sales
+ FROM
+  store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ GROUP BY s.s_manager
+ ORDER BY total_sales DESC
+ LIMIT 5;",0.0
+15.2,Manajer toko mana aja yang toko-nya paling tinggi total penjualannya? Tampilkan s_manager dan total_sales.,"SELECT s_manager, SUM(ss_ext_sales_price) AS total_sales
+FROM store_sales
+JOIN store ON store_sales.ss_store_sk = store.s_store_sk
+GROUP BY s_manager
+ORDER BY total_sales DESC;","SELECT
+  s.s_manager,
+  SUM(ss.ss_net_paid) AS total_sales
+ FROM
+  store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ GROUP BY s.s_manager
+ ORDER BY total_sales DESC
+ LIMIT 5;",0.0
+16.1,Which 5 countries have customers with the highest estimated spending power? Show ca_country and avg_purchase_estimate.,"SELECT ca_country, AVG(cd_purchase_estimate) AS avg_purchase_estimate
+FROM customer_address
+JOIN customer ON ca_address_sk = c_current_addr_sk
+JOIN customer_demographics ON c_current_cdemo_sk = cd_demo_sk
+GROUP BY ca_country
+ORDER BY avg_purchase_estimate DESC
+LIMIT 5;","SELECT
+  ca.ca_country,
+  AVG(cd.cd_purchase_estimate) AS avg_purchase_estimate
+ FROM
+  customer c
+ JOIN customer_address ca ON c.c_current_addr_sk = ca.ca_address_sk
+ JOIN customer_demographics cd ON c.c_current_cdemo_sk = cd.cd_demo_sk
+ GROUP BY ca.ca_country
+ ORDER BY avg_purchase_estimate DESC
+ LIMIT 5;",1.0
+16.2,Negara mana yang pelanggannya diperkirakan punya daya beli paling tinggi? Tampilkan ca_country dan avg_purchase_estimate.,"SELECT ca_country, AVG(cd_purchase_estimate) AS avg_purchase_estimate
+FROM customer_address
+JOIN customer ON ca_address_sk = c_current_addr_sk
+JOIN customer_demographics ON c_current_cdemo_sk = cd_demo_sk
+GROUP BY ca_country
+ORDER BY avg_purchase_estimate DESC
+LIMIT 1;","SELECT
+  ca.ca_country,
+  AVG(cd.cd_purchase_estimate) AS avg_purchase_estimate
+ FROM
+  customer c
+ JOIN customer_address ca ON c.c_current_addr_sk = ca.ca_address_sk
+ JOIN customer_demographics cd ON c.c_current_cdemo_sk = cd.cd_demo_sk
+ GROUP BY ca.ca_country
+ ORDER BY avg_purchase_estimate DESC
+ LIMIT 5;",1.0
+17.1,Which items were bought by the highest number of different customers in catalog sales? Show i_item_id and customer_count.,"SELECT i_item_id, COUNT(DISTINCT cs_bill_customer_sk) AS customer_count
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_item_id
+ORDER BY customer_count DESC
+LIMIT 1;","SELECT
+  i.i_item_id,
+  COUNT(DISTINCT cs.cs_bill_customer_sk) AS customer_count
+ FROM
+  catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id
+ ORDER BY customer_count DESC
+ LIMIT 5;",0.0
+17.2,Barang apa aja yang paling banyak dibeli sama pelanggan yang berbeda-beda di katalog? Tampilkan i_item_id dan customer_count.,"SELECT i_item_id, COUNT(DISTINCT cs_bill_customer_sk) AS customer_count
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_item_id
+ORDER BY customer_count DESC;","SELECT
+  i.i_item_id,
+  COUNT(DISTINCT cs.cs_bill_customer_sk) AS customer_count
+ FROM
+  catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id
+ ORDER BY customer_count DESC
+ LIMIT 5;",0.0
+18.1,Which call centers handled the most catalog return transactions? Show cc_name and total_returns.,"SELECT cc.cc_name, COUNT(cr.cr_call_center_sk) AS total_returns
+FROM call_center AS cc
+JOIN catalog_returns AS cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY total_returns DESC;","SELECT
+  cc.cc_name,
+  COUNT(*) AS total_returns
+ FROM
+  catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",1.0
+18.2,Pusat panggilan mana yang paling banyak nangani retur dari katalog? Tampilkan cc_name dan total_returns.,"SELECT cc.cc_name, COUNT(cr.cr_call_center_sk) AS total_returns
+FROM call_center AS cc
+JOIN catalog_returns AS cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY total_returns DESC
+LIMIT 1;","SELECT
+  cc.cc_name,
+  COUNT(*) AS total_returns
+ FROM
+  catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",0.0
+19.1,Which 5 income bands see the most average loss from web returns? Show income_band and avg_net_loss.,"SELECT ib.ib_lower_bound || ' - ' || ib.ib_upper_bound AS income_band, AVG(wr.wr_net_loss) AS avg_net_loss
+FROM web_returns wr
+JOIN household_demographics hd ON wr.wr_refunded_hdemo_sk = hd.hd_demo_sk
+JOIN income_band ib ON hd.hd_income_band_sk = ib.ib_income_band_sk
+GROUP BY income_band
+ORDER BY avg_net_loss DESC
+LIMIT 5;","SELECT
+  CONCAT(ib.ib_lower_bound, '-', ib.ib_upper_bound) AS income_band,
+  AVG(wr.wr_net_loss) AS avg_net_loss
+ FROM
+  web_returns wr
+ JOIN customer c ON wr.wr_refunded_customer_sk = c.c_customer_sk
+ JOIN household_demographics hd ON c.c_current_hdemo_sk = hd.hd_demo_sk
+ JOIN income_band ib ON hd.hd_income_band_sk = ib.ib_income_band_sk
+ GROUP BY ib.ib_lower_bound, ib.ib_upper_bound
+ ORDER BY avg_net_loss DESC
+ LIMIT 5;",0.0
+19.2,Kelompok penghasilan mana yang rata-rata paling sering rugi karena retur online? Tampilkan income_band dan avg_net_loss.,"SELECT ib_lower_bound || ' - ' || ib_upper_bound AS income_band, AVG(wr_net_loss) AS avg_net_loss
+FROM web_returns
+JOIN customer ON wr_refunded_customer_sk = c_customer_sk
+JOIN customer_demographics ON c_current_cdemo_sk = cd_demo_sk
+JOIN household_demographics ON cd_demo_sk = hd_demo_sk
+JOIN income_band ON hd_income_band_sk = ib_income_band_sk
+GROUP BY income_band
+ORDER BY avg_net_loss DESC
+LIMIT 1;","SELECT
+  CONCAT(ib.ib_lower_bound, '-', ib.ib_upper_bound) AS income_band,
+  AVG(wr.wr_net_loss) AS avg_net_loss
+ FROM
+  web_returns wr
+ JOIN customer c ON wr.wr_refunded_customer_sk = c.c_customer_sk
+ JOIN household_demographics hd ON c.c_current_hdemo_sk = hd.hd_demo_sk
+ JOIN income_band ib ON hd.hd_income_band_sk = ib.ib_income_band_sk
+ GROUP BY ib.ib_lower_bound, ib.ib_upper_bound
+ ORDER BY avg_net_loss DESC
+ LIMIT 5;",0.0
+20.1,Which call centers have the highest number of return records in catalog_returns? Show cc_name and total_returns.,"SELECT cc.cc_name, COUNT(*) AS total_returns
+FROM call_center cc
+JOIN catalog_returns cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY total_returns DESC;","SELECT cc.cc_name, COUNT(*) AS total_returns
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",1.0
+20.2,Pusat panggilan mana aja yang paling sering masuk data retur dari katalog? Tampilkan cc_name dan total_returns.,"SELECT cc.cc_name, COUNT(cr.cr_call_center_sk) AS total_returns
+FROM call_center cc
+JOIN catalog_returns cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY total_returns DESC;","SELECT cc.cc_name, COUNT(*) AS total_returns
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",1.0
+21.1,Which web pages are linked to the most items being sold? Show wp_url and total_items_sold.,"SELECT wp.wp_url, SUM(ws.ws_quantity) AS total_items_sold
+FROM web_sales ws
+JOIN web_page wp ON ws.ws_web_page_sk = wp.wp_web_page_sk
+GROUP BY wp.wp_url
+ORDER BY total_items_sold DESC;","SELECT wp.wp_url, SUM(ws.ws_quantity) AS total_items_sold
+ FROM web_sales ws
+ JOIN web_page wp ON ws.ws_web_page_sk = wp.wp_web_page_sk
+ GROUP BY wp.wp_url
+ ORDER BY total_items_sold DESC
+ LIMIT 5;",1.0
+21.2,Halaman web mana yang paling banyak jadi tempat jual barang? Tampilkan wp_url dan total_items_sold.,"SELECT wp_url, SUM(ws_quantity) AS total_items_sold FROM web_sales JOIN web_page ON web_sales.ws_web_page_sk = web_page.wp_web_page_sk GROUP BY wp_url ORDER BY total_items_sold DESC LIMIT 1;","SELECT wp.wp_url, SUM(ws.ws_quantity) AS total_items_sold
+ FROM web_sales ws
+ JOIN web_page wp ON ws.ws_web_page_sk = wp.wp_web_page_sk
+ GROUP BY wp.wp_url
+ ORDER BY total_items_sold DESC
+ LIMIT 5;",1.0
+22.1,Which shipping modes are most commonly used in catalog sales? Show sm_type and usage_count.,"SELECT sm_type, COUNT(*) AS usage_count FROM ship_mode JOIN catalog_sales ON ship_mode.sm_ship_mode_sk = catalog_sales.cs_ship_mode_sk GROUP BY sm_type ORDER BY usage_count DESC;","SELECT sm.sm_type, COUNT(*) AS usage_count
+ FROM catalog_sales cs
+ JOIN ship_mode sm ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_type
+ ORDER BY usage_count DESC
+ LIMIT 5;",0.0
+22.2,Jenis pengiriman apa yang paling sering dipakai buat penjualan katalog? Tampilkan sm_type dan usage_count.,"SELECT sm_type, COUNT(*) AS usage_count FROM catalog_sales cs JOIN ship_mode sm ON cs_ship_mode_sk = sm_ship_mode_sk GROUP BY sm_type ORDER BY usage_count DESC LIMIT 1;","SELECT sm.sm_type, COUNT(*) AS usage_count
+ FROM catalog_sales cs
+ JOIN ship_mode sm ON cs.cs_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_type
+ ORDER BY usage_count DESC
+ LIMIT 5;",0.0
+23.1,Which 5 items had the biggest total profit from both store and catalog sales? Show i_product_name and total_profit.,"SELECT i_product_name, SUM(cs_net_profit + ss_net_profit) AS total_profit
+FROM catalog_sales cs
+JOIN item i ON cs_item_sk = i_item_sk
+JOIN store_sales ss ON cs_item_sk = ss_item_sk
+GROUP BY i_product_name
+ORDER BY total_profit DESC
+LIMIT 5;","SELECT i.i_product_name,
+  SUM(COALESCE(ss.ss_net_profit, 0)) + SUM(COALESCE(cs.cs_net_profit, 0)) AS total_profit
+ FROM item i
+ LEFT JOIN store_sales ss ON i.i_item_sk = ss.ss_item_sk
+ LEFT JOIN catalog_sales cs ON i.i_item_sk = cs.cs_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_profit DESC
+ LIMIT 5;",0.0
+23.2,Barang apa aja yang total untungnya paling gede dari penjualan toko dan katalog? Tampilkan i_product_name dan total_profit.,"SELECT i_product_name, SUM(cs_net_profit + ss_net_profit) AS total_profit
+FROM catalog_sales AS cs
+JOIN store_sales AS ss ON cs.cs_item_sk = ss.ss_item_sk
+JOIN item AS i ON cs.cs_item_sk = i.i_item_sk
+GROUP BY i_product_name
+ORDER BY total_profit DESC;","SELECT i.i_product_name,
+  SUM(COALESCE(ss.ss_net_profit, 0)) + SUM(COALESCE(cs.cs_net_profit, 0)) AS total_profit
+ FROM item i
+ LEFT JOIN store_sales ss ON i.i_item_sk = ss.ss_item_sk
+ LEFT JOIN catalog_sales cs ON i.i_item_sk = cs.cs_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_profit DESC
+ LIMIT 5;",0.0
+24.1,Which warehouses have the most average inventory available? Show w_warehouse_name and avg_inventory.,"WITH warehouse_inventory AS (
+  SELECT 
+  	w_warehouse_sk,
+  	w_warehouse_name,
+  	AVG(inv_quantity_on_hand) AS avg_inventory
+  FROM 
+  	warehouse
+  JOIN 
+  	inventory ON w_warehouse_sk = inv_warehouse_sk
+  GROUP BY 
+  	w_warehouse_sk, w_warehouse_name
+)
+SELECT 
+	w_warehouse_name, 
+	avg_inventory
+FROM 
+	warehouse_inventory
+ORDER BY 
+	avg_inventory DESC;","SELECT w.w_warehouse_name, AVG(inv.inv_quantity_on_hand) AS avg_inventory
+ FROM inventory inv
+ JOIN warehouse w ON inv.inv_warehouse_sk = w.w_warehouse_sk
+ GROUP BY w.w_warehouse_name
+ ORDER BY avg_inventory DESC
+ LIMIT 5;",1.0
+24.2,Gudang mana yang rata-rata punya stok paling banyak? Tampilkan w_warehouse_name dan avg_inventory.,"SELECT w_warehouse_name, AVG(inv_quantity_on_hand) AS avg_inventory
+FROM warehouse
+JOIN inventory ON warehouse.w_warehouse_sk = inventory.inv_warehouse_sk
+GROUP BY w_warehouse_name
+ORDER BY avg_inventory DESC
+LIMIT 1;","SELECT w.w_warehouse_name, AVG(inv.inv_quantity_on_hand) AS avg_inventory
+ FROM inventory inv
+ JOIN warehouse w ON inv.inv_warehouse_sk = w.w_warehouse_sk
+ GROUP BY w.w_warehouse_name
+ ORDER BY avg_inventory DESC
+ LIMIT 5;",0.0
+25.1,Which 5 websites generated the most profit from web sales? Show web_name and total_net_profit.,"SELECT w.web_name, SUM(ws.ws_net_profit) AS total_net_profit
+FROM web_site w
+JOIN web_sales ws ON w.web_site_sk = ws.ws_web_site_sk
+GROUP BY w.web_name
+ORDER BY total_net_profit DESC
+LIMIT 5;","SELECT ws.web_name, SUM(wsa.ws_net_profit) AS total_net_profit
+ FROM web_sales wsa
+ JOIN web_site ws ON wsa.ws_web_site_sk = ws.web_site_sk
+ GROUP BY ws.web_name
+ ORDER BY total_net_profit DESC
+ LIMIT 5;",1.0
+25.2,Situs web mana yang paling banyak dapet untung dari penjualan online? Tampilkan web_name dan total_net_profit.,"SELECT web_site.web_name, SUM(web_sales.ws_net_profit) AS total_net_profit
+FROM web_site
+JOIN web_sales ON web_site.web_site_sk = web_sales.ws_web_site_sk
+GROUP BY web_site.web_name
+ORDER BY total_net_profit DESC
+LIMIT 1;","SELECT ws.web_name, SUM(wsa.ws_net_profit) AS total_net_profit
+ FROM web_sales wsa
+ JOIN web_site ws ON wsa.ws_web_site_sk = ws.web_site_sk
+ GROUP BY ws.web_name
+ ORDER BY total_net_profit DESC
+ LIMIT 5;",0.0
+26.1,Which items are returned the most in catalog returns? Show i_product_name and total_returned_qty.,"SELECT i_product_name, SUM(cr_return_quantity) AS total_returned_qty
+FROM catalog_returns
+JOIN item ON catalog_returns.cr_item_sk = item.i_item_sk
+GROUP BY i_product_name
+ORDER BY total_returned_qty DESC;","SELECT i.i_product_name, SUM(cr.cr_return_quantity) AS total_returned_qty
+ FROM catalog_returns cr
+ JOIN item i ON cr.cr_item_sk = i.i_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_returned_qty DESC
+ LIMIT 5;",0.0
+26.2,Barang apa aja yang paling sering dikembalikan lewat katalog? Tampilkan i_product_name dan total_returned_qty.,"SELECT i_product_name, SUM(cr_return_quantity) AS total_returned_qty
+FROM catalog_returns cr
+JOIN item i ON cr.cr_item_sk = i.i_item_sk
+GROUP BY i_product_name
+ORDER BY total_returned_qty DESC;","SELECT i.i_product_name, SUM(cr.cr_return_quantity) AS total_returned_qty
+ FROM catalog_returns cr
+ JOIN item i ON cr.cr_item_sk = i.i_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_returned_qty DESC
+ LIMIT 5;",0.0
+27.1,Which customers made the highest number of store purchases? Show c_customer_id and sales_count.,"SELECT c_customer_id, COUNT(*) AS sales_count FROM store_sales ss JOIN customer c ON ss.ss_customer_sk = c.c_customer_sk GROUP BY c_customer_id ORDER BY sales_count DESC LIMIT 1;","SELECT c.c_customer_id, COUNT(*) AS sales_count
+ FROM store_sales ss
+ JOIN customer c ON ss.ss_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY sales_count DESC
+ LIMIT 5;",0.0
+27.2,Pelanggan mana yang paling sering belanja di toko? Tampilkan c_customer_id dan sales_count.,"SELECT c_customer_id, COUNT(*) AS sales_count FROM store_sales ss JOIN customer c ON ss.ss_customer_sk = c.c_customer_sk GROUP BY c_customer_id ORDER BY sales_count DESC LIMIT 1;","SELECT c.c_customer_id, COUNT(*) AS sales_count
+ FROM store_sales ss
+ JOIN customer c ON ss.ss_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY sales_count DESC
+ LIMIT 5;",0.0
+28.1,Which item categories had the highest total online sales revenue? Show i_category and total_revenue.,"SELECT i_category, SUM(ws_ext_sales_price) AS total_revenue
+FROM web_sales
+JOIN item ON ws_item_sk = i_item_sk
+GROUP BY i_category
+ORDER BY total_revenue DESC;","SELECT i.i_category, SUM(ws.ws_ext_sales_price) AS total_revenue
+ FROM web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_category
+ ORDER BY total_revenue DESC
+ LIMIT 5;",0.0
+28.2,Kategori produk apa yang dapet pemasukan paling besar dari penjualan online? Tampilkan i_category dan total_revenue.,"SELECT i_category, SUM(ws_ext_sales_price) AS total_revenue
+FROM web_sales
+JOIN item ON ws_item_sk = i_item_sk
+GROUP BY i_category
+ORDER BY total_revenue DESC
+LIMIT 1;","SELECT i.i_category, SUM(ws.ws_ext_sales_price) AS total_revenue
+ FROM web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_category
+ ORDER BY total_revenue DESC
+ LIMIT 5;",0.0
+29.1,Which stores have the highest number of item returns? Show s_store_name and total_returns.,"SELECT s_store_name, SUM(sr_return_quantity) AS total_returns
+FROM store_returns
+JOIN store ON store_returns.sr_store_sk = store.s_store_sk
+GROUP BY s_store_name
+ORDER BY total_returns DESC;","SELECT s.s_store_name, COUNT(*) AS total_returns
+ FROM store_returns sr
+ JOIN store s ON sr.sr_store_sk = s.s_store_sk
+ GROUP BY s.s_store_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",0.0
+29.2,Toko mana aja yang paling sering dapet retur barang? Tampilkan s_store_name dan total_returns.,"SELECT s_store_name, COUNT(*) AS total_returns
+FROM store_returns
+JOIN store ON store_returns.sr_store_sk = store.s_store_sk
+GROUP BY s_store_name
+ORDER BY total_returns DESC;","SELECT s.s_store_name, COUNT(*) AS total_returns
+ FROM store_returns sr
+ JOIN store s ON sr.sr_store_sk = s.s_store_sk
+ GROUP BY s.s_store_name
+ ORDER BY total_returns DESC
+ LIMIT 5;",0.0
+30.1,"Which pair of call center and catalog page led to the biggest return losses? Show call center name, catalog page department, and total net loss.","SELECT cc.cc_name, cp.cp_department, SUM(cr.cr_net_loss) AS total_net_loss
+FROM catalog_returns cr
+JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+JOIN catalog_page cp ON cr.cr_catalog_page_sk = cp.cp_catalog_page_sk
+GROUP BY cc.cc_name, cp.cp_department
+ORDER BY total_net_loss DESC
+LIMIT 1;","SELECT cc.cc_name, cp.cp_department, SUM(cr.cr_net_loss) AS total_net_loss
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ JOIN catalog_page cp ON cr.cr_catalog_page_sk = cp.cp_catalog_page_sk
+ GROUP BY cc.cc_name, cp.cp_department
+ ORDER BY total_net_loss DESC
+ LIMIT 1;",1.0
+30.2,"Pasangan call center dan halaman katalog mana yang bikin rugi paling besar karena retur? Tampilkan call center name, catalog page department, dan total net loss.","SELECT cc.cc_name, cp.cp_department, SUM(cr.cr_net_loss) AS total_net_loss
+FROM catalog_returns cr
+JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+JOIN catalog_page cp ON cr.cr_catalog_page_sk = cp.cp_catalog_page_sk
+GROUP BY cc.cc_name, cp.cp_department
+ORDER BY total_net_loss DESC;","SELECT cc.cc_name, cp.cp_department, SUM(cr.cr_net_loss) AS total_net_loss
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ JOIN catalog_page cp ON cr.cr_catalog_page_sk = cp.cp_catalog_page_sk
+ GROUP BY cc.cc_name, cp.cp_department
+ ORDER BY total_net_loss DESC
+ LIMIT 1;",0.0
+31.1,Which store has the highest average selling price per item? Show store name and average price.,"SELECT s_store_name, AVG(ss_sales_price) AS average_selling_price
+FROM store_sales
+JOIN store ON store_sales.ss_store_sk = store.s_store_sk
+GROUP BY s_store_name
+ORDER BY average_selling_price DESC
+LIMIT 1;","SELECT c.c_customer_id, SUM(cs.cs_net_profit) AS total_profit
+ FROM catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_profit DESC
+ LIMIT 5;",0.0
+31.2,Toko mana yang rata-rata harga jual per item-nya paling tinggi? Tampilkan nama toko dan rata-rata harga.,"SELECT s_store_name, AVG(ss_sales_price) AS average_sales_price
+FROM store_sales
+JOIN store ON ss_store_sk = s_store_sk
+GROUP BY s_store_name
+ORDER BY average_sales_price DESC
+LIMIT 1;","SELECT c.c_customer_id, SUM(cs.cs_net_profit) AS total_profit
+ FROM catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_profit DESC
+ LIMIT 5;",0.0
+32.1,"Which item has the biggest gap between list price and wholesale cost in catalog sales? Show item ID, description, and difference.","SELECT i_item_id, i_item_desc, cs_list_price - cs_wholesale_cost AS price_difference
+FROM catalog_sales cs
+JOIN item i ON cs_item_sk = i_item_sk
+ORDER BY price_difference DESC
+LIMIT 1;","SELECT s.s_store_name, AVG(ss.ss_sales_price) AS avg_price
+ FROM store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ GROUP BY s.s_store_name
+ ORDER BY avg_price DESC
+ LIMIT 1;",0.0
+32.2,"Barang apa yang punya selisih paling besar antara harga list dan harga grosir di penjualan katalog? Tampilkan ID barang, deskripsi, dan selisih harga.","SELECT i_item_id, i_item_desc, (cs_list_price - cs_wholesale_cost) AS price_difference
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+ORDER BY price_difference DESC
+LIMIT 1;","SELECT s.s_store_name, AVG(ss.ss_sales_price) AS avg_price
+ FROM store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ GROUP BY s.s_store_name
+ ORDER BY avg_price DESC
+ LIMIT 1;",0.0
+33.1,Which education level group spends the most on average according to purchase estimates? Show education status and average estimate.,"SELECT cd_education_status, AVG(cd_purchase_estimate) AS average_estimate
+FROM customer_demographics
+GROUP BY cd_education_status
+ORDER BY average_estimate DESC
+LIMIT 1;","SELECT i.i_item_id, i.i_item_desc, MAX(cs.cs_list_price - cs.cs_wholesale_cost) AS price_diff
+ FROM catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY price_diff DESC
+ LIMIT 1;",0.0
+33.2,Kelompok pendidikan mana yang rata-rata estimasi belanjanya paling tinggi? Tampilkan status pendidikan dan estimasi rata-ratanya.,"SELECT cd_education_status, AVG(cd_purchase_estimate) AS average_purchase_estimate
+FROM customer_demographics
+GROUP BY cd_education_status
+ORDER BY average_purchase_estimate DESC
+LIMIT 1;","SELECT i.i_item_id, i.i_item_desc, MAX(cs.cs_list_price - cs.cs_wholesale_cost) AS price_diff
+ FROM catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY price_diff DESC
+ LIMIT 1;",0.0
+34.1,What is the average tax amount paid on returned store items per category? Show category and average tax.,"SELECT i_category, AVG(sr_return_tax) AS average_return_tax
+FROM store_returns sr
+JOIN item i ON sr.sr_item_sk = i.i_item_sk
+GROUP BY i_category;","SELECT cd_education_status, AVG(cd_purchase_estimate) AS avg_estimate
+ FROM customer_demographics
+ GROUP BY cd_education_status
+ ORDER BY avg_estimate DESC
+ LIMIT 1;",0.0
+34.2,Berapa rata-rata pajak yang dibayar untuk item retur di toko berdasarkan kategori? Tampilkan kategori dan rata-rata pajaknya.,"SELECT i_category, AVG(sr_return_tax) AS average_return_tax
+FROM store_returns sr
+JOIN item i ON sr.sr_item_sk = i.i_item_sk
+GROUP BY i_category;","SELECT cd_education_status, AVG(cd_purchase_estimate) AS avg_estimate
+ FROM customer_demographics
+ GROUP BY cd_education_status
+ ORDER BY avg_estimate DESC
+ LIMIT 1;",0.0
+35.1,"Which 3 items were returned the most in web sales? Show item ID, description, and total quantity returned.","SELECT i_item_id, i_item_desc, SUM(wr_return_quantity) AS total_quantity_returned
+FROM web_returns
+JOIN item ON wr_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_quantity_returned DESC
+LIMIT 3;","SELECT i.i_category, AVG(sr.sr_return_tax) AS avg_tax
+ FROM store_returns sr
+ JOIN item i ON sr.sr_item_sk = i.i_item_sk
+ GROUP BY i.i_category
+ ORDER BY avg_tax DESC;",0.0
+35.2,"Apa aja 3 item yang paling banyak diretur dari penjualan lewat web? Tampilkan ID barang, deskripsi, dan jumlah retur totalnya.","SELECT i_item_id, i_item_desc, SUM(wr_return_quantity) AS total_returned
+FROM web_returns
+JOIN item ON web_returns.wr_item_sk = item.i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_returned DESC
+LIMIT 3;","SELECT i.i_category, AVG(sr.sr_return_tax) AS avg_tax
+ FROM store_returns sr
+ JOIN item i ON sr.sr_item_sk = i.i_item_sk
+ GROUP BY i.i_category
+ ORDER BY avg_tax DESC;",0.0
+36.1,Which shipping method gives the highest total profit in web sales? Show ship mode ID and total profit.,"SELECT sm_ship_mode_id, SUM(ws_net_profit) AS total_profit
+FROM web_sales
+JOIN ship_mode ON ws_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_ship_mode_id
+ORDER BY total_profit DESC
+LIMIT 1;","SELECT i.i_item_id, i.i_item_desc, SUM(wr.wr_return_quantity) AS total_returned
+ FROM web_returns wr
+ JOIN item i ON wr.wr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_returned DESC
+ LIMIT 3;",0.0
+36.2,Metode pengiriman mana yang kasih keuntungan paling besar di penjualan web? Tampilkan ID metode kirim dan total profit-nya.,"SELECT sm_ship_mode_id, SUM(ws_net_profit) AS total_profit
+FROM web_sales
+JOIN ship_mode ON ws_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_ship_mode_id
+ORDER BY total_profit DESC;","SELECT i.i_item_id, i.i_item_desc, SUM(wr.wr_return_quantity) AS total_returned
+ FROM web_returns wr
+ JOIN item i ON wr.wr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_returned DESC
+ LIMIT 3;",0.0
+37.1,"Which 5 items got the most discount applied in store sales? Show item ID, description, and total discount.","SELECT i_item_id, i_item_desc, SUM(ss_ext_discount_amt) AS total_discount
+FROM store_sales AS ss
+JOIN item AS i ON ss_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_discount DESC
+LIMIT 5;","SELECT sm.sm_ship_mode_id, SUM(ws.ws_net_profit) AS total_profit
+ FROM web_sales ws
+ JOIN ship_mode sm ON ws.ws_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_ship_mode_id
+ ORDER BY total_profit DESC
+ LIMIT 1;",0.0
+37.2,"Barang apa aja yang paling banyak dapet diskon di penjualan toko? Tampilkan ID barang, deskripsi, dan total diskonnya.","SELECT i_item_id, i_item_desc, SUM(ss_ext_discount_amt) AS total_discount
+FROM store_sales
+JOIN item ON ss_item_sk = i_item_sk
+GROUP BY i_item_id, i_item_desc
+ORDER BY total_discount DESC;","SELECT sm.sm_ship_mode_id, SUM(ws.ws_net_profit) AS total_profit
+ FROM web_sales ws
+ JOIN ship_mode sm ON ws.ws_ship_mode_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_ship_mode_id
+ ORDER BY total_profit DESC
+ LIMIT 1;",0.0
+38.1,Which household demographic (based on vehicle count) spends the most on average? Show vehicle count and average estimate.,"SELECT hd_vehicle_count, AVG(cd_purchase_estimate) AS average_purchase_estimate
+FROM household_demographics
+JOIN customer_demographics ON household_demographics.hd_demo_sk = customer_demographics.cd_demo_sk
+GROUP BY hd_vehicle_count
+ORDER BY average_purchase_estimate DESC
+LIMIT 1;","SELECT i.i_item_id, i.i_item_desc, SUM(ss.ss_ext_discount_amt) AS total_discount
+ FROM store_sales ss
+ JOIN item i ON ss.ss_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_discount DESC
+ LIMIT 5;",0.0
+38.2,Rumah tangga dengan jumlah kendaraan berapa yang rata-rata belanjanya paling besar? Tampilkan jumlah kendaraan dan estimasi rata-ratanya.,"SELECT hd_vehicle_count, AVG(cd_purchase_estimate) AS average_purchase_estimate
+FROM household_demographics
+JOIN customer_demographics ON household_demographics.hd_demo_sk = customer_demographics.cd_demo_sk
+GROUP BY hd_vehicle_count
+ORDER BY average_purchase_estimate DESC
+LIMIT 1;","SELECT i.i_item_id, i.i_item_desc, SUM(ss.ss_ext_discount_amt) AS total_discount
+ FROM store_sales ss
+ JOIN item i ON ss.ss_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id, i.i_item_desc
+ ORDER BY total_discount DESC
+ LIMIT 5;",0.0
+39.1,"Which 10 customers spent the most in catalog sales, including tax and shipping? Show c_customer_id and total_spent.","SELECT c_customer_id, SUM(cs_net_paid_inc_ship_tax) AS total_spent
+FROM customer
+JOIN catalog_sales ON c_customer_sk = cs_bill_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_spent DESC
+LIMIT 10;","SELECT hd_vehicle_count, AVG(cd.cd_purchase_estimate) AS avg_estimate
+ FROM household_demographics hd
+ JOIN customer c ON hd.hd_demo_sk = c.c_current_hdemo_sk
+ JOIN customer_demographics cd ON c.c_current_cdemo_sk = cd.cd_demo_sk
+ GROUP BY hd_vehicle_count
+ ORDER BY avg_estimate DESC;",0.0
+39.2,Siapa aja 10 pelanggan yang paling banyak belanja (termasuk pajak dan ongkir) lewat katalog? Tampilkan c_customer_id dan total belanja.,"SELECT c_customer_id, SUM(cs_net_paid_inc_ship_tax) AS total_belanja
+FROM catalog_sales
+JOIN customer ON cs_bill_customer_sk = c_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_belanja DESC
+LIMIT 10;","SELECT hd_vehicle_count, AVG(cd.cd_purchase_estimate) AS avg_estimate
+ FROM household_demographics hd
+ JOIN customer c ON hd.hd_demo_sk = c.c_current_hdemo_sk
+ JOIN customer_demographics cd ON c.c_current_cdemo_sk = cd.cd_demo_sk
+ GROUP BY hd_vehicle_count
+ ORDER BY avg_estimate DESC;",0.0
+40.1,Which store made the highest net profit in December? Show s_store_name and total_net_profit.,"SELECT s_store_name, SUM(ss_net_profit) AS total_net_profit
+FROM store_sales
+JOIN store ON ss_store_sk = s_store_sk
+JOIN date_dim ON ss_sold_date_sk = d_date_sk
+WHERE d_month_seq = 12
+GROUP BY s_store_name
+ORDER BY total_net_profit DESC
+LIMIT 1;","SELECT c.c_customer_id, SUM(cs.cs_net_paid_inc_ship_tax) AS total_spent
+ FROM catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_spent DESC
+ LIMIT 10;",0.0
+40.2,Toko mana yang hasilkan untung bersih paling besar di bulan Desember? Tampilkan s_store_name dan total_net_profit-nya.,"SELECT s_store_name, SUM(ss_net_profit) AS total_net_profit
+FROM store_sales
+JOIN store ON ss_store_sk = s_store_sk
+JOIN date_dim ON ss_sold_date_sk = d_date_sk
+WHERE d_month_seq = 12
+GROUP BY s_store_name
+ORDER BY total_net_profit DESC
+LIMIT 1;","SELECT c.c_customer_id, SUM(cs.cs_net_paid_inc_ship_tax) AS total_spent
+ FROM catalog_sales cs
+ JOIN customer c ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_spent DESC
+ LIMIT 10;",0.0
+41.1,Which 5 items were returned the most in catalog sales by quantity? Show i_item_id and total_returned_quantity.,"SELECT i_item_id, SUM(cr_return_quantity) AS total_returned_quantity
+FROM catalog_returns cr
+JOIN item i ON cr_item_sk = i_item_sk
+GROUP BY i_item_id
+ORDER BY total_returned_quantity DESC
+LIMIT 5;","SELECT s.s_store_name, SUM(ss.ss_net_profit) AS total_net_profit
+ FROM store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk
+ WHERE d.d_moy = 12
+ GROUP BY s.s_store_name
+ ORDER BY total_net_profit DESC
+ LIMIT 1;",0.0
+41.2,Apa aja 5 barang yang paling sering diretur berdasarkan jumlah di penjualan katalog? Tampilkan i_item_id dan total_returned_quantity.,"SELECT i_item_id, SUM(cr_return_quantity) AS total_returned_quantity
+FROM catalog_returns
+JOIN item ON catalog_returns.cr_item_sk = item.i_item_sk
+GROUP BY i_item_id
+ORDER BY total_returned_quantity DESC
+LIMIT 5;","SELECT s.s_store_name, SUM(ss.ss_net_profit) AS total_net_profit
+ FROM store_sales ss
+ JOIN store s ON ss.ss_store_sk = s.s_store_sk
+ JOIN date_dim d ON ss.ss_sold_date_sk = d.d_date_sk
+ WHERE d.d_moy = 12
+ GROUP BY s.s_store_name
+ ORDER BY total_net_profit DESC
+ LIMIT 1;",0.0
+42.1,Which call centers dealt with the most return cases? Show cc_name and return_count.,"SELECT cc.cc_name, COUNT(cr.cr_call_center_sk) AS return_count
+FROM call_center AS cc
+JOIN catalog_returns AS cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY return_count DESC;","SELECT i.i_item_id, SUM(cr.cr_return_quantity) AS total_returned_quantity
+ FROM catalog_returns cr
+ JOIN item i ON cr.cr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id
+ ORDER BY total_returned_quantity DESC
+ LIMIT 5;",0.0
+42.2,Call center mana yang paling banyak tangani retur? Tampilkan cc_name dan jumlah retur.,"SELECT cc.cc_name, COUNT(cr.cr_call_center_sk) AS jumlah_retur
+FROM call_center cc
+JOIN catalog_returns cr ON cc.cc_call_center_sk = cr.cr_call_center_sk
+GROUP BY cc.cc_name
+ORDER BY jumlah_retur DESC
+LIMIT 1;","SELECT i.i_item_id, SUM(cr.cr_return_quantity) AS total_returned_quantity
+ FROM catalog_returns cr
+ JOIN item i ON cr.cr_item_sk = i.i_item_sk
+ GROUP BY i.i_item_id
+ ORDER BY total_returned_quantity DESC
+ LIMIT 5;",0.0
+43.1,What’s the average net paid per weekday in web sales? Show d_day_name and avg_net_paid.,"SELECT d_day_name, AVG(ws_net_paid) AS avg_net_paid
+FROM web_sales
+JOIN date_dim ON ws_sold_date_sk = d_date_sk
+WHERE d_day_name <> 'Saturday' AND d_day_name <> 'Sunday'
+GROUP BY d_day_name;","SELECT cc.cc_name, COUNT(*) AS return_count
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY return_count DESC;",0.0
+43.2,"Berapa rata-rata pembayaran bersih per hari (Senin, Selasa, dll) di penjualan web? Tampilkan d_day_name dan avg_net_paid.","SELECT d_day_name, AVG(ws_net_paid) AS avg_net_paid
+FROM web_sales
+JOIN date_dim ON ws_sold_date_sk = d_date_sk
+GROUP BY d_day_name;","SELECT cc.cc_name, COUNT(*) AS return_count
+ FROM catalog_returns cr
+ JOIN call_center cc ON cr.cr_call_center_sk = cc.cc_call_center_sk
+ GROUP BY cc.cc_name
+ ORDER BY return_count DESC;",0.0
+44.1,Which 3 shipping types bring in the most value in store sales? Show sm_type and total_value.,"SELECT sm_type, SUM(ss_ext_sales_price) AS total_value
+FROM ship_mode
+JOIN store_sales ON sm_ship_mode_sk = ss_ship_mode_sk
+GROUP BY sm_type
+ORDER BY total_value DESC
+LIMIT 3;","SELECT d.d_day_name, AVG(ws.ws_net_paid_inc_ship_tax) AS avg_net_paid
+ FROM web_sales ws
+ JOIN date_dim d ON ws.ws_sold_date_sk = d.d_date_sk
+ GROUP BY d.d_day_name
+ ORDER BY avg_net_paid DESC;",0.0
+44.2,Tipe pengiriman mana yang hasilkan nilai penjualan toko paling besar? Tampilkan sm_type dan total_value.,"SELECT sm_type, SUM(ss_ext_sales_price) AS total_value
+FROM store_sales
+JOIN ship_mode ON ss_ship_mode_sk = sm_ship_mode_sk
+GROUP BY sm_type
+ORDER BY total_value DESC
+LIMIT 1;","SELECT d.d_day_name, AVG(ws.ws_net_paid_inc_ship_tax) AS avg_net_paid
+ FROM web_sales ws
+ JOIN date_dim d ON ws.ws_sold_date_sk = d.d_date_sk
+ GROUP BY d.d_day_name
+ ORDER BY avg_net_paid DESC;",0.0
+45.1,Which 5 catalog items generated the most profit? Show i_product_name and total_net_profit.,"SELECT i_product_name, SUM(cs_net_profit) AS total_net_profit
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_product_name
+ORDER BY total_net_profit DESC
+LIMIT 5;","SELECT sm.sm_type, SUM(ss.ss_net_paid_inc_tax) AS total_value
+ FROM store_sales ss
+ JOIN ship_mode sm ON ss.ss_promo_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_type
+ ORDER BY total_value DESC
+ LIMIT 3;",0.0
+45.2,Barang katalog mana aja yang untungnya paling besar? Tampilkan i_product_name dan total_net_profit.,"SELECT i_product_name, SUM(cs_net_profit) AS total_net_profit
+FROM catalog_sales
+JOIN item ON cs_item_sk = i_item_sk
+GROUP BY i_product_name
+ORDER BY total_net_profit DESC;","SELECT sm.sm_type, SUM(ss.ss_net_paid_inc_tax) AS total_value
+ FROM store_sales ss
+ JOIN ship_mode sm ON ss.ss_promo_sk = sm.sm_ship_mode_sk
+ GROUP BY sm.sm_type
+ ORDER BY total_value DESC
+ LIMIT 3;",0.0
+46.1,Which 3 manufacturers sold the most different items online? Show i_manufact and item_count.,"SELECT i_manufact, COUNT(DISTINCT i_item_id) AS item_count
+FROM item
+JOIN web_sales ON item.i_item_sk = web_sales.ws_item_sk
+GROUP BY i_manufact
+ORDER BY item_count DESC
+LIMIT 3;","SELECT i.i_product_name, SUM(cs.cs_net_profit) AS total_net_profit
+ FROM catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_net_profit DESC
+ LIMIT 5;",0.0
+46.2,Produsen mana yang paling banyak jual item berbeda di web? Tampilkan i_manufact dan item_count.,"SELECT i_manufact, COUNT(DISTINCT i_item_sk) AS item_count
+FROM item
+JOIN web_sales ON item.i_item_sk = web_sales.ws_item_sk
+GROUP BY i_manufact
+ORDER BY item_count DESC
+LIMIT 1;","SELECT i.i_product_name, SUM(cs.cs_net_profit) AS total_net_profit
+ FROM catalog_sales cs
+ JOIN item i ON cs.cs_item_sk = i.i_item_sk
+ GROUP BY i.i_product_name
+ ORDER BY total_net_profit DESC
+ LIMIT 5;",0.0
+47.1,Which 5 states have the most preferred customers? Show ca_state and customer_count.,"SELECT ca_state, COUNT(*) AS customer_count
+FROM customer_address
+JOIN customer ON customer.c_current_addr_sk = customer_address.ca_address_sk
+WHERE c_preferred_cust_flag = 'Y'
+GROUP BY ca_state
+ORDER BY customer_count DESC
+LIMIT 5;","SELECT i.i_manufact, COUNT(DISTINCT ws.ws_item_sk) AS item_count
+ FROM web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_manufact
+ ORDER BY item_count DESC
+ LIMIT 3;",0.0
+47.2,Negara bagian mana yang punya pelanggan prioritas paling banyak? Tampilkan ca_state dan customer_count.,"SELECT ca_state, COUNT(*) AS customer_count
+FROM customer_address
+JOIN customer ON ca_address_sk = c_current_addr_sk
+WHERE c_preferred_cust_flag = 'Y'
+GROUP BY ca_state
+ORDER BY customer_count DESC
+LIMIT 1;","SELECT i.i_manufact, COUNT(DISTINCT ws.ws_item_sk) AS item_count
+ FROM web_sales ws
+ JOIN item i ON ws.ws_item_sk = i.i_item_sk
+ GROUP BY i.i_manufact
+ ORDER BY item_count DESC
+ LIMIT 3;",0.0
+48.1,Which 5 manufacturers sold the most distinct items through both store and web channels? Show i_manufact and item_count.,"WITH manufacturer_item_counts AS (
+  SELECT
+  	i_manufact,
+  	COUNT(DISTINCT i_item_sk) AS item_count
+  FROM
+  	item
+  JOIN
+  	store_sales
+  ON
+  	item.i_item_sk = store_sales.ss_item_sk
+  GROUP BY i_manufact
+  UNION ALL
+  SELECT
+  	i_manufact,
+  	COUNT(DISTINCT i_item_sk) AS item_count
+  FROM
+  	item
+  JOIN
+  	web_sales
+  ON
+  	item.i_item_sk = web_sales.ws_item_sk
+  GROUP BY i_manufact
+)
+SELECT
+  i_manufact,
+  SUM(item_count) AS total_item_count
+FROM
+  manufacturer_item_counts
+GROUP BY
+  i_manufact
+ORDER BY
+  total_item_count DESC
+LIMIT 5;","SELECT ca.ca_state, COUNT(*) AS customer_count
+ FROM customer c
+ JOIN customer_address ca ON c.c_current_addr_sk = ca.ca_address_sk
+ WHERE c.c_preferred_cust_flag = 'Y'
+ GROUP BY ca.ca_state
+ ORDER BY customer_count DESC
+ LIMIT 5;",0.0
+48.2,Produsen mana yang paling banyak jual item berbeda lewat toko dan web? Tampilkan i_manufact dan item_count.,"SELECT i_manufact, COUNT(DISTINCT i_item_sk) AS item_count
+FROM item
+JOIN store_sales ON item.i_item_sk = store_sales.ss_item_sk
+JOIN web_sales ON item.i_item_sk = web_sales.ws_item_sk
+GROUP BY i_manufact
+ORDER BY item_count DESC
+LIMIT 1;","SELECT ca.ca_state, COUNT(*) AS customer_count
+ FROM customer c
+ JOIN customer_address ca ON c.c_current_addr_sk = ca.ca_address_sk
+ WHERE c.c_preferred_cust_flag = 'Y'
+ GROUP BY ca.ca_state
+ ORDER BY customer_count DESC
+ LIMIT 5;",0.0
+49.1,Who are the top 5 customers that bought the most items in total from all sales channels? Show c_customer_id and total_quantity.,"SELECT c_customer_id, SUM(cs_quantity + ss_quantity + ws_quantity) AS total_quantity
+FROM customer
+JOIN catalog_sales ON c_customer_sk = cs_bill_customer_sk
+JOIN store_sales ON c_customer_sk = ss_customer_sk
+JOIN web_sales ON c_customer_sk = ws_bill_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_quantity DESC
+LIMIT 5;","SELECT i.i_manufact, COUNT(DISTINCT i.i_item_sk) AS item_count
+ FROM item i
+ LEFT JOIN store_sales ss ON ss.ss_item_sk = i.i_item_sk
+ LEFT JOIN web_sales ws ON ws.ws_item_sk = i.i_item_sk
+ WHERE ss.ss_item_sk IS NOT NULL OR ws.ws_item_sk IS NOT NULL
+ GROUP BY i.i_manufact
+ ORDER BY item_count DESC
+ LIMIT 5;",0.0
+49.2,Siapa aja 5 pelanggan yang total pembeliannya paling banyak dari semua channel? Tampilkan c_customer_id dan total_quantity.,"SELECT c_customer_id, SUM(cs_quantity + ws_quantity + ss_quantity) AS total_quantity
+FROM customer
+JOIN catalog_sales ON c_customer_sk = cs_bill_customer_sk
+JOIN web_sales ON c_customer_sk = ws_bill_customer_sk
+JOIN store_sales ON c_customer_sk = ss_customer_sk
+GROUP BY c_customer_id
+ORDER BY total_quantity DESC
+LIMIT 5;","SELECT i.i_manufact, COUNT(DISTINCT i.i_item_sk) AS item_count
+ FROM item i
+ LEFT JOIN store_sales ss ON ss.ss_item_sk = i.i_item_sk
+ LEFT JOIN web_sales ws ON ws.ws_item_sk = i.i_item_sk
+ WHERE ss.ss_item_sk IS NOT NULL OR ws.ws_item_sk IS NOT NULL
+ GROUP BY i.i_manufact
+ ORDER BY item_count DESC
+ LIMIT 5;",0.0
+50.1,Which shipping method (sm_type) is used the most in returns across all sales? Show sm_type and return_count.,"SELECT sm_type, COUNT(*) AS return_count FROM ship_mode 
+JOIN catalog_returns ON ship_mode.sm_ship_mode_sk = catalog_returns.cr_ship_mode_sk
+GROUP BY sm_type 
+ORDER BY return_count DESC 
+LIMIT 1;","SELECT c.c_customer_id, SUM(COALESCE(ss.ss_quantity,0) + COALESCE(ws.ws_quantity,0) + COALESCE(cs.cs_quantity,0)) AS total_quantity
+ FROM customer c
+ LEFT JOIN store_sales ss ON ss.ss_customer_sk = c.c_customer_sk
+ LEFT JOIN web_sales ws ON ws.ws_bill_customer_sk = c.c_customer_sk
+ LEFT JOIN catalog_sales cs ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_quantity DESC
+ LIMIT 5;",0.0
+50.2,Jenis pengiriman mana yang paling sering dipakai dalam retur dari semua jenis penjualan? Tampilkan sm_type dan return_count.,"SELECT sm_type, COUNT(*) AS return_count FROM (SELECT cr_ship_mode_sk FROM catalog_returns UNION ALL SELECT cs_ship_mode_sk FROM catalog_sales UNION ALL SELECT ws_ship_mode_sk FROM web_sales) AS ship_modes JOIN ship_mode sm ON ship_modes.cr_ship_mode_sk = sm.sm_ship_mode_sk GROUP BY sm_type ORDER BY return_count DESC LIMIT 1;","SELECT c.c_customer_id, SUM(COALESCE(ss.ss_quantity,0) + COALESCE(ws.ws_quantity,0) + COALESCE(cs.cs_quantity,0)) AS total_quantity
+ FROM customer c
+ LEFT JOIN store_sales ss ON ss.ss_customer_sk = c.c_customer_sk
+ LEFT JOIN web_sales ws ON ws.ws_bill_customer_sk = c.c_customer_sk
+ LEFT JOIN catalog_sales cs ON cs.cs_bill_customer_sk = c.c_customer_sk
+ GROUP BY c.c_customer_id
+ ORDER BY total_quantity DESC
+ LIMIT 5;",0.0

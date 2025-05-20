@@ -115,12 +115,24 @@ class TextToSQL:
         # 2. Yes relevant retrieval
         # 3. Yes prompt rewriter
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
         if method == "Multistage":
-            relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
+            relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
             attempts_left = self.config.max_retry_attempt
+
+            # Create user prompt
+            final_user_prompt = f"""
+            Original user prompt:
+            {user_prompt}
+
+            Rewritten user prompt:
+            {rewritten_prompt}
+
+            Please use the most complete one for generating the SQL query
+            """
+
             query = self.query_generator.generate_v1(
-                user_prompt=rewritten_prompt,
+                user_prompt=final_user_prompt,
                 schema=schema,
                 example=relevant_example,
             )
@@ -131,7 +143,7 @@ class TextToSQL:
                 except Exception as e:
                     attempts_left -= 1
                     query = self.query_generator.fix_query(
-                        user_prompt=user_prompt,
+                        user_prompt=final_user_prompt,
                         sql_query=query,
                         error_message=str(e),
                         schema=schema,
@@ -142,7 +154,9 @@ class TextToSQL:
                 f"Your task is to break this question into a series of step-by-step sub-questions "
                 f"that build towards the final answer.\n\n"
                 f"Database Schema:\n{schema}\n\n"
-                f"Question: {user_prompt}\n\n"
+                f"Original Question: {user_prompt}\n\n"
+                f"Rewritten Question: {rewritten_prompt}\n\n"
+                f"Please use the most complete question\n\n"
                 f"Return a list of step-by-step sub-questions."
             )
 
@@ -174,6 +188,8 @@ class TextToSQL:
             final_sql_prompt = (
                 f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
                 f"Original Question: {user_prompt}\n\n"
+                f"Rewritten Question: {rewritten_prompt}\n\n"
+                f"Please use the most complete question\n\n"
                 f"Steps:\n"
             )
             for i, q in enumerate(intermediate_queries, 1):
@@ -181,7 +197,7 @@ class TextToSQL:
 
             final_sql_prompt += "Return only the final SQL query that answers the full question."
 
-            relevant_example = self.retrieve_context.generate(user_prompt=user_prompt)
+            relevant_example = self.retrieve_context.generate(user_prompt=final_sql_prompt)
             final_query = self.query_generator.generate_v1(
                 user_prompt=final_sql_prompt,
                 schema=schema,
@@ -190,8 +206,19 @@ class TextToSQL:
 
             return final_query.strip()
         else:
+            # Create user prompt
+            final_user_prompt = f"""
+            Original user prompt:
+            {user_prompt}
+
+            Rewritten user prompt:
+            {rewritten_prompt}
+
+            Please use the most complete one for generating the SQL query
+            """
+
             query = self.query_generator.generate_v1(
-                user_prompt=rewritten_prompt,
+                user_prompt=final_user_prompt,
                 schema=schema,
                 example=relevant_example,
             )

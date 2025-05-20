@@ -1,0 +1,1180 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,"Which 5 products brought in the most total revenue (unitprice * orderqty - unitpricediscount)? Show productid, Name, total_revenue.","SELECT p.productid, p.name, SUM(sod.unitprice * sod.orderqty - sod.unitpricediscount) AS total_revenue
+FROM product p
+JOIN salesorderdetail sod ON p.productid = sod.productid
+GROUP BY p.productid, p.name
+ORDER BY total_revenue DESC
+LIMIT 5;","SELECT p.productid, p.name, 
+  SUM(sod.unitprice * sod.orderqty - sod.unitpricediscount) AS total_revenue
+ FROM product p
+ JOIN salesorderdetail sod ON p.productid = sod.productid
+ GROUP BY p.productid, p.name
+ ORDER BY total_revenue DESC
+ LIMIT 5;",1.0
+1.2,"5 Produk mana aja yang ngasih pendapatan paling tinggi dari total penjualan? Tampilkan productid, Name, total_revenue.","SELECT p.productid, p.name, SUM(sod.unitprice * sod.orderqty - sod.unitpricediscount) AS total_revenue
+FROM product p
+JOIN salesorderdetail sod ON p.productid = sod.productid
+GROUP BY p.productid, p.name
+ORDER BY total_revenue DESC
+LIMIT 5;","SELECT p.productid, p.name, 
+  SUM(sod.unitprice * sod.orderqty - sod.unitpricediscount) AS total_revenue
+ FROM product p
+ JOIN salesorderdetail sod ON p.productid = sod.productid
+ GROUP BY p.productid, p.name
+ ORDER BY total_revenue DESC
+ LIMIT 5;",1.0
+2.1,"Which customers have more than 5 orders and spent over 5000 total? Show customerid, total_orders, total_spending.","SELECT c.customerid, COUNT(soh.salesorderid) AS total_orders, SUM(soh.totaldue) AS total_spending
+FROM customer c
+JOIN salesorderheader soh ON c.customerid = soh.customerid
+GROUP BY c.customerid
+HAVING COUNT(soh.salesorderid) > 5 AND SUM(soh.totaldue) > 5000;","SELECT c.customerid, COUNT(soh.salesorderid) AS total_orders,
+  SUM(soh.totaldue) AS total_spending
+ FROM customer c
+ JOIN salesorderheader soh ON c.customerid = soh.customerid
+ GROUP BY c.customerid
+ HAVING COUNT(soh.salesorderid) > 5 AND SUM(soh.totaldue) > 5000;",1.0
+2.2,"Customer mana yang belanjanya udah lebih dari 5 kali dan bayar lebih dari 5000? Tampilkan customerid, total_orders, total_spending.","SELECT customerid, COUNT(*) AS total_orders, SUM(totaldue) AS total_spending
+FROM salesorderheader
+GROUP BY customerid
+HAVING COUNT(*) > 5 AND SUM(totaldue) > 5000;","SELECT c.customerid, COUNT(soh.salesorderid) AS total_orders,
+  SUM(soh.totaldue) AS total_spending
+ FROM customer c
+ JOIN salesorderheader soh ON c.customerid = soh.customerid
+ GROUP BY c.customerid
+ HAVING COUNT(soh.salesorderid) > 5 AND SUM(soh.totaldue) > 5000;",1.0
+3.1,"What's the average cost and price and their difference for each category? Show categoryid, categoryname, avg_cost, avg_price, and avg_diff.","SELECT pc.productcategoryid, pc.name AS categoryname,
+  AVG(p.standardcost) AS avg_cost,
+  AVG(p.listprice) AS avg_price,
+  AVG(p.listprice - p.standardcost) AS avg_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+GROUP BY pc.productcategoryid, pc.name;","SELECT pc.productcategoryid, pc.name AS categoryname,
+  AVG(p.standardcost) AS avg_cost,
+  AVG(p.listprice) AS avg_price,
+  AVG(p.listprice - p.standardcost) AS avg_diff
+ FROM product p
+ JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+ JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+ GROUP BY pc.productcategoryid, pc.name;",1.0
+3.2,"Berapa sih rata-rata harga pokok dan jual per kategori, dan beda harganya? Tampilkan categoryid, categoryname, avg_cost, avg_price, dan avg_diff.","SELECT pc.productcategoryid, pc.name AS categoryname, AVG(p.standardcost) AS avg_cost, AVG(p.listprice) AS avg_price, AVG(p.listprice - p.standardcost) AS avg_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+GROUP BY pc.productcategoryid, pc.name;","SELECT pc.productcategoryid, pc.name AS categoryname,
+  AVG(p.standardcost) AS avg_cost,
+  AVG(p.listprice) AS avg_price,
+  AVG(p.listprice - p.standardcost) AS avg_diff
+ FROM product p
+ JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+ JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+ GROUP BY pc.productcategoryid, pc.name;",1.0
+4.1,"Who are the 3 vendors that usually deliver the fastest? Show vendorid, name, and avg_lead_time.","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+FROM vendor v
+JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+GROUP BY v.businessentityid, v.name
+ORDER BY avg_lead_time ASC
+LIMIT 3;","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+ FROM vendor v
+ JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+ GROUP BY v.businessentityid, v.name
+ ORDER BY avg_lead_time ASC
+ LIMIT 3;",1.0
+4.2,"Vendor mana aja yang paling cepet nganterin barang? Ambil 3 teratas. Tampilkan vendorid, name, dan avg_lead_time.","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+FROM vendor v
+JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+GROUP BY v.businessentityid, v.name
+ORDER BY avg_lead_time ASC
+LIMIT 3;","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+ FROM vendor v
+ JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+ GROUP BY v.businessentityid, v.name
+ ORDER BY avg_lead_time ASC
+ LIMIT 3;",1.0
+5.1,"Which sales territories had a sales difference more than 10% between this year and last year? Show territoryid, name, and difference_percent.","SELECT st.territoryid, st.name, ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+FROM salesterritory st
+WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;","SELECT st.territoryid, st.name,
+  ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+ FROM salesterritory st
+ WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;",1.0
+5.2,"Wilayah penjualan mana yang selisih omsetnya dari tahun ke tahun lebih dari 10%? Tampilkan territoryid, name, dan difference_percent.","SELECT st.territoryid, st.name, ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+FROM salesterritory st
+WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;","SELECT st.territoryid, st.name,
+  ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+ FROM salesterritory st
+ WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;",1.0
+6.1,"Which product models have more than 2 descriptions in different languages? Show productmodelid, Name, and description_count.","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+FROM productmodel pm
+JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+GROUP BY pm.productmodelid, pm.name
+HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+ FROM productmodel pm
+ JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+ GROUP BY pm.productmodelid, pm.name
+ HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;",1.0
+6.2,"Model produk mana yang punya lebih dari 2 deskripsi dalam berbagai bahasa? Tampilkan productmodelid, Name, dan description_count.","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+FROM productmodel pm
+JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+GROUP BY pm.productmodelid, pm.name
+HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+ FROM productmodel pm
+ JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+ GROUP BY pm.productmodelid, pm.name
+ HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;",1.0
+7.1,"Which 5 products are both bought and sold, with the biggest price gap between buying and selling? Show productid, max_purchase_price, min_sales_price, price_spread.","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+),
+sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+)
+SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+FROM purchase p
+JOIN sales s ON p.productid = s.productid
+ORDER BY price_spread DESC
+LIMIT 5;","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+ ),
+ sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+ )
+ SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+ FROM purchase p
+ JOIN sales s ON p.productid = s.productid
+ ORDER BY price_spread DESC
+ LIMIT 5;",1.0
+7.2,"5 Produk apa aja yang dibeli dan dijual dengan selisih harganya paling besar? Tampilkan productid, max_purchase_price, min_sales_price, price_spread.","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+),
+sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+)
+SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+FROM purchase p
+JOIN sales s ON p.productid = s.productid
+ORDER BY price_spread DESC
+LIMIT 5;","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+ ),
+ sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+ )
+ SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+ FROM purchase p
+ JOIN sales s ON p.productid = s.productid
+ ORDER BY price_spread DESC
+ LIMIT 5;",1.0
+8.1,Which territories have the most stable sales over the years (lowest stddev)? Show territoryid and stddev_salesquota.,"SELECT sp.territoryid, STDDEV(sq.salesquota) AS stddev_salesquota
+FROM salesperson sp
+JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+GROUP BY sp.territoryid
+ORDER BY stddev_salesquota ASC
+LIMIT 5;","SELECT sp.territoryid,
+  STDDEV(sq.salesquota) AS stddev_salesquota
+ FROM salesperson sp
+ JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+ GROUP BY sp.territoryid
+ ORDER BY stddev_salesquota ASC
+ LIMIT 5;",1.0
+8.2,Wilayah mana yang penjualannya paling stabil tiap tahun? Lihat dari standar deviasinya. Tampilkan territoryid dan stddev_salesquota.,"SELECT sp.territoryid, STDDEV(sq.salesquota) AS sales_quota_stddev
+FROM salesperson sp
+JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+GROUP BY sp.territoryid
+ORDER BY sales_quota_stddev ASC;","SELECT sp.territoryid,
+  STDDEV(sq.salesquota) AS stddev_salesquota
+ FROM salesperson sp
+ JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+ GROUP BY sp.territoryid
+ ORDER BY stddev_salesquota ASC
+ LIMIT 5;",0.0
+9.1,Which products always had increasing cost in every record? Show productid.,"SELECT productid
+ FROM (
+  SELECT productid,
+  standardcost,
+  LAG(standardcost) OVER (PARTITION BY productid ORDER BY startdate) AS prev_cost
+  FROM productcosthistory
+ ) t
+ GROUP BY productid
+ HAVING BOOL_AND(standardcost >= prev_cost);","SELECT productid
+ FROM (
+  SELECT productid,
+  standardcost,
+  LAG(standardcost) OVER (PARTITION BY productid ORDER BY startdate) AS prev_cost
+  FROM productcosthistory
+ ) t
+ GROUP BY productid
+ HAVING BOOL_AND(standardcost >= prev_cost);",1.0
+9.2,Produk mana saja yang harga pokoknya selalu naik di tiap riwayatnya? Tampilkan productid.,"WITH ProductCostHistory AS (
+  SELECT
+    productid,
+    standardcost,
+    ROW_NUMBER() OVER (PARTITION BY productid ORDER BY startdate) AS rn
+  FROM productcosthistory
+),
+RankedProductCosts AS (
+  SELECT
+    productid,
+    standardcost,
+    rn,
+    LAG(standardcost, 1, 0) OVER (PARTITION BY productid ORDER BY rn) AS prev_cost
+  FROM ProductCostHistory
+)
+SELECT
+  productid
+FROM RankedProductCosts
+WHERE
+  standardcost > prev_cost
+GROUP BY
+  productid
+HAVING
+  COUNT(*) = COUNT(*)
+ORDER BY
+  productid;","SELECT productid
+ FROM (
+  SELECT productid,
+  standardcost,
+  LAG(standardcost) OVER (PARTITION BY productid ORDER BY startdate) AS prev_cost
+  FROM productcosthistory
+ ) t
+ GROUP BY productid
+ HAVING BOOL_AND(standardcost >= prev_cost);",0.0
+10.1,"Which 3 work orders used the most hours per unit produced? Show workorderid, productid, and ratio.","SELECT wr.workorderid, wr.productid, SUM(wr.actualresourcehrs) / NULLIF(w.stockedqty, 0) AS ratio
+FROM workorderrouting wr
+JOIN workorder w ON wr.workorderid = w.workorderid AND wr.productid = w.productid
+GROUP BY wr.workorderid, wr.productid, w.stockedqty
+ORDER BY ratio DESC
+LIMIT 3;","SELECT wr.workorderid, wr.productid,
+  SUM(wr.actualresourcehrs) / NULLIF(w.stockedqty, 0) AS ratio
+ FROM workorderrouting wr
+ JOIN workorder w ON wr.workorderid = w.workorderid AND wr.productid = w.productid
+ GROUP BY wr.workorderid, wr.productid, w.stockedqty
+ ORDER BY ratio DESC
+ LIMIT 3;",1.0
+10.2,"3 Work order mana yang paling boros jam kerja per produk? Tampilkan workorderid, productid, dan ratio.","SELECT wo.workorderid, wo.productid, SUM(wor.actualresourcehrs) / wo.orderqty AS labor_hours_per_product_ratio
+FROM workorder wo
+JOIN workorderrouting wor ON wo.workorderid = wor.workorderid
+GROUP BY wo.workorderid, wo.productid, wo.orderqty
+ORDER BY labor_hours_per_product_ratio DESC
+LIMIT 3;","SELECT wr.workorderid, wr.productid,
+  SUM(wr.actualresourcehrs) / NULLIF(w.stockedqty, 0) AS ratio
+ FROM workorderrouting wr
+ JOIN workorder w ON wr.workorderid = w.workorderid AND wr.productid = w.productid
+ GROUP BY wr.workorderid, wr.productid, w.stockedqty
+ ORDER BY ratio DESC
+ LIMIT 3;",0.0
+11.1,"Which 5 customers spent the most and bought more than 5 times? Show customerid, total_orders, total_spending.","SELECT c.customerid, COUNT(soh.salesorderid) AS total_orders, SUM(soh.totaldue) AS total_spending
+FROM customer c
+JOIN salesorderheader soh ON c.customerid = soh.customerid
+GROUP BY c.customerid
+HAVING COUNT(soh.salesorderid) > 5
+ORDER BY total_spending DESC
+LIMIT 5;","SELECT shipmethodid,
+  AVG(freight / NULLIF(subtotal, 0)) AS avg_ratio
+ FROM salesorderheader
+ GROUP BY shipmethodid
+ ORDER BY avg_ratio DESC
+ LIMIT 3;",0.0
+11.2,"Siapa aja 5 pelanggan yang belanja lebih dari 5 kali dan ngeluarin duit paling banyak? Tampilkan customerid, total_orders, dan total_spending.","SELECT customerid, COUNT(*) AS total_orders, SUM(totaldue) AS total_spending
+FROM salesorderheader
+GROUP BY customerid
+HAVING COUNT(*) > 5
+ORDER BY total_spending DESC
+LIMIT 5;","SELECT shipmethodid,
+  AVG(freight / NULLIF(subtotal, 0)) AS avg_ratio
+ FROM salesorderheader
+ GROUP BY shipmethodid
+ ORDER BY avg_ratio DESC
+ LIMIT 3;",0.0
+12.1,"What's the average price vs. cost difference for each product category? Show categoryid, categoryname, avg_cost, avg_price, and avg_diff.","SELECT pc.productcategoryid, pc.name AS categoryname,
+  AVG(p.standardcost) AS avg_cost,
+  AVG(p.listprice) AS avg_price,
+  AVG(p.listprice - p.standardcost) AS avg_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+GROUP BY pc.productcategoryid, pc.name;","SELECT creditcardid, COUNT(*) AS usage_count
+ FROM personcreditcard
+ GROUP BY creditcardid
+ ORDER BY usage_count DESC
+ LIMIT 5;",0.0
+12.2,"Berapa rata-rata selisih harga sama biaya per kategori produk? Tampilkan categoryid, categoryname, avg_cost, avg_price, dan avg_diff.","SELECT pc.productcategoryid, pc.name AS categoryname, AVG(p.standardcost) AS avg_cost, AVG(p.listprice) AS avg_price, AVG(p.listprice - p.standardcost) AS avg_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+GROUP BY pc.productcategoryid, pc.name;","SELECT creditcardid, COUNT(*) AS usage_count
+ FROM personcreditcard
+ GROUP BY creditcardid
+ ORDER BY usage_count DESC
+ LIMIT 5;",0.0
+13.1,"Which 3 vendors deliver products the fastest on average? Show vendor id, name, and avg_lead_time.","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+FROM vendor v
+JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+GROUP BY v.businessentityid, v.name
+ORDER BY avg_lead_time ASC
+LIMIT 3;","SELECT productmodelid, COUNT(*) AS illustration_count
+ FROM productmodelillustration
+ GROUP BY productmodelid
+ HAVING COUNT(*) > 1;",0.0
+13.2,"3 Vendor mana aja yang rata-rata paling cepat kirim barang? Tampilkan vendor id, name, dan avg_lead_time.","SELECT v.businessentityid, v.name, AVG(pv.averageleadtime) AS avg_lead_time
+FROM vendor v
+JOIN productvendor pv ON v.businessentityid = pv.businessentityid
+GROUP BY v.businessentityid, v.name
+ORDER BY avg_lead_time ASC
+LIMIT 3;","SELECT productmodelid, COUNT(*) AS illustration_count
+ FROM productmodelillustration
+ GROUP BY productmodelid
+ HAVING COUNT(*) > 1;",0.0
+14.1,"Which sales territories saw more than 10% change in sales from last year? Show territoryid, name, difference_percent.","SELECT st.territoryid, st.name, ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+FROM salesterritory st
+WHERE ABS((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;","SELECT businessentityid, departmentid, 
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+FROM employeedepartmenthistory
+GROUP BY businessentityid, departmentid
+HAVING SUM(COALESCE(enddate, CURRENT_DATE) - startdate) > 730;",0.0
+14.2,"Wilayah penjualan mana yang beda penjualannya lebih dari 10% dibanding tahun lalu? Tampilkan territoryid, name, dan difference_percent.","SELECT st.territoryid, st.name, ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 AS difference_percent
+FROM salesterritory st
+WHERE ((st.salesytd - st.saleslastyear) / NULLIF(st.saleslastyear, 0)) * 100 > 10;","SELECT businessentityid, departmentid, 
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+FROM employeedepartmenthistory
+GROUP BY businessentityid, departmentid
+HAVING SUM(COALESCE(enddate, CURRENT_DATE) - startdate) > 730;",0.0
+15.1,"Which product models have more than two product descriptions across languages? Show productmodelid, Name, and description_count.","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+FROM productmodel pm
+JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+GROUP BY pm.productmodelid, pm.name
+HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;","SELECT poh.vendorid, AVG(pod.unitprice) AS avg_unitprice
+ FROM purchaseorderheader poh
+ JOIN purchaseorderdetail pod ON poh.purchaseorderid = pod.purchaseorderid
+ GROUP BY poh.vendorid
+ ORDER BY avg_unitprice DESC
+ LIMIT 5;",0.0
+15.2,"Model produk mana yang punya lebih dari dua deskripsi dalam berbagai bahasa? Tampilkan productmodelid, Name, dan description_count.","SELECT pm.productmodelid, pm.name, COUNT(DISTINCT pmpdc.productdescriptionid) AS description_count
+FROM productmodel pm
+JOIN productmodelproductdescriptionculture pmpdc ON pm.productmodelid = pmpdc.productmodelid
+GROUP BY pm.productmodelid, pm.name
+HAVING COUNT(DISTINCT pmpdc.productdescriptionid) > 2;","SELECT poh.vendorid, AVG(pod.unitprice) AS avg_unitprice
+ FROM purchaseorderheader poh
+ JOIN purchaseorderdetail pod ON poh.purchaseorderid = pod.purchaseorderid
+ GROUP BY poh.vendorid
+ ORDER BY avg_unitprice DESC
+ LIMIT 5;",0.0
+16.1,"Which 5 products show the biggest price gap between buying and selling? Show productid, max_purchase_price, min_sales_price, and price_spread.","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+),
+sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+)
+SELECT p.productid, p.max_purchase_price, s.min_sales_price,
+  (p.max_purchase_price - s.min_sales_price) AS price_spread
+FROM purchase p
+JOIN sales s ON p.productid = s.productid
+ORDER BY price_spread DESC
+LIMIT 5;","SELECT p.productid, p.name
+ FROM product p
+ LEFT JOIN salesorderdetail sod ON p.productid = sod.productid
+ LEFT JOIN productreview pr ON p.productid = pr.productid
+ LEFT JOIN workorder wo ON p.productid = wo.productid
+ WHERE sod.productid IS NULL AND pr.productid IS NULL AND wo.productid IS NULL;",0.0
+16.2,"Produk mana yang punya selisih harga jual dan beli paling gede? Tampilkan productid, max_purchase_price, min_sales_price, dan price_spread.","WITH purchase AS (
+  SELECT productid, MAX(unitprice) AS max_purchase_price
+  FROM purchaseorderdetail
+  GROUP BY productid
+),
+sales AS (
+  SELECT productid, MIN(unitprice) AS min_sales_price
+  FROM salesorderdetail
+  GROUP BY productid
+)
+SELECT p.productid, p.max_purchase_price, s.min_sales_price, 
+(p.max_purchase_price - s.min_sales_price) AS price_spread
+FROM purchase p
+JOIN sales s ON p.productid = s.productid
+ORDER BY price_spread DESC;","SELECT p.productid, p.name
+ FROM product p
+ LEFT JOIN salesorderdetail sod ON p.productid = sod.productid
+ LEFT JOIN productreview pr ON p.productid = pr.productid
+ LEFT JOIN workorder wo ON p.productid = wo.productid
+ WHERE sod.productid IS NULL AND pr.productid IS NULL AND wo.productid IS NULL;",0.0
+17.1,Which territories have the most stable sales based on standard deviation? Show territoryid and stddev_salesquota.,"SELECT sp.territoryid, STDDEV(sq.salesquota) AS stddev_salesquota
+FROM salesperson sp
+JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+GROUP BY sp.territoryid
+ORDER BY stddev_salesquota ASC;","SELECT p.productmodelid,
+  MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+ FROM product p
+ JOIN productlistpricehistory plph ON p.productid = plph.productid
+ GROUP BY p.productmodelid
+ ORDER BY price_range DESC
+ LIMIT 5;",0.0
+17.2,Wilayah mana yang penjualannya paling stabil dilihat dari deviasi standarnya? Tampilkan territoryid dan stddev_salesquota.,"SELECT sp.territoryid, STDDEV(sq.salesquota) AS sales_quota_stddev
+FROM salesperson sp
+JOIN salespersonquotahistory sq ON sp.businessentityid = sq.businessentityid
+GROUP BY sp.territoryid
+ORDER BY sales_quota_stddev ASC
+LIMIT 1;","SELECT p.productmodelid,
+  MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+ FROM product p
+ JOIN productlistpricehistory plph ON p.productid = plph.productid
+ GROUP BY p.productmodelid
+ ORDER BY price_range DESC
+ LIMIT 5;",0.0
+18.1,Which products consistently increased in cost every time? Show productid.,"SELECT productid
+ FROM (
+  SELECT productid,
+  standardcost,
+  LAG(standardcost) OVER (PARTITION BY productid ORDER BY startdate) AS prev_cost
+  FROM productcosthistory
+ ) t
+ GROUP BY productid
+ HAVING BOOL_AND(standardcost >= prev_cost);","SELECT currencycode, STDDEV(rate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+ ) AS rates
+ GROUP BY currencycode
+ ORDER BY volatility DESC
+ LIMIT 5;",0.0
+18.2,Produk apa aja yang harganya selalu naik terus tiap dicatat? Tampilkan productid.,"WITH ProductPriceHistory AS (
+  SELECT
+    productid,
+    standardcost,
+    ROW_NUMBER() OVER (PARTITION BY productid ORDER BY startdate) AS rn
+  FROM productcosthistory
+), PriceComparison AS (
+  SELECT
+    productid,
+    standardcost,
+    rn,
+    LAG(standardcost, 1, 0) OVER (PARTITION BY productid ORDER BY rn) AS prev_cost
+  FROM ProductPriceHistory
+)
+SELECT
+  productid
+FROM PriceComparison
+WHERE
+  standardcost > prev_cost
+GROUP BY
+  productid
+HAVING
+  COUNT(*) = COUNT(CASE WHEN standardcost > prev_cost THEN 1 END);","SELECT currencycode, STDDEV(rate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate AS rate FROM currencyrate
+ ) AS rates
+ GROUP BY currencycode
+ ORDER BY volatility DESC
+ LIMIT 5;",0.0
+19.1,"Which 3 work orders had the most actual hours used per stocked unit? Show workorderid, productid, and ratio.","SELECT wr.workorderid, wr.productid, SUM(wr.actualresourcehrs) / NULLIF(w.stockedqty, 0) AS ratio
+FROM workorderrouting wr
+JOIN workorder w ON wr.workorderid = w.workorderid AND wr.productid = w.productid
+GROUP BY wr.workorderid, wr.productid, w.stockedqty
+ORDER BY ratio DESC
+LIMIT 3;","SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count
+ FROM (
+  SELECT e.businessentityid, e.jobtitle, edh.startdate
+  FROM employee e
+  JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid
+ ) AS t
+ GROUP BY businessentityid
+ ORDER BY jobtitle_count DESC
+ LIMIT 3;",0.0
+19.2,"Work order mana yang pakai jam kerja paling banyak dibanding jumlah barangnya? Tampilkan workorderid, productid, dan ratio.","SELECT wo.workorderid, wo.productid, (SUM(wor.actualresourcehrs)::numeric / wo.orderqty) AS ratio
+FROM workorder wo
+JOIN workorderrouting wor ON wo.workorderid = wor.workorderid
+GROUP BY wo.workorderid, wo.productid, wo.orderqty
+ORDER BY ratio DESC;","SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count
+ FROM (
+  SELECT e.businessentityid, e.jobtitle, edh.startdate
+  FROM employee e
+  JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid
+ ) AS t
+ GROUP BY businessentityid
+ ORDER BY jobtitle_count DESC
+ LIMIT 3;",0.0
+20.1,Which 3 shipping methods cost the most in freight compared to order value? Show shipmethodid and avg_ratio.,"SELECT shipmethodid, AVG(freight / NULLIF(subtotal, 0)) AS avg_ratio FROM salesorderheader GROUP BY shipmethodid ORDER BY avg_ratio DESC LIMIT 3;","SELECT status, folderflag, COUNT(*) AS total_docs
+ FROM document
+ GROUP BY status, folderflag;",0.0
+20.2,Metode kirim mana yang ongkirnya paling mahal dibanding nilai ordernya? Tampilkan shipmethodid dan avg_ratio.,"SELECT shipmethodid, AVG(freight/totaldue) AS average_ratio FROM salesorderheader GROUP BY shipmethodid ORDER BY average_ratio DESC;","SELECT status, folderflag, COUNT(*) AS total_docs
+ FROM document
+ GROUP BY status, folderflag;",0.0
+21.1,Which credit cards are used the most? Show creditcardid and usage_count.,"SELECT creditcardid, COUNT(*) AS usage_count FROM salesorderheader WHERE creditcardid IS NOT NULL GROUP BY creditcardid ORDER BY usage_count DESC;","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+ FROM store s
+ JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+ JOIN employee e ON sp.businessentityid = e.businessentityid
+ ORDER BY sp.bonus DESC
+ LIMIT 3;",0.0
+21.2,Kartu kredit mana yang paling sering dipake? Tampilkan creditcardid dan usage_count.,"SELECT creditcardid, COUNT(*) AS usage_count
+FROM personcreditcard
+GROUP BY creditcardid
+ORDER BY usage_count DESC;","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+ FROM store s
+ JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+ JOIN employee e ON sp.businessentityid = e.businessentityid
+ ORDER BY sp.bonus DESC
+ LIMIT 3;",0.0
+22.1,Which product models are linked to more than 1 illustration? Show productmodelid and illustration_count.,"SELECT productmodelid, COUNT(*) AS illustration_count
+FROM productmodelillustration
+GROUP BY productmodelid
+HAVING COUNT(*) > 1;","SELECT p.productid, p.name, p.weight, avg_group.avg_weight AS avg_group_weight
+ FROM product p
+ JOIN (
+  SELECT sizeunitmeasurecode, AVG(weight) AS avg_weight
+  FROM product
+  WHERE weight IS NOT NULL
+  GROUP BY sizeunitmeasurecode
+ ) AS avg_group ON p.sizeunitmeasurecode = avg_group.sizeunitmeasurecode
+ WHERE p.weight > avg_group.avg_weight;",0.0
+22.2,Model produk mana yang punya lebih dari satu ilustrasi? Tampilkan productmodelid dan illustration_count.,"SELECT productmodelid, COUNT(*) AS illustration_count
+FROM productmodelillustration
+GROUP BY productmodelid
+HAVING COUNT(*) > 1;","SELECT p.productid, p.name, p.weight, avg_group.avg_weight AS avg_group_weight
+ FROM product p
+ JOIN (
+  SELECT sizeunitmeasurecode, AVG(weight) AS avg_weight
+  FROM product
+  WHERE weight IS NOT NULL
+  GROUP BY sizeunitmeasurecode
+ ) AS avg_group ON p.sizeunitmeasurecode = avg_group.sizeunitmeasurecode
+ WHERE p.weight > avg_group.avg_weight;",0.0
+23.1,"Who worked di satu divisi lebih dari 2 tahun tanpa pindah? Show businessentityid, departmentid, and total_days.","SELECT businessentityid, departmentid, SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+FROM employeedepartmenthistory
+GROUP BY businessentityid, departmentid
+HAVING count(*) = 1 AND SUM(COALESCE(enddate, CURRENT_DATE) - startdate) > 730;","SELECT p.productid, p.name,
+  STDDEV(pch.standardcost) AS cost_stddev,
+  COUNT(*) AS record_count
+FROM product p
+JOIN productcosthistory pch ON p.productid = pch.productid
+GROUP BY p.productid, p.name
+ORDER BY cost_stddev DESC
+LIMIT 5;",0.0
+23.2,"Siapa aja yang kerja terus di satu divisi selama lebih dari 2 tahun? Tampilkan businessentityid, departmentid, dan total_days.","SELECT businessentityid, departmentid, SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days FROM employeedepartmenthistory GROUP BY businessentityid, departmentid HAVING SUM(COALESCE(enddate, CURRENT_DATE) - startdate) > 730;","SELECT p.productid, p.name,
+  STDDEV(pch.standardcost) AS cost_stddev,
+  COUNT(*) AS record_count
+FROM product p
+JOIN productcosthistory pch ON p.productid = pch.productid
+GROUP BY p.productid, p.name
+ORDER BY cost_stddev DESC
+LIMIT 5;",0.0
+24.1,Which vendors have the highest average unit price in purchases? Show vendorid and avg_unitprice.,"SELECT poh.vendorid, AVG(pod.unitprice) AS avg_unitprice
+FROM purchaseorderheader poh
+JOIN purchaseorderdetail pod ON poh.purchaseorderid = pod.purchaseorderid
+GROUP BY poh.vendorid
+ORDER BY avg_unitprice DESC
+LIMIT 1;","SELECT p.productid, p.name,
+  SUM(COALESCE(t.actualcost, 0)) + SUM(COALESCE(ta.actualcost, 0)) AS total_cost
+FROM product p
+LEFT JOIN transactionhistory t ON p.productid = t.productid
+LEFT JOIN transactionhistoryarchive ta ON p.productid = ta.productid
+GROUP BY p.productid, p.name
+ORDER BY total_cost DESC
+LIMIT 10;",0.0
+24.2,Vendor mana yang harga unit barangnya paling mahal rata-ratanya? Tampilkan vendorid dan avg_unitprice.,"SELECT poh.vendorid, AVG(pod.unitprice) AS avg_unitprice
+FROM purchaseorderheader poh
+JOIN purchaseorderdetail pod ON poh.purchaseorderid = pod.purchaseorderid
+GROUP BY poh.vendorid
+ORDER BY avg_unitprice DESC
+LIMIT 1;","SELECT p.productid, p.name,
+  SUM(COALESCE(t.actualcost, 0)) + SUM(COALESCE(ta.actualcost, 0)) AS total_cost
+FROM product p
+LEFT JOIN transactionhistory t ON p.productid = t.productid
+LEFT JOIN transactionhistoryarchive ta ON p.productid = ta.productid
+GROUP BY p.productid, p.name
+ORDER BY total_cost DESC
+LIMIT 10;",0.0
+25.1,"Which products were never sold, reviewed, or used in a work order? Show productid and name.","SELECT p.productid, p.name
+FROM product p
+LEFT JOIN salesorderdetail sod ON p.productid = sod.productid
+LEFT JOIN productreview pr ON p.productid = pr.productid
+LEFT JOIN workorder wo ON p.productid = wo.productid
+WHERE sod.productid IS NULL AND pr.productid IS NULL AND wo.productid IS NULL;","SELECT businessentityid,
+  COUNT(DISTINCT departmentid) AS change_count
+ FROM employeedepartmenthistory
+ GROUP BY businessentityid
+ ORDER BY change_count DESC
+ LIMIT 10;",0.0
+25.2,"Produk apa aja yang belum pernah dijual, di-review, atau dipakai di work order? Tampilkan productid dan name.","SELECT productid, name
+FROM product
+WHERE productid NOT IN (
+    SELECT productid FROM salesorderdetail
+    UNION
+    SELECT productid FROM productreview
+    UNION
+    SELECT productid FROM workorder
+);","SELECT businessentityid,
+  COUNT(DISTINCT departmentid) AS change_count
+ FROM employeedepartmenthistory
+ GROUP BY businessentityid
+ ORDER BY change_count DESC
+ LIMIT 10;",0.0
+26.1,Which 5 product models have the biggest difference in price history? Show productmodelid and price_range.,"SELECT p.productmodelid, MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+FROM product p
+JOIN productlistpricehistory plph ON p.productid = plph.productid
+GROUP BY p.productmodelid
+ORDER BY price_range DESC
+LIMIT 5;","SELECT businessentityid,
+  COUNT(DISTINCT productid) AS product_count
+ FROM productvendor
+ GROUP BY businessentityid
+ ORDER BY product_count DESC
+ LIMIT 10;",0.0
+26.2,Model produk mana yang rentang perubahan harganya paling besar? Tampilkan productmodelid dan price_range.,"SELECT productmodelid, MAX(listprice) - MIN(listprice) AS price_range
+FROM product
+GROUP BY productmodelid
+ORDER BY price_range DESC;","SELECT businessentityid,
+  COUNT(DISTINCT productid) AS product_count
+ FROM productvendor
+ GROUP BY businessentityid
+ ORDER BY product_count DESC
+ LIMIT 10;",0.0
+27.1,Which 5 currencies fluctuate the most? Show currencycode and volatility.,"SELECT currencycode, STDDEV(endofdayrate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate FROM currencyrate
+) AS rates
+GROUP BY currencycode
+ORDER BY volatility DESC
+LIMIT 5;","SELECT pm.productmodelid, pm.name,
+  AVG(pr.rating) AS avg_rating,
+  COUNT(pr.productreviewid) AS total_reviews
+FROM productmodel pm
+JOIN product p ON pm.productmodelid = p.productmodelid
+JOIN productreview pr ON p.productid = pr.productid
+GROUP BY pm.productmodelid, pm.name
+ORDER BY avg_rating DESC
+LIMIT 10;",0.0
+27.2,Mata uang mana yang nilai tukarnya paling naik turun? Tampilkan currencycode dan volatility.,"SELECT currencycode, STDDEV(endofdayrate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate FROM currencyrate
+) AS rates
+GROUP BY currencycode
+ORDER BY volatility DESC
+LIMIT 1;","SELECT pm.productmodelid, pm.name,
+  AVG(pr.rating) AS avg_rating,
+  COUNT(pr.productreviewid) AS total_reviews
+FROM productmodel pm
+JOIN product p ON pm.productmodelid = p.productmodelid
+JOIN productreview pr ON p.productid = pr.productid
+GROUP BY pm.productmodelid, pm.name
+ORDER BY avg_rating DESC
+LIMIT 10;",0.0
+28.1,Which 3 employees had the most job titles over time? Show businessentityid and jobtitle_count.,"SELECT businessentityid, COUNT(*) AS job_title_count
+FROM employeedepartmenthistory
+GROUP BY businessentityid
+ORDER BY job_title_count DESC
+LIMIT 3;","SELECT l.locationid, l.name,
+  SUM(wr.actualcost) AS total_actual_cost
+FROM workorderrouting wr
+JOIN location l ON wr.locationid = l.locationid
+GROUP BY l.locationid, l.name
+ORDER BY total_actual_cost DESC
+LIMIT 10;",0.0
+28.2,Karyawan mana aja yang paling sering ganti jabatan? Tampilkan businessentityid dan jobtitle_count.,"SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count FROM (SELECT e.businessentityid, e.jobtitle, edh.startdate FROM employee e JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid) AS t GROUP BY businessentityid ORDER BY jobtitle_count DESC;","SELECT l.locationid, l.name,
+  SUM(wr.actualcost) AS total_actual_cost
+FROM workorderrouting wr
+JOIN location l ON wr.locationid = l.locationid
+GROUP BY l.locationid, l.name
+ORDER BY total_actual_cost DESC
+LIMIT 10;",0.0
+29.1,"How many documents are there by status and folderflag? Show status, folderflag, and total_docs.","SELECT status, folderflag, COUNT(*) AS total_document_count FROM document GROUP BY status, folderflag;","SELECT pc.name AS category_name,
+  AVG(pv.averageleadtime) AS avg_leadtime
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+JOIN productvendor pv ON p.productid = pv.productid
+GROUP BY pc.name
+ORDER BY avg_leadtime DESC;",0.0
+29.2,"Ada berapa dokumen berdasarkan status dan folderflag-nya? Tampilkan status, folderflag, dan total_docs.","SELECT status, folderflag, COUNT(*) AS total_documents FROM document GROUP BY status, folderflag;","SELECT pc.name AS category_name,
+  AVG(pv.averageleadtime) AS avg_leadtime
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+JOIN productvendor pv ON p.productid = pv.productid
+GROUP BY pc.name
+ORDER BY avg_leadtime DESC;",0.0
+30.1,"Which stores have employees with the biggest bonuses? Show store_name, employeeid, and bonus.","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+FROM store s
+JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+JOIN employee e ON sp.businessentityid = e.businessentityid
+ORDER BY sp.bonus DESC;","SELECT customerid,
+  COUNT(*) AS total_orders
+ FROM salesorderheader
+ GROUP BY customerid
+ ORDER BY total_orders DESC
+ LIMIT 5;",0.0
+30.2,"Toko mana yang punya pegawai dengan bonus paling gede? Tampilkan store_name, employeeid, dan bonus.","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+FROM store s
+JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+JOIN employee e ON sp.businessentityid = e.businessentityid
+ORDER BY sp.bonus DESC;","SELECT customerid,
+  COUNT(*) AS total_orders
+ FROM salesorderheader
+ GROUP BY customerid
+ ORDER BY total_orders DESC
+ LIMIT 5;",0.0
+31.1,Which product models have the biggest average difference between their lowest and highest list prices? Show productmodelid and price_range.,"SELECT p.productmodelid, MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+FROM product p
+JOIN productlistpricehistory plph ON p.productid = plph.productid
+GROUP BY p.productmodelid
+ORDER BY price_range DESC;","SELECT s.shipmethodid, s.name,
+  COUNT(*) AS usage_count
+FROM salesorderheader soh
+JOIN shipmethod s ON soh.shipmethodid = s.shipmethodid
+GROUP BY s.shipmethodid, s.name
+ORDER BY usage_count DESC;",0.0
+31.2,Model produk mana yang punya selisih harga list paling besar rata-ratanya? Tampilkan productmodelid dan price_range.,"SELECT
+  pm.productmodelid,
+  MAX(plph.listprice) - MIN(plph.listprice) AS price_range
+FROM productmodel AS pm
+JOIN product AS p
+  ON pm.productmodelid = p.productmodelid
+JOIN productlistpricehistory AS plph
+  ON p.productid = plph.productid
+GROUP BY
+  pm.productmodelid
+ORDER BY
+  price_range DESC;","SELECT s.shipmethodid, s.name,
+  COUNT(*) AS usage_count
+FROM salesorderheader soh
+JOIN shipmethod s ON soh.shipmethodid = s.shipmethodid
+GROUP BY s.shipmethodid, s.name
+ORDER BY usage_count DESC;",0.0
+32.1,Which 5 currencies fluctuate the most based on exchange rate changes? Show currencycode and volatility.,"SELECT currencycode, STDDEV(endofdayrate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate FROM currencyrate
+) AS rates
+GROUP BY currencycode
+ORDER BY volatility DESC
+LIMIT 5;","SELECT pc.name AS category_name,
+  MIN(p.weight) AS min_weight,
+  MAX(p.weight) AS max_weight,
+  MAX(p.weight) - MIN(p.weight) AS weight_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+WHERE p.weight IS NOT NULL
+GROUP BY pc.name
+ORDER BY weight_diff DESC
+LIMIT 5;",0.0
+32.2,Mata uang apa aja yang nilai tukarnya paling naik turun? Tampilkan currencycode dan volatility.,"SELECT currencycode, STDDEV(endofdayrate) AS volatility FROM (
+  SELECT fromcurrencycode AS currencycode, endofdayrate FROM currencyrate
+  UNION ALL
+  SELECT tocurrencycode AS currencycode, endofdayrate FROM currencyrate
+) AS rates
+GROUP BY currencycode
+ORDER BY volatility DESC;","SELECT pc.name AS category_name,
+  MIN(p.weight) AS min_weight,
+  MAX(p.weight) AS max_weight,
+  MAX(p.weight) - MIN(p.weight) AS weight_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+WHERE p.weight IS NOT NULL
+GROUP BY pc.name
+ORDER BY weight_diff DESC
+LIMIT 5;",0.0
+33.1,Which 3 employees had the most different job titles over time? Show businessentityid and jobtitle_count.,"SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count
+FROM (
+  SELECT e.businessentityid, e.jobtitle, edh.startdate
+  FROM employee e
+  JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid
+) AS t
+GROUP BY businessentityid
+ORDER BY jobtitle_count DESC
+LIMIT 3;","SELECT 
+  CONCAT(p.firstname, ' ', p.lastname) AS salesperson_name,
+  MAX(soh.totaldue) AS max_order_total
+ FROM salesorderheader soh
+ JOIN salesperson sp ON soh.salespersonid = sp.businessentityid
+ JOIN person p ON sp.businessentityid = p.businessentityid
+ WHERE soh.totaldue > 10000
+ GROUP BY salesperson_name;",0.0
+33.2,Siapa aja 3 karyawan yang paling sering ganti jabatan? Tampilkan businessentityid dan jobtitle_count.,"SELECT businessentityid, COUNT(DISTINCT jobtitle) AS jobtitle_count
+FROM (
+  SELECT e.businessentityid, e.jobtitle, edh.startdate
+  FROM employee e
+  JOIN employeedepartmenthistory edh ON e.businessentityid = edh.businessentityid
+) AS t
+GROUP BY businessentityid
+ORDER BY jobtitle_count DESC
+LIMIT 3;","SELECT 
+  CONCAT(p.firstname, ' ', p.lastname) AS salesperson_name,
+  MAX(soh.totaldue) AS max_order_total
+ FROM salesorderheader soh
+ JOIN salesperson sp ON soh.salespersonid = sp.businessentityid
+ JOIN person p ON sp.businessentityid = p.businessentityid
+ WHERE soh.totaldue > 10000
+ GROUP BY salesperson_name;",0.0
+34.1,"How many documents are there by their status and folderflag? Show status, folderflag, and total_docs.","SELECT status, folderflag, COUNT(*) AS total_document_count FROM document GROUP BY status, folderflag;","SELECT 
+  sod.productid,
+  AVG(sod.orderqty) AS avg_quantity
+ FROM salesorderdetail sod
+ GROUP BY sod.productid
+ ORDER BY avg_quantity DESC
+ LIMIT 5;",0.0
+34.2,"Ada berapa dokumen untuk tiap status dan folderflag? Tampilkan status, folderflag, dan total_docs.","SELECT status, folderflag, COUNT(*) AS total_documents
+FROM document
+GROUP BY status, folderflag;","SELECT 
+  sod.productid,
+  AVG(sod.orderqty) AS avg_quantity
+ FROM salesorderdetail sod
+ GROUP BY sod.productid
+ ORDER BY avg_quantity DESC
+ LIMIT 5;",0.0
+35.1,"Which stores are connected to employees who got the biggest bonuses? Show store_name, employeeid, and bonus.","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+FROM store s
+JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+JOIN employee e ON sp.businessentityid = e.businessentityid
+ORDER BY sp.bonus DESC;","SELECT 
+  pv.businessentityid AS vendor_id,
+  COUNT(DISTINCT pv.productid) AS num_products_supplied
+ FROM productvendor pv
+ GROUP BY vendor_id
+ HAVING COUNT(DISTINCT pv.productid) > 3;",0.0
+35.2,"Toko mana aja yang pegawainya dapat bonus paling gede? Tampilkan store_name, employeeid, dan bonus.","SELECT s.name AS store_name, e.businessentityid AS employeeid, sp.bonus
+FROM store s
+JOIN salesperson sp ON s.salespersonid = sp.businessentityid
+JOIN employee e ON sp.businessentityid = e.businessentityid
+ORDER BY sp.bonus DESC;","SELECT 
+  pv.businessentityid AS vendor_id,
+  COUNT(DISTINCT pv.productid) AS num_products_supplied
+ FROM productvendor pv
+ GROUP BY vendor_id
+ HAVING COUNT(DISTINCT pv.productid) > 3;",0.0
+36.1,"Which products weigh more than the average weight in their size unit group? Show productid, name, weight, and avg_group_weight.","SELECT p.productid, p.name, p.weight, avg_group.avg_weight AS avg_group_weight
+FROM product p
+JOIN (
+  SELECT sizeunitmeasurecode, AVG(weight) AS avg_weight
+  FROM product
+  WHERE weight IS NOT NULL
+  GROUP BY sizeunitmeasurecode
+) AS avg_group ON p.sizeunitmeasurecode = avg_group.sizeunitmeasurecode
+WHERE p.weight > avg_group.avg_weight;","SELECT 
+  edh.businessentityid AS employee_id,
+  COUNT(DISTINCT edh.departmentid) AS department_change_count
+ FROM employeedepartmenthistory edh
+ GROUP BY edh.businessentityid
+ HAVING COUNT(DISTINCT edh.departmentid) >= 2;",0.0
+36.2,"Produk apa yang beratnya di atas rata-rata dalam grup ukuran yang sama? Tampilkan productid, name, weight, dan avg_group_weight.","SELECT p.productid, p.name, p.weight, avg_group.avg_weight AS avg_group_weight
+FROM product p
+JOIN (
+  SELECT sizeunitmeasurecode, AVG(weight) AS avg_weight
+  FROM product
+  WHERE weight IS NOT NULL
+  GROUP BY sizeunitmeasurecode
+) AS avg_group ON p.sizeunitmeasurecode = avg_group.sizeunitmeasurecode
+WHERE p.weight > avg_group.avg_weight;","SELECT 
+  edh.businessentityid AS employee_id,
+  COUNT(DISTINCT edh.departmentid) AS department_change_count
+ FROM employeedepartmenthistory edh
+ GROUP BY edh.businessentityid
+ HAVING COUNT(DISTINCT edh.departmentid) >= 2;",0.0
+37.1,"Which 5 products had the most unstable standard cost? Show productid, name, stddev of cost, and how many records they have.","SELECT p.productid, p.name, STDDEV(pch.standardcost) AS cost_stddev, COUNT(*) AS record_count
+FROM product p
+JOIN productcosthistory pch ON p.productid = pch.productid
+GROUP BY p.productid, p.name
+ORDER BY cost_stddev DESC
+LIMIT 5;","SELECT 
+  soh.customerid,
+  COUNT(DISTINCT sod.productid) AS num_distinct_products
+ FROM salesorderheader soh
+ JOIN salesorderdetail sod ON soh.salesorderid = sod.salesorderid
+ GROUP BY soh.customerid
+ HAVING COUNT(DISTINCT sod.productid) > 3;",0.0
+37.2,"Produk apa aja yang biaya standarnya paling gak stabil? Tampilkan productid, name, standar deviasi cost, dan jumlah recordnya.","SELECT p.ProductID, p.Name, STDDEV(pch.StandardCost) AS CostStdDev, COUNT(*) AS NumRecords
+FROM ProductCosthistory pch
+JOIN Product p ON pch.ProductID = p.ProductID
+GROUP BY p.ProductID, p.Name
+ORDER BY CostStdDev DESC;","SELECT 
+  soh.customerid,
+  COUNT(DISTINCT sod.productid) AS num_distinct_products
+ FROM salesorderheader soh
+ JOIN salesorderdetail sod ON soh.salesorderid = sod.salesorderid
+ GROUP BY soh.customerid
+ HAVING COUNT(DISTINCT sod.productid) > 3;",0.0
+38.1,"What are the 10 products with the highest total transaction cost from transaction records? Show productid, name, and total_cost.","SELECT p.productid, p.name, SUM(th.actualcost) AS total_cost
+FROM product p
+JOIN transactionhistory th ON p.productid = th.productid
+GROUP BY p.productid, p.name
+ORDER BY total_cost DESC
+LIMIT 10;","SELECT 
+  sm.name AS shipmethod_name,
+  COUNT(*) AS num_orders
+FROM salesorderheader soh
+JOIN shipmethod sm ON soh.shipmethodid = sm.shipmethodid
+WHERE soh.totaldue > 5000
+GROUP BY sm.name
+ORDER BY num_orders DESC;",0.0
+38.2,"Apa aja 10 produk yang total biaya transaksinya paling tinggi? Tampilkan productid, name, dan total_cost.","SELECT p.productid, p.name, SUM(COALESCE(th.actualcost, 0) + COALESCE(tha.actualcost, 0)) AS total_cost
+FROM product p
+LEFT JOIN transactionhistory th ON p.productid = th.productid
+LEFT JOIN transactionhistoryarchive tha ON p.productid = tha.productid
+GROUP BY p.productid, p.name
+ORDER BY total_cost DESC
+LIMIT 10;","SELECT 
+  sm.name AS shipmethod_name,
+  COUNT(*) AS num_orders
+FROM salesorderheader soh
+JOIN shipmethod sm ON soh.shipmethodid = sm.shipmethodid
+WHERE soh.totaldue > 5000
+GROUP BY sm.name
+ORDER BY num_orders DESC;",0.0
+39.1,Which employees changed departments the most times during their career? Show businessentityid and change_count.,"SELECT businessentityid, COUNT(*) AS num_department_changes FROM employeedepartmenthistory GROUP BY businessentityid ORDER BY num_department_changes DESC;","SELECT 
+  pch.productid,
+  MAX(pch.standardcost) - MIN(pch.standardcost) AS cost_variance
+ FROM productcosthistory pch
+ GROUP BY pch.productid
+ ORDER BY cost_variance DESC
+ LIMIT 5;",0.0
+39.2,Karyawan mana aja yang paling sering pindah departemen? Tampilkan businessentityid dan change_count.,"SELECT businessentityid, COUNT(*) AS change_count FROM employeedepartmenthistory GROUP BY businessentityid ORDER BY change_count DESC;","SELECT 
+  pch.productid,
+  MAX(pch.standardcost) - MIN(pch.standardcost) AS cost_variance
+ FROM productcosthistory pch
+ GROUP BY pch.productid
+ ORDER BY cost_variance DESC
+ LIMIT 5;",0.0
+40.1,Which vendors supplied the highest number of unique products? Show businessentityid and product_count.,"SELECT businessentityid, COUNT(DISTINCT productid) AS product_count FROM productvendor GROUP BY businessentityid ORDER BY product_count DESC LIMIT 1;","SELECT businessentityid,
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+  FROM employeedepartmenthistory
+  GROUP BY businessentityid
+  ORDER BY total_days DESC
+  LIMIT 5;",0.0
+40.2,Vendor mana yang nyuplai produk paling beragam? Tampilkan businessentityid dan product_count.,"SELECT businessentityid, COUNT(DISTINCT productid) AS product_count FROM productvendor GROUP BY businessentityid ORDER BY product_count DESC LIMIT 1;","SELECT businessentityid,
+  SUM(COALESCE(enddate, CURRENT_DATE) - startdate) AS total_days
+  FROM employeedepartmenthistory
+  GROUP BY businessentityid
+  ORDER BY total_days DESC
+  LIMIT 5;",0.0
+41.1,"How good are products rated by customers on average and how many reviews do they have? Show productmodelid, name, avg_rating, and total_reviews.","SELECT pm.productmodelid, pm.name, AVG(pr.rating) AS avg_rating, COUNT(pr.productreviewid) AS total_reviews
+FROM productmodel pm
+JOIN product p ON pm.productmodelid = p.productmodelid
+JOIN productreview pr ON p.productid = pr.productid
+GROUP BY pm.productmodelid, pm.name
+ORDER BY pm.productmodelid;","SELECT p.productid, p.standardcost, AVG(pod.unitprice) AS avg_purchase_price,
+  ABS(p.standardcost - AVG(pod.unitprice)) AS cost_diff
+  FROM product p
+  JOIN purchaseorderdetail pod ON p.productid = pod.productid
+  GROUP BY p.productid, p.standardcost
+  ORDER BY cost_diff DESC
+  LIMIT 5;",0.0
+41.2,"Rata-rata rating produk gimana dan ada berapa reviewnya? Tampilkan productmodelid, name, avg_rating, dan total_reviews.","SELECT p.productmodelid, pm.name, AVG(pr.rating) AS avg_rating, COUNT(*) AS total_reviews
+FROM product AS p
+JOIN productmodel AS pm ON p.productmodelid = pm.productmodelid
+LEFT JOIN productreview AS pr ON p.productid = pr.productid
+GROUP BY p.productmodelid, pm.name;","SELECT p.productid, p.standardcost, AVG(pod.unitprice) AS avg_purchase_price,
+  ABS(p.standardcost - AVG(pod.unitprice)) AS cost_diff
+  FROM product p
+  JOIN purchaseorderdetail pod ON p.productid = pod.productid
+  GROUP BY p.productid, p.standardcost
+  ORDER BY cost_diff DESC
+  LIMIT 5;",0.0
+42.1,"Which work order locations have the biggest total actual costs? Show locationid, name, and total_actual_cost.","SELECT l.locationid, l.name, SUM(wr.actualcost) AS total_actual_cost
+FROM workorderrouting wr
+JOIN location l ON wr.locationid = l.locationid
+GROUP BY l.locationid, l.name
+ORDER BY total_actual_cost DESC
+LIMIT 10;","SELECT wo.productid, COUNT(*) AS total_workorders
+  FROM workorder wo
+  WHERE wo.productid IN (
+  SELECT sod.productid FROM salesorderdetail sod
+  ) AND wo.productid NOT IN (
+  SELECT pod.productid FROM purchaseorderdetail pod
+  )
+  GROUP BY wo.productid;",0.0
+42.2,"Lokasi kerja mana yang habisin biaya aktual paling besar? Tampilkan locationid, name, dan total_actual_cost.","SELECT l.locationid, l.name, SUM(wr.actualcost) AS total_actual_cost
+FROM workorderrouting wr
+JOIN location l ON wr.locationid = l.locationid
+GROUP BY l.locationid, l.name
+ORDER BY total_actual_cost DESC;","SELECT wo.productid, COUNT(*) AS total_workorders
+  FROM workorder wo
+  WHERE wo.productid IN (
+  SELECT sod.productid FROM salesorderdetail sod
+  ) AND wo.productid NOT IN (
+  SELECT pod.productid FROM purchaseorderdetail pod
+  )
+  GROUP BY wo.productid;",0.0
+43.1,What’s the average lead time for each product category? Show category name and avg_leadtime.,"SELECT pc.name AS category_name, AVG(pv.averageleadtime) AS avg_leadtime
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+JOIN productvendor pv ON p.productid = pv.productid
+GROUP BY pc.name
+ORDER BY avg_leadtime DESC;","SELECT soh.customerid, soh.creditcardid, COUNT(*) AS usage_count
+  FROM salesorderheader soh
+  WHERE soh.creditcardid IS NOT NULL
+  GROUP BY soh.customerid, soh.creditcardid
+  ORDER BY usage_count DESC
+  LIMIT 5;",0.0
+43.2,Berapa rata-rata waktu tunggu untuk tiap kategori produk? Tampilkan category name dan avg_leadtime.,"SELECT pc.name AS category_name, AVG(pv.averageleadtime) AS avg_leadtime
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+JOIN productvendor pv ON p.productid = pv.productid
+GROUP BY pc.name
+ORDER BY avg_leadtime DESC;","SELECT soh.customerid, soh.creditcardid, COUNT(*) AS usage_count
+  FROM salesorderheader soh
+  WHERE soh.creditcardid IS NOT NULL
+  GROUP BY soh.customerid, soh.creditcardid
+  ORDER BY usage_count DESC
+  LIMIT 5;",0.0
+44.1,Which 5 customers placed the most sales orders? Show customerid and total_orders.,"SELECT customerid, COUNT(*) AS total_orders FROM salesorderheader GROUP BY customerid ORDER BY total_orders DESC LIMIT 5;","SELECT productcategoryid, COUNT(*) AS subcategory_count
+  FROM productsubcategory
+  GROUP BY productcategoryid
+  ORDER BY subcategory_count DESC
+  LIMIT 5;",0.0
+44.2,Pelanggan mana aja yang paling sering pesan barang? Tampilkan customerid dan total_orders.,"SELECT customerid, COUNT(*) AS total_orders FROM salesorderheader GROUP BY customerid ORDER BY total_orders DESC;","SELECT productcategoryid, COUNT(*) AS subcategory_count
+  FROM productsubcategory
+  GROUP BY productcategoryid
+  ORDER BY subcategory_count DESC
+  LIMIT 5;",0.0
+45.1,"What ship methods are used most often in sales orders? Show shipmethodid, name, and usage_count.","SELECT s.shipmethodid, s.name, COUNT(*) AS usage_count
+FROM salesorderheader soh
+JOIN shipmethod s ON soh.shipmethodid = s.shipmethodid
+GROUP BY s.shipmethodid, s.name
+ORDER BY usage_count DESC;","SELECT productid,
+  MAX(startdate) - MIN(startdate) AS days_span
+  FROM productlistpricehistory
+  GROUP BY productid
+  ORDER BY days_span DESC
+  LIMIT 5;",0.0
+45.2,"Metode kirim apa yang paling sering dipakai buat pesanan? Tampilkan shipmethodid, name, dan usage_count.","SELECT s.shipmethodid, s.name, COUNT(*) AS usage_count
+FROM salesorderheader soh
+JOIN shipmethod s ON soh.shipmethodid = s.shipmethodid
+GROUP BY s.shipmethodid, s.name
+ORDER BY usage_count DESC;","SELECT productid,
+  MAX(startdate) - MIN(startdate) AS days_span
+  FROM productlistpricehistory
+  GROUP BY productid
+  ORDER BY days_span DESC
+  LIMIT 5;",0.0
+46.1,"Which product categories have the biggest spread in product weights? Show category name, min_weight, max_weight, and weight_diff.","SELECT pc.name AS category_name,
+  MIN(p.weight) AS min_weight,
+  MAX(p.weight) AS max_weight,
+  MAX(p.weight) - MIN(p.weight) AS weight_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+WHERE p.weight IS NOT NULL
+GROUP BY pc.name
+ORDER BY weight_diff DESC
+LIMIT 5;","SELECT edh.businessentityid,
+  SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days_worked
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.businessentityid
+  ORDER BY total_days_worked DESC
+  LIMIT 5;",0.0
+46.2,"Kategori produk mana yang punya selisih berat paling besar? Tampilkan category name, min_weight, max_weight, dan weight_diff.","SELECT pc.name AS category_name, MIN(p.weight) AS min_weight, MAX(p.weight) AS max_weight, MAX(p.weight) - MIN(p.weight) AS weight_diff
+FROM product p
+JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+WHERE p.weight IS NOT NULL
+GROUP BY pc.name
+ORDER BY weight_diff DESC;","SELECT edh.businessentityid,
+  SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days_worked
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.businessentityid
+  ORDER BY total_days_worked DESC
+  LIMIT 5;",0.0
+47.1,"For each salesperson, what’s their biggest order value above 10k? Show salesperson_name and max_order_total.","SELECT 
+  CONCAT(p.firstname, ' ', p.lastname) AS salesperson_name,
+  MAX(soh.totaldue) AS max_order_total
+FROM salesorderheader soh
+JOIN salesperson sp ON soh.salespersonid = sp.businessentityid
+JOIN person p ON sp.businessentityid = p.businessentityid
+WHERE soh.totaldue > 10000
+GROUP BY salesperson_name;","SELECT edh.departmentid,
+       SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days
+FROM employeedepartmenthistory edh
+GROUP BY edh.departmentid
+ORDER BY total_days DESC
+LIMIT 5;",0.0
+47.2,Penjual mana yang pernah dapat pesanan paling besar di atas 10 ribu? Tampilkan salesperson_name dan max_order_total.,"SELECT
+  CONCAT(p.firstname, ' ', p.lastname) AS salesperson_name,
+  MAX(soh.totaldue) AS max_order_total
+FROM salesorderheader soh
+JOIN salesperson sp ON soh.salespersonid = sp.businessentityid
+JOIN person p ON sp.businessentityid = p.businessentityid
+WHERE soh.totaldue > 10000
+GROUP BY salesperson_name
+ORDER BY max_order_total DESC
+LIMIT 1;","SELECT edh.departmentid,
+       SUM(COALESCE(edh.enddate, CURRENT_DATE) - edh.startdate) AS total_days
+FROM employeedepartmenthistory edh
+GROUP BY edh.departmentid
+ORDER BY total_days DESC
+LIMIT 5;",0.0
+48.1,Which 5 products have the highest average quantity sold per order? Show product_id and avg_quantity.,"SELECT sod.productid, AVG(sod.orderqty) AS avg_quantity FROM salesorderdetail sod GROUP BY sod.productid ORDER BY avg_quantity DESC LIMIT 5;","SELECT e.businessentityid, COUNT(DISTINCT wo.workorderid) AS workorder_count
+FROM employee e
+JOIN workorder wo ON e.businessentityid = wo.productid
+GROUP BY e.businessentityid
+ORDER BY workorder_count DESC
+LIMIT 5;",0.0
+48.2,Produk mana yang rata-rata dijual paling banyak per pesanan? Tampilkan product_id dan avg_quantity.,"SELECT sod.productid, AVG(sod.orderqty) AS avg_quantity FROM salesorderdetail sod GROUP BY sod.productid ORDER BY avg_quantity DESC;","SELECT e.businessentityid, COUNT(DISTINCT wo.workorderid) AS workorder_count
+FROM employee e
+JOIN workorder wo ON e.businessentityid = wo.productid
+GROUP BY e.businessentityid
+ORDER BY workorder_count DESC
+LIMIT 5;",0.0
+49.1,Which vendors supplied more than 3 unique products? Show vendor_id and num_products_supplied.,"SELECT pv.businessentityid AS vendor_id, COUNT(DISTINCT pv.productid) AS num_products_supplied FROM productvendor pv GROUP BY vendor_id HAVING COUNT(DISTINCT pv.productid) > 3;","SELECT pc.productcategoryid, pc.name, COUNT(DISTINCT sod.productid) AS product_count
+  FROM salesorderdetail sod
+  JOIN product p ON sod.productid = p.productid
+  JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+  JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+  GROUP BY pc.productcategoryid, pc.name
+  ORDER BY product_count DESC
+  LIMIT 5;",0.0
+49.2,Vendor mana aja yang nyuplai lebih dari 3 produk berbeda? Tampilkan vendor_id dan num_products_supplied.,"SELECT 
+  pv.businessentityid AS vendor_id,
+  COUNT(DISTINCT pv.productid) AS num_products_supplied
+FROM productvendor pv
+GROUP BY vendor_id
+HAVING COUNT(DISTINCT pv.productid) > 3;","SELECT pc.productcategoryid, pc.name, COUNT(DISTINCT sod.productid) AS product_count
+  FROM salesorderdetail sod
+  JOIN product p ON sod.productid = p.productid
+  JOIN productsubcategory ps ON p.productsubcategoryid = ps.productsubcategoryid
+  JOIN productcategory pc ON ps.productcategoryid = pc.productcategoryid
+  GROUP BY pc.productcategoryid, pc.name
+  ORDER BY product_count DESC
+  LIMIT 5;",0.0
+50.1,Which employees switched departments at least twice? Show employee_id and department_change_count.,"SELECT 
+  edh.businessentityid AS employee_id,
+  COUNT(DISTINCT edh.departmentid) AS department_change_count
+FROM employeedepartmenthistory edh
+GROUP BY edh.businessentityid
+HAVING COUNT(DISTINCT edh.departmentid) >= 2;","SELECT edh.departmentid, COUNT(*) AS total_records
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.departmentid
+  ORDER BY total_records DESC
+  LIMIT 5;",0.0
+50.2,Karyawan mana aja yang pernah pindah departemen minimal dua kali? Tampilkan employee_id dan department_change_count.,"SELECT businessentityid, COUNT(*) AS department_change_count
+FROM employeedepartmenthistory
+GROUP BY businessentityid
+HAVING COUNT(*) >= 2;","SELECT edh.departmentid, COUNT(*) AS total_records
+  FROM employeedepartmenthistory edh
+  GROUP BY edh.departmentid
+  ORDER BY total_records DESC
+  LIMIT 5;",0.0

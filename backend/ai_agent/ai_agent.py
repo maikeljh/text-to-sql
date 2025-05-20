@@ -189,10 +189,10 @@ def generate_sql_tool(state: AgentState) -> dict:
             model=state.model,
             provider=state.provider,
             api_key=ENUM.get(state.provider, ""),
-            schema_path="./files/metadata/sakila.json",
+            schema_path=f"./files/schema/{state.database}.txt",
         ),
         retrieve_context_config=ContextConfig(
-            data_path="./files/dataset/dataset_sakila.csv"
+            data_path=f"./files/dataset/dataset_{state.database}.csv"
         ),
         query_executor_config = QueryConfig(
             host=ENUM.get("database", {}).get(state.database, {}).get("DB_SOURCE_HOST", ""),

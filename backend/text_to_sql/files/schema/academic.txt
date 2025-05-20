@@ -1,0 +1,215 @@
+CREATE TABLE Fakultas (
+id_fakultas INT PRIMARY KEY,
+nama VARCHAR(100),
+jumlah_dosen INT,
+id_kepala INT -- FK ke Dosen (Satu-ke-Satu)
+);
+
+CREATE TABLE Dosen (
+id_dosen INT PRIMARY KEY,
+nama VARCHAR(100),
+jabatan VARCHAR(50),
+email VARCHAR(100),
+telepon VARCHAR(20),
+id_fakultas INT,
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas)
+);
+
+CREATE TABLE Jurusan (
+id_jurusan INT PRIMARY KEY,
+nama VARCHAR(100),
+id_fakultas INT,
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas)
+);
+
+CREATE TABLE Mahasiswa (
+id_mahasiswa INT PRIMARY KEY,
+nama VARCHAR(100),
+tanggal_lahir DATE,
+email VARCHAR(100),
+telepon VARCHAR(20),
+alamat TEXT,
+tanggal_masuk DATE,
+id_jurusan INT,
+id_fakultas INT,
+id_pembimbing INT,
+FOREIGN KEY (id_jurusan) REFERENCES Jurusan(id_jurusan),
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas),
+FOREIGN KEY (id_pembimbing) REFERENCES Dosen(id_dosen)
+);
+
+CREATE TABLE MataKuliah (
+id_mk INT PRIMARY KEY,
+judul VARCHAR(100),
+deskripsi TEXT,
+sks INT,
+id_fakultas INT,
+id_jurusan INT,
+id_pengajar INT,
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas),
+FOREIGN KEY (id_jurusan) REFERENCES Jurusan(id_jurusan),
+FOREIGN KEY (id_pengajar) REFERENCES Dosen(id_dosen)
+);
+
+CREATE TABLE Kelas (
+id_kelas INT PRIMARY KEY,
+id_mk INT,
+id_mahasiswa INT,
+FOREIGN KEY (id_mk) REFERENCES MataKuliah(id_mk),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);
+
+CREATE TABLE ProyekPenelitian (
+id_proyek INT PRIMARY KEY,
+judul VARCHAR(150),
+tanggal_mulai DATE,
+tanggal_selesai DATE,
+id_dosen INT,
+id_fakultas INT,
+FOREIGN KEY (id_dosen) REFERENCES Dosen(id_dosen),
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas)
+);
+
+CREATE TABLE PartisipasiPenelitian (
+id_partisipasi INT PRIMARY KEY,
+id_proyek INT,
+id_mahasiswa INT,
+peran VARCHAR(50),
+jam_kontribusi FLOAT,
+FOREIGN KEY (id_proyek) REFERENCES ProyekPenelitian(id_proyek),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);
+
+CREATE TABLE Publikasi (
+id_publikasi INT PRIMARY KEY,
+judul VARCHAR(200),
+tanggal_terbit DATE,
+nama_jurnal VARCHAR(100),
+id_fakultas INT,
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas)
+);
+
+CREATE TABLE PenulisPublikasi (
+id_penulis_publikasi INT PRIMARY KEY,
+id_publikasi INT,
+id_dosen INT,
+urutan_penulis INT,
+FOREIGN KEY (id_publikasi) REFERENCES Publikasi(id_publikasi),
+FOREIGN KEY (id_dosen) REFERENCES Dosen(id_dosen)
+);
+
+CREATE TABLE Sesi (
+id_sesi INT PRIMARY KEY,
+id_mk INT,
+id_pengajar INT,
+semester VARCHAR(10),
+jadwal VARCHAR(100),
+ruang VARCHAR(10),
+FOREIGN KEY (id_mk) REFERENCES MataKuliah(id_mk),
+FOREIGN KEY (id_pengajar) REFERENCES Dosen(id_dosen)
+);
+
+CREATE TABLE EnrolmenKelas (
+id_enrolmen_kelas INT PRIMARY KEY,
+id_sesi INT,
+id_mahasiswa INT,
+kehadiran FLOAT,
+nilai_partisipasi FLOAT,
+FOREIGN KEY (id_sesi) REFERENCES Sesi(id_sesi),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);
+
+CREATE TABLE CatatanKehadiran (
+id_kehadiran INT PRIMARY KEY,
+id_sesi INT,
+id_mahasiswa INT,
+tanggal DATE,
+status VARCHAR(20),
+FOREIGN KEY (id_sesi) REFERENCES Sesi(id_sesi),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);
+
+CREATE TABLE Nilai (
+id_nilai INT PRIMARY KEY,
+id_mahasiswa INT,
+id_mk INT,
+semester VARCHAR(10),
+nilai_akhir FLOAT,
+IPK FLOAT,
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa),
+FOREIGN KEY (id_mk) REFERENCES MataKuliah(id_mk)
+);
+
+CREATE TABLE Ujian (
+id_ujian INT PRIMARY KEY,
+id_mk INT,
+tanggal DATE,
+jenis VARCHAR(30),
+total_nilai FLOAT,
+FOREIGN KEY (id_mk) REFERENCES MataKuliah(id_mk)
+);
+
+CREATE TABLE HasilUjian (
+id_hasil INT PRIMARY KEY,
+id_ujian INT,
+id_mahasiswa INT,
+nilai_diperoleh FLOAT,
+FOREIGN KEY (id_ujian) REFERENCES Ujian(id_ujian),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);
+
+CREATE TABLE Fasilitas (
+id_fasilitas INT PRIMARY KEY,
+nama VARCHAR(100),
+lokasi VARCHAR(100),
+kapasitas INT,
+jam_operasional VARCHAR(100)
+);
+
+CREATE TABLE FasilitasFakultas (
+id_fasilitas_fakultas INT PRIMARY KEY,
+id_fakultas INT,
+id_fasilitas INT,
+tingkat_akses INT,
+FOREIGN KEY (id_fakultas) REFERENCES Fakultas(id_fakultas),
+FOREIGN KEY (id_fasilitas) REFERENCES Fasilitas(id_fasilitas)
+);
+
+CREATE TABLE BukuPerpustakaan (
+id_buku INT PRIMARY KEY,
+judul VARCHAR(150),
+penulis VARCHAR(100),
+isbn VARCHAR(20),
+tahun_terbit INT,
+kategori VARCHAR(50),
+salinan_tersedia INT
+);
+
+CREATE TABLE PeminjamanBuku (
+id_peminjaman INT PRIMARY KEY,
+id_buku INT,
+id_peminjam INT, -- bisa mahasiswa atau dosen (polimorfik)
+tanggal_pinjam DATE,
+tanggal_kembali DATE,
+tanggal_dikembalikan DATE,
+FOREIGN KEY (id_buku) REFERENCES BukuPerpustakaan(id_buku)
+);
+
+CREATE TABLE OrganisasiKlub (
+id_klub INT PRIMARY KEY,
+nama VARCHAR(100),
+id_pembimbing_dosen INT,
+tipe VARCHAR(50),
+deskripsi TEXT,
+FOREIGN KEY (id_pembimbing_dosen) REFERENCES Dosen(id_dosen)
+);
+
+CREATE TABLE KeanggotaanKlub (
+id_keanggotaan INT PRIMARY KEY,
+id_klub INT,
+id_mahasiswa INT,
+peran VARCHAR(50),
+tanggal_gabung DATE,
+FOREIGN KEY (id_klub) REFERENCES OrganisasiKlub(id_klub),
+FOREIGN KEY (id_mahasiswa) REFERENCES Mahasiswa(id_mahasiswa)
+);

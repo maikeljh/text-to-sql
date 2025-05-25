@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
-import { BiSearch, BiPlus } from "react-icons/bi";
-import { BsSoundwave } from "react-icons/bs";
+import { BiSearch, BiPlus, BiSend } from "react-icons/bi";
 import toast from "react-hot-toast";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -308,6 +307,7 @@ function ChatPage() {
       {/* Sidebar */}
       <aside className="w-[280px] bg-[#1B2332]/60 border border-white/20 rounded-2xl flex flex-col p-4">
         <button
+          disabled={loading}
           className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-lg shadow mb-6 cursor-pointer"
           onClick={() => setSelectedChat(null)}
         >
@@ -346,6 +346,7 @@ function ChatPage() {
                     {chat.title}
                   </p>
                   <button
+                    disabled={loading}
                     onClick={() => openDeleteModal(chat.id)}
                     className="text-white/50 hover:text-red-400 text-sm ml-2 opacity-0 group-hover:opacity-100 transition cursor-pointer"
                     title="Delete"
@@ -359,6 +360,7 @@ function ChatPage() {
         </div>
         <div className="mt-auto">
           <button
+            disabled={loading}
             onClick={() => setShowSettingsModal(true)}
             className="cursor-pointer flex items-center justify-center w-full bg-white/10 hover:bg-white/20 text-white text-sm px-4 py-2 rounded-lg transition"
           >
@@ -386,6 +388,7 @@ function ChatPage() {
             {showDropdown && (
               <div className="absolute right-0 mt-2 w-32 bg-black text-white rounded shadow-lg z-50 cursor-pointer">
                 <button
+                  disabled={loading}
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2 hover:bg-gray-800 cursor-pointer"
                 >
@@ -399,7 +402,7 @@ function ChatPage() {
         {/* Chat Area */}
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6 py-4">
           {!selectedChat && (
-            <div className="text-center w-1/2">
+            <div className="text-center w-full max-w-xl">
               <h2 className="text-3xl font-semibold text-white mb-6">
                 What can I help with?
               </h2>
@@ -421,9 +424,10 @@ function ChatPage() {
                 </div>
               )}
 
-              <div className="bg-[#1B2332]/80 rounded-2xl p-4 max-w-2xl w-full ml-10">
+              <div className="bg-[#1B2332]/80 rounded-2xl p-4 max-w-2xl w-full">
                 <div className="flex items-center gap-2">
                   <textarea
+                    disabled={loading}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => {
@@ -443,7 +447,7 @@ function ChatPage() {
                     {loading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                     ) : (
-                      <BsSoundwave size={20} />
+                      <BiSend size={20} />
                     )}
                   </button>
                 </div>
@@ -555,7 +559,7 @@ function ChatPage() {
                             </>
                           )}
                         </div>
-                        {msg.sender === "bot" && !msg.feedback && (
+                        {msg.sender === "bot" && !msg.feedback && !loading && (
                           <div className="flex justify-end mt-2 space-x-2 pr-1">
                             <button
                               onClick={() => sendFeedback(msg.id, "positive")}
@@ -584,6 +588,7 @@ function ChatPage() {
               <div className="bg-[#1B2332]/80 rounded-2xl p-4 mt-4">
                 <div className="flex items-center gap-2">
                   <textarea
+                    disabled={loading}
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={(e) => {
@@ -603,7 +608,7 @@ function ChatPage() {
                     {loading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                     ) : (
-                      <BsSoundwave size={20} />
+                      <BiSend size={20} />
                     )}
                   </button>
                 </div>

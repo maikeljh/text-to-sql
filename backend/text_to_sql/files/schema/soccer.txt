@@ -1,256 +1,537 @@
 --
--- Name: asst_referee_mast; Type: TABLE; Schema: public; Owner: -
+-- Name: asst_referee_mast; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE asst_referee_mast (
-ID smallint,
-ass_ref_id numeric(6,1) DEFAULT NULL::numeric,
-ass_ref_name character varying(24) DEFAULT NULL::character varying,
-country_id numeric(5,1) DEFAULT NULL::numeric
+    ass_ref_id numeric(6,1) DEFAULT NULL::numeric NOT NULL,
+    ass_ref_name character varying(24) DEFAULT NULL::character varying,
+    country_id numeric(5,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: coach_mast; Type: TABLE; Schema: public; Owner: -
+-- Name: coach_mast; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE coach_mast (
-ID smallint,
-coach_id numeric(5,1) DEFAULT NULL::numeric,
-coach_name character varying(19) DEFAULT NULL::character varying
+    coach_id numeric(5,1) DEFAULT NULL::numeric NOT NULL,
+    coach_name character varying(19) DEFAULT NULL::character varying
 );
 
-
 --
--- Name: goal_details; Type: TABLE; Schema: public; Owner: -
+-- Name: goal_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE goal_details (
-ID smallint,
-goal_id numeric(4,1) DEFAULT NULL::numeric,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-player_id numeric(7,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-goal_time numeric(4,1) DEFAULT NULL::numeric,
-goal_type character varying(1) DEFAULT NULL::character varying,
-play_stage character varying(1) DEFAULT NULL::character varying,
-goal_schedule character varying(2) DEFAULT NULL::character varying,
-goal_half numeric(2,1) DEFAULT NULL::numeric
+    goal_id numeric(4,1) DEFAULT NULL::numeric,
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    player_id numeric(7,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    goal_time numeric(4,1) DEFAULT NULL::numeric,
+    goal_type character varying(1) DEFAULT NULL::character varying,
+    play_stage character varying(1) DEFAULT NULL::character varying,
+    goal_schedule character varying(2) DEFAULT NULL::character varying,
+    goal_half numeric(2,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: match_captain; Type: TABLE; Schema: public; Owner: -
+-- Name: match_captain; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE match_captain (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-player_captain numeric(7,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    player_captain numeric(7,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: match_details; Type: TABLE; Schema: public; Owner: -
+-- Name: match_details; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE match_details (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-play_stage character varying(1) DEFAULT NULL::character varying,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-win_lose character varying(1) DEFAULT NULL::character varying,
-decided_by character varying(1) DEFAULT NULL::character varying,
-goal_score numeric(2,1) DEFAULT NULL::numeric,
-penalty_score character varying(1) DEFAULT NULL::character varying,
-ass_ref numeric(6,1) DEFAULT NULL::numeric,
-player_gk numeric(7,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    play_stage character varying(1) DEFAULT NULL::character varying,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    win_lose character varying(1) DEFAULT NULL::character varying,
+    decided_by character varying(1) DEFAULT NULL::character varying,
+    goal_score numeric(2,1) DEFAULT NULL::numeric,
+    penalty_score character varying(1) DEFAULT NULL::character varying,
+    ass_ref numeric(6,1) DEFAULT NULL::numeric,
+    player_gk numeric(7,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: match_mast; Type: TABLE; Schema: public; Owner: -
+-- Name: match_mast; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE match_mast (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-play_stage character varying(1) DEFAULT NULL::character varying,
-play_date character varying(19) DEFAULT NULL::character varying,
-results character varying(4) DEFAULT NULL::character varying,
-decided_by character varying(1) DEFAULT NULL::character varying,
-goal_score character varying(6) DEFAULT NULL::character varying,
-venue_id numeric(6,1) DEFAULT NULL::numeric,
-referee_id numeric(6,1) DEFAULT NULL::numeric,
-audence numeric(6,1) DEFAULT NULL::numeric,
-plr_of_match numeric(7,1) DEFAULT NULL::numeric,
-stop1_sec numeric(4,1) DEFAULT NULL::numeric,
-stop2_sec numeric(4,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric NOT NULL,
+    play_stage character varying(1) DEFAULT NULL::character varying,
+    play_date timestamp with time zone DEFAULT now(),
+    results character varying(4) DEFAULT NULL::character varying,
+    decided_by character varying(1) DEFAULT NULL::character varying,
+    goal_score character varying(6) DEFAULT NULL::character varying,
+    venue_id numeric(6,1) DEFAULT NULL::numeric,
+    referee_id numeric(6,1) DEFAULT NULL::numeric,
+    audence numeric(6,1) DEFAULT NULL::numeric,
+    plr_of_match numeric(7,1) DEFAULT NULL::numeric,
+    stop1_sec numeric(4,1) DEFAULT NULL::numeric,
+    stop2_sec numeric(4,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: penalty_gk; Type: TABLE; Schema: public; Owner: -
+-- Name: penalty_gk; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE penalty_gk (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-player_gk numeric(7,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    player_gk numeric(7,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: penalty_shootout; Type: TABLE; Schema: public; Owner: -
+-- Name: penalty_shootout; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE penalty_shootout (
-ID smallint,
-kick_id numeric(3,1) DEFAULT NULL::numeric,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-player_id numeric(7,1) DEFAULT NULL::numeric,
-score_goal character varying(1) DEFAULT NULL::character varying,
-kick_no numeric(3,1) DEFAULT NULL::numeric
+    kick_id numeric(3,1) DEFAULT NULL::numeric,
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    player_id numeric(7,1) DEFAULT NULL::numeric,
+    score_goal character varying(1) DEFAULT NULL::character varying,
+    kick_no numeric(3,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: player_booked; Type: TABLE; Schema: public; Owner: -
+-- Name: player_booked; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE player_booked (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-player_id numeric(7,1) DEFAULT NULL::numeric,
-booking_time numeric(4,1) DEFAULT NULL::numeric,
-sent_off character varying(1) DEFAULT NULL::character varying,
-play_schedule character varying(2) DEFAULT NULL::character varying,
-play_half numeric(2,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    player_id numeric(7,1) DEFAULT NULL::numeric,
+    booking_time numeric(4,1) DEFAULT NULL::numeric,
+    sent_off character varying(1) DEFAULT NULL::character varying,
+    play_schedule character varying(2) DEFAULT NULL::character varying,
+    play_half numeric(2,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: player_in_out; Type: TABLE; Schema: public; Owner: -
+-- Name: player_in_out; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE player_in_out (
-ID smallint,
-match_no numeric(3,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-player_id numeric(7,1) DEFAULT NULL::numeric,
-in_out character varying(1) DEFAULT NULL::character varying,
-time_in_out numeric(4,1) DEFAULT NULL::numeric,
-play_schedule character varying(2) DEFAULT NULL::character varying,
-play_half numeric(2,1) DEFAULT NULL::numeric
+    match_no numeric(3,1) DEFAULT NULL::numeric,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    player_id numeric(7,1) DEFAULT NULL::numeric,
+    in_out character varying(1) DEFAULT NULL::character varying,
+    time_in_out numeric(4,1) DEFAULT NULL::numeric,
+    play_schedule character varying(2) DEFAULT NULL::character varying,
+    play_half numeric(2,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: player_mast; Type: TABLE; Schema: public; Owner: -
+-- Name: player_mast; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE player_mast (
-ID smallint,
-player_id numeric(7,1) DEFAULT NULL::numeric,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-jersey_no numeric(3,1) DEFAULT NULL::numeric,
-player_name character varying(22) DEFAULT NULL::character varying,
-posi_to_play character varying(2) DEFAULT NULL::character varying,
-dt_of_bir character varying(19) DEFAULT NULL::character varying,
-age numeric(3,1) DEFAULT NULL::numeric,
-playing_club character varying(19) DEFAULT NULL::character varying
+    player_id numeric(7,1) DEFAULT NULL::numeric NOT NULL,
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    jersey_no numeric(3,1) DEFAULT NULL::numeric,
+    player_name character varying(22) DEFAULT NULL::character varying,
+    posi_to_play character varying(2) DEFAULT NULL::character varying,
+    dt_of_bir timestamp with time zone,
+    age numeric(3,1) DEFAULT NULL::numeric,
+    playing_club character varying(19) DEFAULT NULL::character varying
 );
 
-
 --
--- Name: playing_position; Type: TABLE; Schema: public; Owner: -
+-- Name: playing_position; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE playing_position (
-position_id character varying(3) NOT NULL,
-position_desc character varying(50) NOT NULL
+    position_id character varying(3) NOT NULL,
+    position_desc character varying(50) NOT NULL
 );
 
-
 --
--- Name: referee_mast; Type: TABLE; Schema: public; Owner: -
+-- Name: referee_mast; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE referee_mast (
-ID smallint,
-referee_id numeric(6,1) DEFAULT NULL::numeric,
-referee_name character varying(23) DEFAULT NULL::character varying,
-country_id numeric(5,1) DEFAULT NULL::numeric
+    referee_id numeric(6,1) DEFAULT NULL::numeric NOT NULL,
+    referee_name character varying(23) DEFAULT NULL::character varying,
+    country_id numeric(5,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: soccer_city; Type: TABLE; Schema: public; Owner: -
+-- Name: soccer_city; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE soccer_city (
-ID smallint,
-city_id numeric(6,1) DEFAULT NULL::numeric,
-city character varying(13) DEFAULT NULL::character varying,
-country_id numeric(5,1) DEFAULT NULL::numeric
+    city_id numeric(6,1) DEFAULT NULL::numeric NOT NULL,
+    city character varying(13) DEFAULT NULL::character varying,
+    country_id numeric(5,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: soccer_country; Type: TABLE; Schema: public; Owner: -
+-- Name: soccer_country; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE soccer_country (
-ID smallint,
-country_id numeric(5,1) DEFAULT NULL::numeric,
-country_abbr character varying(3) DEFAULT NULL::character varying,
-country_name character varying(19) DEFAULT NULL::character varying
+    country_id numeric(5,1) DEFAULT NULL::numeric NOT NULL,
+    country_abbr character varying(3) DEFAULT NULL::character varying,
+    country_name character varying(19) DEFAULT NULL::character varying
 );
 
-
 --
--- Name: soccer_team; Type: TABLE; Schema: public; Owner: -
+-- Name: soccer_team; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE soccer_team (
-ID smallint,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-team_group character varying(1) DEFAULT NULL::character varying,
-match_played numeric(2,1) DEFAULT NULL::numeric,
-won numeric(2,1) DEFAULT NULL::numeric,
-draw numeric(2,1) DEFAULT NULL::numeric,
-lost numeric(2,1) DEFAULT NULL::numeric,
-goal_for numeric(2,1) DEFAULT NULL::numeric,
-goal_agnst numeric(2,1) DEFAULT NULL::numeric,
-goal_diff numeric(2,1) DEFAULT NULL::numeric,
-points numeric(2,1) DEFAULT NULL::numeric,
-group_position numeric(2,1) DEFAULT NULL::numeric
+    team_id numeric(5,1) DEFAULT NULL::numeric NOT NULL,
+    team_group character varying(1) DEFAULT NULL::character varying,
+    match_played numeric(2,1) DEFAULT NULL::numeric,
+    won numeric(2,1) DEFAULT NULL::numeric,
+    draw numeric(2,1) DEFAULT NULL::numeric,
+    lost numeric(2,1) DEFAULT NULL::numeric,
+    goal_for numeric(2,1) DEFAULT NULL::numeric,
+    goal_agnst numeric(2,1) DEFAULT NULL::numeric,
+    goal_diff numeric(2,1) DEFAULT NULL::numeric,
+    points numeric(2,1) DEFAULT NULL::numeric,
+    group_position numeric(2,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: soccer_venue; Type: TABLE; Schema: public; Owner: -
+-- Name: soccer_venue; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE soccer_venue (
-ID smallint,
-venue_id numeric(6,1) DEFAULT NULL::numeric,
-venue_name character varying(23) DEFAULT NULL::character varying,
-city_id numeric(6,1) DEFAULT NULL::numeric,
-aud_capacity numeric(6,1) DEFAULT NULL::numeric
+    venue_id numeric(6,1) DEFAULT NULL::numeric NOT NULL,
+    venue_name character varying(23) DEFAULT NULL::character varying,
+    city_id numeric(6,1) DEFAULT NULL::numeric,
+    aud_capacity numeric(6,1) DEFAULT NULL::numeric
 );
 
-
 --
--- Name: team_coaches; Type: TABLE; Schema: public; Owner: -
+-- Name: team_coaches; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE team_coaches (
-ID smallint,
-team_id numeric(5,1) DEFAULT NULL::numeric,
-coach_id numeric(5,1) DEFAULT NULL::numeric
+    team_id numeric(5,1) DEFAULT NULL::numeric,
+    coach_id numeric(5,1) DEFAULT NULL::numeric
 );
+
+--
+-- Name: asst_referee_mast pk_asst_referee; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY asst_referee_mast
+    ADD CONSTRAINT pk_asst_referee PRIMARY KEY (ass_ref_id);
+
+--
+-- Name: soccer_city pk_city; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_city
+    ADD CONSTRAINT pk_city PRIMARY KEY (city_id);
+
+--
+-- Name: coach_mast pk_coach; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY coach_mast
+    ADD CONSTRAINT pk_coach PRIMARY KEY (coach_id);
+
+--
+-- Name: soccer_country pk_country; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_country
+    ADD CONSTRAINT pk_country PRIMARY KEY (country_id);
+
+--
+-- Name: match_mast pk_match; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_mast
+    ADD CONSTRAINT pk_match PRIMARY KEY (match_no);
+
+--
+-- Name: player_mast pk_player; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_mast
+    ADD CONSTRAINT pk_player PRIMARY KEY (player_id);
+
+--
+-- Name: referee_mast pk_referee; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY referee_mast
+    ADD CONSTRAINT pk_referee PRIMARY KEY (referee_id);
+
+--
+-- Name: soccer_team pk_team; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_team
+    ADD CONSTRAINT pk_team PRIMARY KEY (team_id);
+
+--
+-- Name: soccer_venue pk_venue; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_venue
+    ADD CONSTRAINT pk_venue PRIMARY KEY (venue_id);
+
+--
+-- Name: playing_position playing_position_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY playing_position
+    ADD CONSTRAINT playing_position_pkey PRIMARY KEY (position_id);
+
+--
+-- Name: asst_referee_mast fk_asstref_country; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY asst_referee_mast
+    ADD CONSTRAINT fk_asstref_country FOREIGN KEY (country_id) REFERENCES soccer_country(country_id);
+
+--
+-- Name: player_booked fk_booked_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_booked
+    ADD CONSTRAINT fk_booked_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: player_booked fk_booked_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_booked
+    ADD CONSTRAINT fk_booked_player FOREIGN KEY (player_id) REFERENCES player_mast(player_id);
+
+--
+-- Name: player_booked fk_booked_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_booked
+    ADD CONSTRAINT fk_booked_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: match_captain fk_captain_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_captain
+    ADD CONSTRAINT fk_captain_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: match_captain fk_captain_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_captain
+    ADD CONSTRAINT fk_captain_player FOREIGN KEY (player_captain) REFERENCES player_mast(player_id);
+
+--
+-- Name: match_captain fk_captain_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_captain
+    ADD CONSTRAINT fk_captain_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: soccer_city fk_city_country; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_city
+    ADD CONSTRAINT fk_city_country FOREIGN KEY (country_id) REFERENCES soccer_country(country_id);
+
+--
+-- Name: match_details fk_details_assref; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_details
+    ADD CONSTRAINT fk_details_assref FOREIGN KEY (ass_ref) REFERENCES asst_referee_mast(ass_ref_id);
+
+--
+-- Name: match_details fk_details_gk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_details
+    ADD CONSTRAINT fk_details_gk FOREIGN KEY (player_gk) REFERENCES player_mast(player_id);
+
+--
+-- Name: match_details fk_details_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_details
+    ADD CONSTRAINT fk_details_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: match_details fk_details_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_details
+    ADD CONSTRAINT fk_details_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: goal_details fk_goal_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY goal_details
+    ADD CONSTRAINT fk_goal_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: goal_details fk_goal_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY goal_details
+    ADD CONSTRAINT fk_goal_player FOREIGN KEY (player_id) REFERENCES player_mast(player_id);
+
+--
+-- Name: goal_details fk_goal_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY goal_details
+    ADD CONSTRAINT fk_goal_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: player_in_out fk_inout_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_in_out
+    ADD CONSTRAINT fk_inout_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: player_in_out fk_inout_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_in_out
+    ADD CONSTRAINT fk_inout_player FOREIGN KEY (player_id) REFERENCES player_mast(player_id);
+
+--
+-- Name: player_in_out fk_inout_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_in_out
+    ADD CONSTRAINT fk_inout_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: match_mast fk_match_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_mast
+    ADD CONSTRAINT fk_match_player FOREIGN KEY (plr_of_match) REFERENCES player_mast(player_id);
+
+--
+-- Name: match_mast fk_match_referee; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_mast
+    ADD CONSTRAINT fk_match_referee FOREIGN KEY (referee_id) REFERENCES referee_mast(referee_id);
+
+--
+-- Name: match_mast fk_match_venue; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY match_mast
+    ADD CONSTRAINT fk_match_venue FOREIGN KEY (venue_id) REFERENCES soccer_venue(venue_id);
+
+--
+-- Name: penalty_gk fk_penaltygk_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_gk
+    ADD CONSTRAINT fk_penaltygk_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: penalty_gk fk_penaltygk_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_gk
+    ADD CONSTRAINT fk_penaltygk_player FOREIGN KEY (player_gk) REFERENCES player_mast(player_id);
+
+--
+-- Name: penalty_gk fk_penaltygk_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_gk
+    ADD CONSTRAINT fk_penaltygk_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: player_mast fk_player_position; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_mast
+    ADD CONSTRAINT fk_player_position FOREIGN KEY (posi_to_play) REFERENCES playing_position(position_id);
+
+--
+-- Name: player_mast fk_player_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY player_mast
+    ADD CONSTRAINT fk_player_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: referee_mast fk_referee_country; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY referee_mast
+    ADD CONSTRAINT fk_referee_country FOREIGN KEY (country_id) REFERENCES soccer_country(country_id);
+
+--
+-- Name: penalty_shootout fk_shootout_match; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_shootout
+    ADD CONSTRAINT fk_shootout_match FOREIGN KEY (match_no) REFERENCES match_mast(match_no);
+
+--
+-- Name: penalty_shootout fk_shootout_player; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_shootout
+    ADD CONSTRAINT fk_shootout_player FOREIGN KEY (player_id) REFERENCES player_mast(player_id);
+
+--
+-- Name: penalty_shootout fk_shootout_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY penalty_shootout
+    ADD CONSTRAINT fk_shootout_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: team_coaches fk_teamcoach_coach; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY team_coaches
+    ADD CONSTRAINT fk_teamcoach_coach FOREIGN KEY (coach_id) REFERENCES coach_mast(coach_id);
+
+--
+-- Name: team_coaches fk_teamcoach_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY team_coaches
+    ADD CONSTRAINT fk_teamcoach_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: team_coaches fk_teamcoaches_coach; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY team_coaches
+    ADD CONSTRAINT fk_teamcoaches_coach FOREIGN KEY (coach_id) REFERENCES coach_mast(coach_id);
+
+--
+-- Name: team_coaches fk_teamcoaches_team; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY team_coaches
+    ADD CONSTRAINT fk_teamcoaches_team FOREIGN KEY (team_id) REFERENCES soccer_team(team_id);
+
+--
+-- Name: soccer_venue fk_venue_city; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY soccer_venue
+    ADD CONSTRAINT fk_venue_city FOREIGN KEY (city_id) REFERENCES soccer_city(city_id);

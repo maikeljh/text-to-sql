@@ -1,0 +1,1059 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,How much money did we make in 1997 total? Show it as '1997 Total Revenues'.,"SELECT SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS ""1997 Total Revenues"" FROM order_details od INNER JOIN orders o ON od.order_id = o.order_id WHERE EXTRACT(YEAR FROM o.order_date) = 1997;",SELECT SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total_revenue_1997 FROM order_details od INNER JOIN orders o ON od.order_id = o.order_id WHERE EXTRACT(YEAR FROM o.order_date) = 1997;,1.0
+1.2,Total pendapatan kita tahun 1997 berapa sih? Tampilkan sebagai '1997 Total Revenues'.,"SELECT SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS ""1997 Total Revenues"" FROM order_details od INNER JOIN orders o ON od.order_id = o.order_id WHERE EXTRACT(YEAR FROM o.order_date) = 1997;",SELECT SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total_revenue_1997 FROM order_details od INNER JOIN orders o ON od.order_id = o.order_id WHERE EXTRACT(YEAR FROM o.order_date) = 1997;,1.0
+2.1,How much has each customer paid overall? Show 'CompanyName' and total as 'Total'.,"SELECT c.company_name AS ""CompanyName"", 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS ""Total""
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.company_name
+ORDER BY ""Total"" DESC;","SELECT c.company_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id INNER JOIN order_details od ON od.order_id = o.order_id GROUP BY c.company_name ORDER BY total DESC;",1.0
+2.2,Tiap customer udah bayar ke kita totalnya berapa? Tampilkan 'CompanyName' dan totalnya sebagai 'Total'.,"SELECT c.company_name AS ""CompanyName"", 
+       SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS ""Total""
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.company_name
+ORDER BY ""Total"" DESC;","SELECT c.company_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS total FROM customers c INNER JOIN orders o ON c.customer_id = o.customer_id INNER JOIN order_details od ON od.order_id = o.order_id GROUP BY c.company_name ORDER BY total DESC;",1.0
+3.1,"What are our top 10 most sold products, looking from revenue after getting discounted? Show 'ProductName' and 'Sales amount'.","SELECT p.product_name AS ""ProductName"", 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS ""Sales amount""
+FROM products p
+JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY ""Sales amount"" DESC
+LIMIT 10;","SELECT p.product_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS sales FROM products p INNER JOIN order_details od ON od.product_id = p.product_id GROUP BY p.product_name ORDER BY sales DESC LIMIT 10;",1.0
+3.2,10 produk paling laku berdasarkan pendapatan setelah didiskonkan? Tampilkan 'ProductName' dan 'Sales amount'.,"SELECT p.product_name, SUM(od.unit_price * od.quantity * (1 - od.discount)) AS sales_amount FROM products p INNER JOIN order_details od ON p.product_id = od.product_id GROUP BY p.product_name ORDER BY sales_amount DESC LIMIT 10;","SELECT p.product_name, SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS sales FROM products p INNER JOIN order_details od ON od.product_id = p.product_id GROUP BY p.product_name ORDER BY sales DESC LIMIT 10;",1.0
+4.1,Which UK customers paid more than $1000? Show 'ContactName' and 'Payments'.,"SELECT c.contact_name,
+       SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS payments
+FROM customers c
+INNER JOIN orders o ON o.customer_id = c.customer_id
+INNER JOIN order_details od ON od.order_id = o.order_id
+WHERE c.country ILIKE 'UK'
+GROUP BY c.contact_name
+HAVING SUM(od.unit_price * od.quantity * (1.0 - od.discount)) > 1000;","SELECT c.contact_name,
+       SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS payments
+FROM customers c
+INNER JOIN orders o ON o.customer_id = c.customer_id
+INNER JOIN order_details od ON od.order_id = o.order_id
+WHERE c.country = 'UK'
+GROUP BY c.contact_name
+HAVING SUM(od.unit_price * od.quantity * (1.0 - od.discount)) > 1000;",1.0
+4.2,Customer dari UK yang bayar lebih dari $1000 siapa aja? Tampilkan 'ContactName' dan 'Payments'.,"SELECT c.contact_name,
+       SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS payments
+FROM customers c
+INNER JOIN orders o ON o.customer_id = c.customer_id
+INNER JOIN order_details od ON od.order_id = o.order_id
+WHERE c.country = 'UK'
+GROUP BY c.contact_name
+HAVING SUM(od.unit_price * od.quantity * (1.0 - od.discount)) > 1000;","SELECT c.contact_name,
+       SUM(od.unit_price * od.quantity * (1.0 - od.discount)) AS payments
+FROM customers c
+INNER JOIN orders o ON o.customer_id = c.customer_id
+INNER JOIN order_details od ON od.order_id = o.order_id
+WHERE c.country = 'UK'
+GROUP BY c.contact_name
+HAVING SUM(od.unit_price * od.quantity * (1.0 - od.discount)) > 1000;",1.0
+5.1,"How much has each customer paid in total, including those who didn’t make any purchases, and how much of that was paid in 1997? Please include the CustomerID, CompanyName, and Country, and show the total revenue as Customer Total and the 1997 revenue as 1997, sorted by Customer Total.","SELECT c.customer_id, c.company_name, c.country, COALESCE(SUM(od.unit_price * od.quantity * (1.0 - od.discount)), 0) AS customer_total, COALESCE(SUM(CASE WHEN EXTRACT(YEAR FROM o.order_date) = 1997 THEN od.unit_price * od.quantity * (1.0 - od.discount) ELSE 0 END), 0) AS revenue_1997 FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id LEFT JOIN order_details od ON od.order_id = o.order_id GROUP BY c.customer_id, c.company_name, c.country ORDER BY customer_total;","SELECT c.customer_id, c.company_name, c.country, COALESCE(SUM(od.unit_price * od.quantity * (1.0 - od.discount)), 0) AS customer_total, COALESCE((SELECT SUM(od2.unit_price * od2.quantity * (1.0 - od2.discount)) FROM orders o2 JOIN order_details od2 ON o2.order_id = od2.order_id WHERE o2.customer_id = c.customer_id AND EXTRACT(YEAR FROM o2.order_date) = 1997), 0) AS revenue_1997 FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id LEFT JOIN order_details od ON od.order_id = o.order_id GROUP BY c.customer_id, c.company_name, c.country ORDER BY customer_total;",1.0
+5.2,"Berapa total pembayaran yang dilakukan oleh setiap customer, termasuk yang tidak melakukan pembelian sama sekali, dan berapa yang berasal dari tahun 1997? Tampilkan CustomerID, CompanyName, dan Country, serta total pendapatan sebagai Customer Total dan pendapatan tahun 1997 sebagai 1997, urutkan berdasarkan Customer Total.","SELECT 
+    c.customer_id AS ""CustomerID"",
+    c.company_name AS ""CompanyName"",
+    c.country AS ""Country"",
+    COALESCE(SUM(od.unit_price * od.quantity * (1 - od.discount)), 0) AS ""Customer Total"",
+    COALESCE(SUM(CASE WHEN EXTRACT(YEAR FROM o.order_date) = 1997 THEN od.unit_price * od.quantity * (1 - od.discount) ELSE 0 END), 0) AS ""1997""
+FROM 
+    customers c
+LEFT JOIN 
+    orders o ON c.customer_id = o.customer_id
+LEFT JOIN 
+    order_details od ON o.order_id = od.order_id
+GROUP BY 
+    c.customer_id, c.company_name, c.country
+ORDER BY 
+    ""Customer Total"" DESC;","SELECT c.customer_id, c.company_name, c.country, COALESCE(SUM(od.unit_price * od.quantity * (1.0 - od.discount)), 0) AS customer_total, COALESCE((SELECT SUM(od2.unit_price * od2.quantity * (1.0 - od2.discount)) FROM orders o2 JOIN order_details od2 ON o2.order_id = od2.order_id WHERE o2.customer_id = c.customer_id AND EXTRACT(YEAR FROM o2.order_date) = 1997), 0) AS revenue_1997 FROM customers c LEFT JOIN orders o ON o.customer_id = c.customer_id LEFT JOIN order_details od ON od.order_id = o.order_id GROUP BY c.customer_id, c.company_name, c.country ORDER BY customer_total;",1.0
+6.1,"Which top 1 employee handled the most orders? Show 'employee_id', 'first_name', 'last_name', 'total_orders'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(o.order_id) AS total_orders
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY total_orders DESC
+LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(o.order_id) AS total_orders
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_orders DESC
+  LIMIT 1;",1.0
+6.2,"Top 1 Karyawan mana yang paling banyak urus order? Tampilkan 'employee_id', 'first_name', 'last_name', 'total_orders'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(o.order_id) AS total_orders
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY total_orders DESC
+LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(o.order_id) AS total_orders
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_orders DESC
+  LIMIT 1;",1.0
+7.1,Top 5 countries with the most customers? Show 'country' and 'total_customers'.,"SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC
+LIMIT 5;","SELECT country, COUNT(customer_id) AS total_customers
+  FROM customers
+  GROUP BY country
+  ORDER BY total_customers DESC
+  LIMIT 5;",1.0
+7.2,5 negara dengan jumlah customer terbanyak? Tampilkan 'country' dan 'total_customers'.,"SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC
+LIMIT 5;","SELECT country, COUNT(customer_id) AS total_customers
+  FROM customers
+  GROUP BY country
+  ORDER BY total_customers DESC
+  LIMIT 5;",1.0
+8.1,"Which top 1 supplier offer the most products? Show 'supplier_id', 'company_name', 'product_count'.","SELECT s.supplier_id, s.company_name, COUNT(p.product_id) AS product_count
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY product_count DESC
+LIMIT 1;","SELECT s.supplier_id, s.company_name, COUNT(p.product_id) AS product_count
+  FROM suppliers s
+  JOIN products p ON s.supplier_id = p.supplier_id
+  GROUP BY s.supplier_id, s.company_name
+  ORDER BY product_count DESC
+  LIMIT 1;",1.0
+8.2,"Top 1 supplier mana yang punya produk paling banyak? Tampilkan 'supplier_id', 'company_name', 'product_count'.","SELECT s.supplier_id, s.company_name, COUNT(p.product_id) AS product_count
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY product_count DESC
+LIMIT 1;","SELECT s.supplier_id, s.company_name, COUNT(p.product_id) AS product_count
+  FROM suppliers s
+  JOIN products p ON s.supplier_id = p.supplier_id
+  GROUP BY s.supplier_id, s.company_name
+  ORDER BY product_count DESC
+  LIMIT 1;",1.0
+9.1,"How many units sold for each product? Show 'product_id', 'product_name', 'total_units_sold'.","SELECT p.product_id, p.product_name, SUM(od.quantity) AS total_units_sold
+FROM products p
+JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_units_sold DESC;","SELECT p.product_id, p.product_name, SUM(od.quantity) AS total_units_sold
+  FROM products p
+  JOIN order_details od ON p.product_id = od.product_id
+  GROUP BY p.product_id, p.product_name
+  ORDER BY total_units_sold DESC;",1.0
+9.2,"Total unit terjual per produk? Tampilkan 'product_id', 'product_name', 'total_units_sold'.","SELECT p.product_id, p.product_name, SUM(od.quantity) AS total_units_sold
+FROM products p
+JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY total_units_sold DESC;","SELECT p.product_id, p.product_name, SUM(od.quantity) AS total_units_sold
+  FROM products p
+  JOIN order_details od ON p.product_id = od.product_id
+  GROUP BY p.product_id, p.product_name
+  ORDER BY total_units_sold DESC;",1.0
+10.1,Which top 1 region have the most territories? Show 'region_id' and 'total_territories'.,"SELECT r.region_id, COUNT(t.territory_id) AS total_territories
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+GROUP BY r.region_id
+ORDER BY total_territories DESC
+LIMIT 1;","SELECT r.region_id, COUNT(t.territory_id) AS total_territories
+  FROM region r
+  JOIN territories t ON r.region_id = t.region_id
+  GROUP BY r.region_id
+  ORDER BY total_territories DESC
+  LIMIT 1;",1.0
+10.2,Top 1 region mana yang punya territory paling banyak? Tampilkan 'region_id' dan 'total_territories'.,"SELECT r.region_id, COUNT(t.territory_id) AS total_territories
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+GROUP BY r.region_id
+ORDER BY total_territories DESC
+LIMIT 1;","SELECT r.region_id, COUNT(t.territory_id) AS total_territories
+  FROM region r
+  JOIN territories t ON r.region_id = t.region_id
+  GROUP BY r.region_id
+  ORDER BY total_territories DESC
+  LIMIT 1;",1.0
+11.1,"Which top 1 shipping company was used the most? Show 'shipper_id', 'company_name', 'shipment_count'.","SELECT s.shipper_id, s.company_name, COUNT(o.order_id) AS shipment_count
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY shipment_count DESC
+LIMIT 1;","SELECT s.shipper_id, s.company_name, COUNT(o.order_id) AS shipment_count
+  FROM shippers s
+  JOIN orders o ON s.shipper_id = o.ship_via
+  GROUP BY s.shipper_id, s.company_name
+  ORDER BY shipment_count DESC
+  LIMIT 1;",1.0
+11.2,"Top 1 shipper mana yang paling sering dipakai? Tampilkan 'shipper_id', 'company_name', 'shipment_count'.","SELECT s.shipper_id, s.company_name, COUNT(o.order_id) AS shipment_count
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY shipment_count DESC
+LIMIT 1;","SELECT s.shipper_id, s.company_name, COUNT(o.order_id) AS shipment_count
+  FROM shippers s
+  JOIN orders o ON s.shipper_id = o.ship_via
+  GROUP BY s.shipper_id, s.company_name
+  ORDER BY shipment_count DESC
+  LIMIT 1;",1.0
+12.1,Total freight costs per country? Show 'ship_country' and 'total_freight'.,"SELECT ship_country, SUM(freight) AS total_freight
+FROM orders
+GROUP BY ship_country
+ORDER BY total_freight DESC;","SELECT ship_country, SUM(freight) AS total_freight
+  FROM orders
+  GROUP BY ship_country
+  ORDER BY total_freight DESC;",1.0
+12.2,Total ongkir per negara berapa aja? Tampilkan 'ship_country' dan 'total_freight'.,"SELECT ship_country, SUM(freight) AS total_freight
+FROM orders
+GROUP BY ship_country
+ORDER BY total_freight DESC;","SELECT ship_country, SUM(freight) AS total_freight
+  FROM orders
+  GROUP BY ship_country
+  ORDER BY total_freight DESC;",1.0
+13.1,"Who top 1 sold the most? Show 'employee_id', 'first_name', 'last_name', 'total_sales'.","SELECT e.employee_id, e.first_name, e.last_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_sales
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_sales DESC
+  LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_sales
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_sales DESC
+  LIMIT 1;",1.0
+13.2,"Top 1 karyawan mana yang hasilin penjualan paling gede? Tampilkan 'employee_id', 'first_name', 'last_name', 'total_sales'.","SELECT e.employee_id, e.first_name, e.last_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_sales
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_sales DESC
+  LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_sales
+  FROM employees e
+  JOIN orders o ON e.employee_id = o.employee_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY total_sales DESC
+  LIMIT 1;",1.0
+14.1,"Which top 1 product made the most money? Show 'product_id', 'product_name', 'revenue'.","SELECT p.product_id, p.product_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS revenue
+FROM products p
+JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY revenue DESC
+LIMIT 1;","SELECT p.product_id, p.product_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS revenue
+  FROM products p
+  JOIN order_details od ON p.product_id = od.product_id
+  GROUP BY p.product_id, p.product_name
+  ORDER BY revenue DESC
+  LIMIT 1;",1.0
+14.2,"Top 1 produk mana yang hasilin duit paling banyak? Tampilkan 'product_id', 'product_name', 'revenue'.","SELECT p.product_id, p.product_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS revenue
+FROM products p
+JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_id, p.product_name
+ORDER BY revenue DESC
+LIMIT 1;","SELECT p.product_id, p.product_name,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS revenue
+  FROM products p
+  JOIN order_details od ON p.product_id = od.product_id
+  GROUP BY p.product_id, p.product_name
+  ORDER BY revenue DESC
+  LIMIT 1;",1.0
+15.1,"On average, how many times each customer order? Show 'total_customers', 'total_orders', 'average_orders_per_customer'.","SELECT COUNT(DISTINCT customer_id) AS total_customers,
+       COUNT(order_id) AS total_orders,
+       COUNT(order_id)::FLOAT / COUNT(DISTINCT customer_id) AS average_orders_per_customer
+FROM orders
+WHERE customer_id IS NOT NULL;","SELECT COUNT(DISTINCT c.customer_id) AS total_customers,
+  COUNT(o.order_id) AS total_orders,
+  CAST(COUNT(*) AS REAL) / COUNT(DISTINCT c.customer_id) AS average_orders_per_customer
+  FROM customers c
+  JOIN orders o ON c.customer_id = o.customer_id;",1.0
+15.2,"Rata-rata order per customer berapa? Tampilkan 'total_customers', 'total_orders', 'average_orders_per_customer'.","SELECT COUNT(DISTINCT c.customer_id) AS total_customers,
+       COUNT(o.order_id) AS total_orders,
+       COUNT(o.order_id)::FLOAT / COUNT(DISTINCT c.customer_id) AS average_orders_per_customer
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id;","SELECT COUNT(DISTINCT c.customer_id) AS total_customers,
+  COUNT(o.order_id) AS total_orders,
+  CAST(COUNT(*) AS REAL) / COUNT(DISTINCT c.customer_id) AS average_orders_per_customer
+  FROM customers c
+  JOIN orders o ON c.customer_id = o.customer_id;",0.0
+16.1,"Which top 1 category has the most products? Show 'category_id', 'category_name', 'product_count'.","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS product_count
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY product_count DESC
+LIMIT 1;","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS product_count
+  FROM categories c
+  JOIN products p ON c.category_id = p.category_id
+  GROUP BY c.category_id, c.category_name
+  ORDER BY product_count DESC
+  LIMIT 1;",1.0
+16.2,"Top 1 kategori mana yang punya produk paling banyak? Tampilkan 'category_id', 'category_name', 'product_count'.","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS product_count
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY product_count DESC
+LIMIT 1;","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS product_count
+  FROM categories c
+  JOIN products p ON c.category_id = p.category_id
+  GROUP BY c.category_id, c.category_name
+  ORDER BY product_count DESC
+  LIMIT 1;",1.0
+17.1,"Monthly revenue for 1997? Show 'month', 'monthly_revenue'.","SELECT
+  to_char(o.order_date, 'YYYY-MM') AS month,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS monthly_revenue
+FROM orders AS o
+JOIN order_details AS od
+  ON o.order_id = od.order_id
+WHERE
+  EXTRACT(YEAR FROM o.order_date) = 1997
+GROUP BY
+  month
+ORDER BY
+  month;","SELECT
+  to_char(o.order_date, 'YYYY-MM') AS month,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS monthly_revenue
+FROM orders AS o
+JOIN order_details AS od
+  ON o.order_id = od.order_id
+WHERE
+  EXTRACT(YEAR FROM o.order_date) = 1997
+GROUP BY
+  month
+ORDER BY
+  month;",1.0
+17.2,Pendapatan per bulan selama 1997? Tampilkan 'month' dan 'monthly_revenue'.,"SELECT
+  to_char(o.order_date, 'YYYY-MM') AS month,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS monthly_revenue
+FROM orders AS o
+JOIN order_details AS od
+  ON o.order_id = od.order_id
+WHERE
+  EXTRACT(YEAR FROM o.order_date) = 1997
+GROUP BY
+  month
+ORDER BY
+  month;","SELECT
+  to_char(o.order_date, 'YYYY-MM') AS month,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS monthly_revenue
+FROM orders AS o
+JOIN order_details AS od
+  ON o.order_id = od.order_id
+WHERE
+  EXTRACT(YEAR FROM o.order_date) = 1997
+GROUP BY
+  month
+ORDER BY
+  month;",1.0
+18.1,Top 3 cities with the most orders? Show 'city' and 'total_orders'.,"SELECT ship_city AS city, COUNT(order_id) AS total_orders
+FROM orders
+WHERE ship_city IS NOT NULL
+GROUP BY ship_city
+ORDER BY total_orders DESC
+LIMIT 3;","SELECT ship_city AS city, COUNT(order_id) AS total_orders
+  FROM orders
+  WHERE ship_city IS NOT NULL
+  GROUP BY ship_city
+  ORDER BY total_orders DESC
+  LIMIT 3;",1.0
+18.2,3 kota dengan jumlah order terbanyak? Tampilkan 'city' dan 'total_orders'.,"SELECT ship_city AS city, COUNT(order_id) AS total_orders
+FROM orders
+WHERE ship_city IS NOT NULL
+GROUP BY ship_city
+ORDER BY total_orders DESC
+LIMIT 3;","SELECT ship_city AS city, COUNT(order_id) AS total_orders
+  FROM orders
+  WHERE ship_city IS NOT NULL
+  GROUP BY ship_city
+  ORDER BY total_orders DESC
+  LIMIT 3;",1.0
+19.1,"Who’s the top customer that bought the most different products? Show their customer_id, company_name, and how many unique products they’ve purchased as distinct_product_count. Just return the top one based on that count.","SELECT
+  c.customer_id,
+  c.company_name,
+  COUNT(DISTINCT od.product_id) AS distinct_product_count
+FROM
+  customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY
+  c.customer_id, c.company_name
+ORDER BY
+  distinct_product_count DESC
+LIMIT 1;","SELECT
+  c.customer_id,
+  c.company_name,
+  COUNT(DISTINCT od.product_id) AS distinct_product_count
+FROM
+  customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY
+  c.customer_id, c.company_name
+ORDER BY
+  distinct_product_count DESC
+LIMIT 1;",1.0
+19.2,"Top 1 customer mana yang membeli produk paling beragam? Tampilkan 'customer_id', 'company_name', dan 'distinct_product_count', dan ambil satu customer teratas berdasarkan jumlah produk berbeda yang dibeli.","SELECT
+  c.customer_id,
+  c.company_name,
+  COUNT(DISTINCT od.product_id) AS distinct_product_count
+FROM
+  customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY
+  c.customer_id, c.company_name
+ORDER BY
+  distinct_product_count DESC
+LIMIT 1;","SELECT
+  c.customer_id,
+  c.company_name,
+  COUNT(DISTINCT od.product_id) AS distinct_product_count
+FROM
+  customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY
+  c.customer_id, c.company_name
+ORDER BY
+  distinct_product_count DESC
+LIMIT 1;",1.0
+20.1,"Which top 5 suppliers ship the priciest stuff on average? Show 'supplier_id', 'company_name', 'average_price'.","SELECT s.supplier_id, s.company_name, AVG(p.unit_price) AS average_price
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY average_price DESC
+LIMIT 5;","SELECT s.supplier_id, s.company_name, AVG(p.unit_price) AS average_price
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY average_price DESC
+LIMIT 5;",1.0
+20.2,"Top 5 supplier mana yang ngirim produk paling mahal rata-rata? Tampilkan 'supplier_id', 'company_name', 'average_price'.","SELECT s.supplier_id, s.company_name, AVG(p.unit_price) AS average_price
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY average_price DESC
+LIMIT 5;","SELECT s.supplier_id, s.company_name, AVG(p.unit_price) AS average_price
+FROM suppliers s
+JOIN products p ON s.supplier_id = p.supplier_id
+GROUP BY s.supplier_id, s.company_name
+ORDER BY average_price DESC
+LIMIT 5;",1.0
+21.1,What’s the average discount per order? Show 'order_id' and 'average_discount'. Order by id,"SELECT order_id, AVG(discount) AS average_discount
+FROM order_details
+GROUP BY order_id
+ORDER BY order_id;","SELECT order_id, AVG(discount) AS average_discount
+FROM order_details
+GROUP BY order_id
+ORDER BY order_id;",1.0
+21.2,Rata-rata diskon per order berapa? Tampilkan 'order_id' dan 'average_discount'. Urutkan berdasarkan id,"SELECT order_id, AVG(discount) AS average_discount
+FROM order_details
+GROUP BY order_id
+ORDER BY order_id;","SELECT order_id, AVG(discount) AS average_discount
+FROM order_details
+GROUP BY order_id
+ORDER BY order_id;",1.0
+22.1,"Who are the top 5 employees working across the most different regions based on their assigned territories? Show 'employee_id', 'first_name', 'last_name', and 'region_count'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(DISTINCT t.region_id) AS region_count
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY region_count DESC
+LIMIT 5;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(DISTINCT t.region_id) AS region_count
+  FROM employees e
+  JOIN employee_territories et ON e.employee_id = et.employee_id
+  JOIN territories t ON et.territory_id = t.territory_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY region_count DESC
+  LIMIT 5;",1.0
+22.2,"Siapa 5 karyawan teratas yang menangani wilayah kerja (territory) dari jumlah region yang paling banyak? Tampilkan 'employee_id', 'first_name', 'last_name', dan 'region_count'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(DISTINCT t.region_id) AS region_count
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY region_count DESC
+LIMIT 5;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(DISTINCT t.region_id) AS region_count
+  FROM employees e
+  JOIN employee_territories et ON e.employee_id = et.employee_id
+  JOIN territories t ON et.territory_id = t.territory_id
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY region_count DESC
+  LIMIT 5;",1.0
+23.1,"Which customers ordered over 10,000 units? Show 'customer_id', 'company_name', 'total_units_ordered'.","SELECT c.customer_id, c.company_name, SUM(od.quantity) AS total_units_ordered
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.company_name
+HAVING SUM(od.quantity) > 10000
+ORDER BY total_units_ordered DESC;","SELECT c.customer_id, c.company_name, SUM(od.quantity) AS total_units_ordered
+  FROM customers c
+  JOIN orders o ON c.customer_id = o.customer_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY c.customer_id, c.company_name
+  HAVING SUM(od.quantity) > 10000
+  ORDER BY total_units_ordered DESC;",1.0
+23.2,"Customer siapa saja yang total order-nya lebih dari 10.000 unit? Tampilkan 'customer_id', 'company_name', 'total_units_ordered'.","SELECT c.customer_id, c.company_name, SUM(od.quantity) AS total_units_ordered
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.company_name
+HAVING SUM(od.quantity) > 10000
+ORDER BY total_units_ordered DESC;","SELECT c.customer_id, c.company_name, SUM(od.quantity) AS total_units_ordered
+  FROM customers c
+  JOIN orders o ON c.customer_id = o.customer_id
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY c.customer_id, c.company_name
+  HAVING SUM(od.quantity) > 10000
+  ORDER BY total_units_ordered DESC;",1.0
+24.1,Which year made the most revenue? Show 'year' and 'total_revenue'.,"SELECT EXTRACT(YEAR FROM o.order_date) AS year,
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_revenue
+FROM orders o
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY year
+ORDER BY total_revenue DESC
+LIMIT 1;","SELECT EXTRACT(YEAR FROM o.order_date) AS year,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_revenue
+  FROM orders o
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY year
+  ORDER BY total_revenue DESC
+  LIMIT 1;",1.0
+24.2,Tahun mana yang pendapatannya paling tinggi? Tampilkan 'year' dan 'total_revenue'.,"SELECT EXTRACT(YEAR FROM o.order_date) AS year,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_revenue
+  FROM orders o
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY year
+  ORDER BY total_revenue DESC
+  LIMIT 1;","SELECT EXTRACT(YEAR FROM o.order_date) AS year,
+  SUM(od.unit_price * od.quantity * (1 - od.discount)) AS total_revenue
+  FROM orders o
+  JOIN order_details od ON o.order_id = od.order_id
+  GROUP BY year
+  ORDER BY total_revenue DESC
+  LIMIT 1;",1.0
+25.1,"Which product category has the highest average price? Show 'category_id', 'category_name', 'average_price'.","SELECT c.category_id, c.category_name, AVG(p.unit_price) AS average_price
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY average_price DESC
+LIMIT 1;","SELECT c.category_id, c.category_name, AVG(p.unit_price) AS average_price
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY average_price DESC
+LIMIT 1;",1.0
+25.2,"Top 1 kategori produk mana yang harga rata-ratanya paling tinggi? Tampilkan 'category_id', 'category_name', 'average_price'.","SELECT c.category_id, c.category_name, AVG(p.unit_price) AS average_price
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY average_price DESC
+LIMIT 1;","SELECT c.category_id, c.category_name, AVG(p.unit_price) AS average_price
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+GROUP BY c.category_id, c.category_name
+ORDER BY average_price DESC
+LIMIT 1;",1.0
+26.1,"Which top 1 employee manages the most subordinates? Show 'employee_id', 'first_name', 'last_name', 'report_count'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(e2.employee_id) AS report_count
+FROM employees e
+JOIN employees e2 ON e.employee_id = e2.reports_to
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY report_count DESC
+LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(e2.employee_id) AS report_count
+  FROM employees e
+  JOIN employees e2 ON e.employee_id = e2.reports_to
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY report_count DESC
+  LIMIT 1;",1.0
+26.2,"Top 1 karyawan mana yang punya bawahan paling banyak? Tampilkan 'employee_id', 'first_name', 'last_name', 'report_count'.","SELECT e.employee_id, e.first_name, e.last_name, COUNT(e2.employee_id) AS report_count
+FROM employees e
+JOIN employees e2 ON e.employee_id = e2.reports_to
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY report_count DESC
+LIMIT 1;","SELECT e.employee_id, e.first_name, e.last_name, COUNT(e2.employee_id) AS report_count
+  FROM employees e
+  JOIN employees e2 ON e.employee_id = e2.reports_to
+  GROUP BY e.employee_id, e.first_name, e.last_name
+  ORDER BY report_count DESC
+  LIMIT 1;",1.0
+27.1,"Which products are out of stock now? Show 'product_id', 'product_name', 'units_in_stock'.","SELECT product_id, product_name, units_in_stock
+FROM products
+WHERE units_in_stock = 0;","SELECT product_id, product_name, units_in_stock
+  FROM products
+  WHERE units_in_stock = 0;",1.0
+27.2,"Produk apa aja yang lagi kosong stoknya? Tampilkan 'product_id', 'product_name', 'units_in_stock'.","SELECT product_id, product_name, units_in_stock
+FROM products
+WHERE units_in_stock = 0;","SELECT product_id, product_name, units_in_stock
+  FROM products
+  WHERE units_in_stock = 0;",1.0
+28.1,Which top 1 country has the most suppliers? Show 'country' and 'supplier_count'.,"SELECT country, COUNT(*) AS supplier_count
+FROM suppliers
+GROUP BY country
+ORDER BY supplier_count DESC
+LIMIT 1;","SELECT country, COUNT(*) AS supplier_count
+  FROM suppliers
+  GROUP BY country
+  ORDER BY supplier_count DESC
+  LIMIT 1;",1.0
+28.2,Top 1 negara mana yang punya supplier paling banyak? Tampilkan 'country' dan 'supplier_count'.,"SELECT country, COUNT(*) AS supplier_count
+FROM suppliers
+GROUP BY country
+ORDER BY supplier_count DESC
+LIMIT 1;","SELECT country, COUNT(*) AS supplier_count
+  FROM suppliers
+  GROUP BY country
+  ORDER BY supplier_count DESC
+  LIMIT 1;",1.0
+29.1,Which top 3 cities have the most customers? Show 'city' and 'customer_count'.,"SELECT city, COUNT(*) AS customer_count
+FROM customers
+WHERE city IS NOT NULL
+GROUP BY city
+ORDER BY customer_count DESC
+LIMIT 3;","SELECT city, COUNT(*) AS customer_count
+  FROM customers
+  WHERE city IS NOT NULL
+  GROUP BY city
+  ORDER BY customer_count DESC
+  LIMIT 3;",1.0
+29.2,Top 3 kota mana yang punya customer paling banyak? Tampilkan 'city' dan 'customer_count'.,"SELECT city, COUNT(*) AS customer_count
+FROM customers
+WHERE city IS NOT NULL
+GROUP BY city
+ORDER BY customer_count DESC
+LIMIT 3;","SELECT city, COUNT(*) AS customer_count
+  FROM customers
+  WHERE city IS NOT NULL
+  GROUP BY city
+  ORDER BY customer_count DESC
+  LIMIT 3;",1.0
+30.1,"How many discontinued products are in each category? Show 'category_id', 'category_name', 'discontinued_count'.","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS discontinued_count
+FROM categories c
+LEFT JOIN products p ON c.category_id = p.category_id AND p.discontinued = 1
+GROUP BY c.category_id, c.category_name
+ORDER BY discontinued_count DESC;","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS discontinued_count
+  FROM categories c
+  JOIN products p ON c.category_id = p.category_id
+  WHERE p.discontinued = 1
+  GROUP BY c.category_id, c.category_name
+  ORDER BY discontinued_count DESC;",0.0
+30.2,"Jumlah produk discontinue per kategori gimana? Tampilkan 'category_id', 'category_name', 'discontinued_count'.","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS discontinued_count
+FROM categories c
+JOIN products p ON c.category_id = p.category_id
+WHERE p.discontinued = 1
+GROUP BY c.category_id, c.category_name
+ORDER BY discontinued_count DESC;","SELECT c.category_id, c.category_name, COUNT(p.product_id) AS discontinued_count
+  FROM categories c
+  JOIN products p ON c.category_id = p.category_id
+  WHERE p.discontinued = 1
+  GROUP BY c.category_id, c.category_name
+  ORDER BY discontinued_count DESC;",1.0
+31.1,Which customers never ordered anything? Show 'customer_id' and 'company_name'.,"SELECT c.customer_id, c.company_name
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;","SELECT c.customer_id, c.company_name
+  FROM customers c
+  LEFT JOIN orders o ON c.customer_id = o.customer_id
+  WHERE o.order_id IS NULL;",1.0
+31.2,Customer mana yang belum pernah order sama sekali? Tampilkan 'customer_id' dan 'company_name'.,"SELECT c.customer_id, c.company_name
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+WHERE o.order_id IS NULL;","SELECT c.customer_id, c.company_name
+  FROM customers c
+  LEFT JOIN orders o ON c.customer_id = o.customer_id
+  WHERE o.order_id IS NULL;",1.0
+32.1,"Which top 1 shipper has the highest average freight cost? Show 'shipper_id', 'company_name', 'avg_freight'.","SELECT s.shipper_id, s.company_name, AVG(o.freight) AS avg_freight
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY avg_freight DESC
+LIMIT 1;","SELECT s.shipper_id, s.company_name, AVG(o.freight) AS avg_freight
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY avg_freight DESC
+LIMIT 1;",1.0
+32.2,"Top 1 shipper mana yang ongkir rata-ratanya paling mahal? Tampilkan 'shipper_id', 'company_name', 'avg_freight'.","SELECT s.shipper_id, s.company_name, AVG(o.freight) AS avg_freight
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY avg_freight DESC
+LIMIT 1;","SELECT s.shipper_id, s.company_name, AVG(o.freight) AS avg_freight
+FROM shippers s
+JOIN orders o ON s.shipper_id = o.ship_via
+GROUP BY s.shipper_id, s.company_name
+ORDER BY avg_freight DESC
+LIMIT 1;",1.0
+33.1,"Who handled at least 10 orders? Show 'first_name', 'last_name', 'total_orders_handled'.","SELECT e.first_name, e.last_name, COUNT(o.order_id) AS total_orders_handled
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(o.order_id) >= 10;","SELECT e.first_name, e.last_name, COUNT(o.order_id) AS total_orders_handled
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(o.order_id) >= 10;",1.0
+33.2,"Karyawan siapa saja yang udah ngurus minimal 10 order? Tampilkan 'first_name', 'last_name', 'total_orders_handled'.","SELECT e.first_name, e.last_name, COUNT(o.order_id) AS total_orders_handled
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(o.order_id) >= 10;","SELECT e.first_name, e.last_name, COUNT(o.order_id) AS total_orders_handled
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(o.order_id) >= 10;",1.0
+34.1,"Total orders per year and month? Show 'order_year', 'order_month', 'no_of_orders'.","SELECT
+  EXTRACT(YEAR FROM order_date) AS order_year,
+  EXTRACT(MONTH FROM order_date) AS order_month,
+  COUNT(*) AS no_of_orders
+FROM orders
+GROUP BY order_year, order_month
+ORDER BY order_year, order_month;","SELECT
+  EXTRACT(YEAR FROM order_date) AS order_year,
+  EXTRACT(MONTH FROM order_date) AS order_month,
+  COUNT(*) AS no_of_orders
+FROM orders
+GROUP BY order_year, order_month;",1.0
+34.2,"Jumlah order per tahun dan bulan berapa aja? Tampilkan 'order_year', 'order_month', 'no_of_orders'.","SELECT
+  EXTRACT(YEAR FROM order_date) AS order_year,
+  EXTRACT(MONTH FROM order_date) AS order_month,
+  COUNT(*) AS no_of_orders
+FROM orders
+GROUP BY order_year, order_month
+ORDER BY order_year, order_month;","SELECT
+  EXTRACT(YEAR FROM order_date) AS order_year,
+  EXTRACT(MONTH FROM order_date) AS order_month,
+  COUNT(*) AS no_of_orders
+FROM orders
+GROUP BY order_year, order_month;",1.0
+35.1,How many customers are there per region? Show 'region' and 'total_customers'.,"SELECT region, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY region;","SELECT c.region, COUNT(c.customer_id) AS total_customers
+FROM customers c
+GROUP BY c.region
+",1.0
+35.2,Jumlah customer per region berapa? Tampilkan 'region' dan 'total_customers'.,"SELECT region, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY region;","SELECT c.region, COUNT(c.customer_id) AS total_customers
+FROM customers c
+GROUP BY c.region
+",1.0
+36.1,List products that were never ordered and their suppliers. Show 'product_name' and 'supplier_name'.,"SELECT p.product_name, s.company_name AS supplier_name
+FROM products p
+JOIN suppliers s ON p.supplier_id = s.supplier_id
+WHERE p.product_id NOT IN (SELECT DISTINCT product_id FROM order_details);","SELECT p.product_name, s.company_name AS supplier_name
+FROM products p
+JOIN suppliers s ON p.supplier_id = s.supplier_id
+WHERE p.product_id NOT IN (SELECT DISTINCT product_id FROM order_details);
+",1.0
+36.2,Produk yang belum pernah diorder dan suppliernya apa aja? Tampilkan 'product_name' dan 'supplier_name'.,"SELECT p.product_name, s.company_name AS supplier_name
+FROM products p
+JOIN suppliers s ON p.supplier_id = s.supplier_id
+WHERE p.product_id NOT IN (SELECT DISTINCT product_id FROM order_details);","SELECT p.product_name, s.company_name AS supplier_name
+FROM products p
+JOIN suppliers s ON p.supplier_id = s.supplier_id
+WHERE p.product_id NOT IN (SELECT DISTINCT product_id FROM order_details);
+",1.0
+37.1,How many employees are there in each region? Show 'region_description' and 'total_employees'.,"SELECT r.region_description, COUNT(e.employee_id) AS total_employees
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+JOIN employee_territories et ON t.territory_id = et.territory_id
+JOIN employees e ON et.employee_id = e.employee_id
+GROUP BY r.region_description
+ORDER BY total_employees DESC;","SELECT r.region_description, COUNT(e.employee_id) AS total_employees
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+JOIN employee_territories et ON t.territory_id = et.territory_id
+JOIN employees e ON et.employee_id = e.employee_id
+GROUP BY r.region_description
+ORDER BY total_employees DESC;
+",1.0
+37.2,Jumlah karyawan per region berapa? Tampilkan 'region_description' dan 'total_employees'.,"SELECT r.region_description, COUNT(e.employee_id) AS total_employees
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+JOIN employee_territories et ON t.territory_id = et.territory_id
+JOIN employees e ON et.employee_id = e.employee_id
+GROUP BY r.region_description
+ORDER BY total_employees DESC;","SELECT r.region_description, COUNT(e.employee_id) AS total_employees
+FROM region r
+JOIN territories t ON r.region_id = t.region_id
+JOIN employee_territories et ON t.territory_id = et.territory_id
+JOIN employees e ON et.employee_id = e.employee_id
+GROUP BY r.region_description
+ORDER BY total_employees DESC;
+",1.0
+38.1,Which employees never handled any orders? Show 'first_name' and 'last_name'.,"SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM orders);","SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM orders);
+",1.0
+38.2,Siapa aja karyawan yang belum pernah ngurus order? Tampilkan 'first_name' dan 'last_name'.,"SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM orders);","SELECT first_name, last_name
+FROM employees
+WHERE employee_id NOT IN (SELECT DISTINCT employee_id FROM orders);
+",1.0
+39.1,"Which products are below reorder level in stock? Show 'product_name', 'units_in_stock', 'reorder_level'.","SELECT product_name, units_in_stock, reorder_level
+FROM products
+WHERE units_in_stock < reorder_level;","SELECT product_name, units_in_stock, reorder_level
+FROM products
+WHERE units_in_stock < reorder_level;
+",1.0
+39.2,"Produk apa aja yang stoknya udah di bawah level reorder? Tampilkan 'product_name', 'units_in_stock', 'reorder_level'.","SELECT product_name, units_in_stock, reorder_level
+FROM products
+WHERE units_in_stock < reorder_level;","SELECT product_name, units_in_stock, reorder_level
+FROM products
+WHERE units_in_stock < reorder_level;
+",1.0
+40.1,"Which employees are assigned to territories that belong to more than one region? Show 'first_name', 'last_name', and the number of unique regions as 'total_regions'.","SELECT e.first_name, e.last_name, COUNT(DISTINCT t.region_id) AS total_regions
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(DISTINCT t.region_id) > 1
+ORDER BY total_regions DESC;","SELECT e.first_name, e.last_name, COUNT(DISTINCT r.region_id) AS total_regions
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+JOIN region r ON t.region_id = r.region_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(DISTINCT r.region_id) > 1
+ORDER BY total_regions DESC;
+",1.0
+40.2,"Karyawan siapa saja yang ngurus territory di lebih dari 1 region? Tampilkan 'first_name', 'last_name', 'total_regions'.","SELECT e.first_name, e.last_name, COUNT(DISTINCT r.region_id) AS total_regions
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+JOIN region r ON t.region_id = r.region_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(DISTINCT r.region_id) > 1
+ORDER BY total_regions DESC;","SELECT e.first_name, e.last_name, COUNT(DISTINCT r.region_id) AS total_regions
+FROM employees e
+JOIN employee_territories et ON e.employee_id = et.employee_id
+JOIN territories t ON et.territory_id = t.territory_id
+JOIN region r ON t.region_id = r.region_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+HAVING COUNT(DISTINCT r.region_id) > 1
+ORDER BY total_regions DESC;
+",1.0
+41.1,"Which orders were shipped late? Show 'order_id', 'customer_name', and 'delay_in_days'.","SELECT o.order_id, c.company_name AS customer_name, (o.shipped_date - o.required_date) AS delay_in_days
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.shipped_date > o.required_date;","SELECT o.order_id, c.company_name AS customer_name, (o.shipped_date - o.required_date) AS delay_in_days
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.shipped_date > o.required_date;",1.0
+41.2,"Order mana saja yang dikirim lebih lambat dari tanggal yang diminta? Tampilkan 'order_id', 'customer_name', dan 'delay_in_days' (jumlah hari keterlambatan).","SELECT o.order_id, c.company_name AS customer_name, (o.shipped_date - o.required_date) AS delay_in_days
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.shipped_date > o.required_date;","SELECT o.order_id, c.company_name AS customer_name, (o.shipped_date - o.required_date) AS delay_in_days
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE o.shipped_date > o.required_date;",1.0
+42.1,Which product got ordered the least? Show 'product_name' and 'total_quantity_ordered'.,"SELECT p.product_name, COALESCE(SUM(od.quantity), 0) AS total_quantity_ordered
+FROM products p
+LEFT JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY total_quantity_ordered ASC
+LIMIT 1;","SELECT p.product_name, COALESCE(SUM(od.quantity), 0) AS total_quantity_ordered
+FROM products p
+LEFT JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY total_quantity_ordered ASC
+LIMIT 1;
+",1.0
+42.2,Produk yang paling jarang diorder apa? Tampilkan 'product_name' dan 'total_quantity_ordered'.,"SELECT p.product_name, COALESCE(SUM(od.quantity), 0) AS total_quantity_ordered
+FROM products p
+LEFT JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY total_quantity_ordered ASC
+LIMIT 1;","SELECT p.product_name, COALESCE(SUM(od.quantity), 0) AS total_quantity_ordered
+FROM products p
+LEFT JOIN order_details od ON p.product_id = od.product_id
+GROUP BY p.product_name
+ORDER BY total_quantity_ordered ASC
+LIMIT 1;
+",1.0
+43.1,"Customers per country, most to least? Show 'country' and 'total_customers'.","SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC;","SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC;
+",1.0
+43.2,"Jumlah customer per negara, dari yang paling banyak ke dikit? Tampilkan 'country' dan 'total_customers'.","SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC;","SELECT country, COUNT(customer_id) AS total_customers
+FROM customers
+GROUP BY country
+ORDER BY total_customers DESC;
+",1.0
+44.1,"Who top 1 placed the most expensive order? Show 'customer_name', 'order_id', 'order_value'.","SELECT c.contact_name AS customer_name, o.order_id, 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS order_value
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.contact_name, o.order_id
+ORDER BY order_value DESC
+LIMIT 1;","SELECT c.contact_name AS customer_name, o.order_id, 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS order_value
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.contact_name, o.order_id
+ORDER BY order_value DESC
+LIMIT 1;
+",1.0
+44.2,"Top 1 customer mana yang pernah bikin order paling mahal? Tampilkan 'customer_name', 'order_id', 'order_value'.","SELECT c.company_name AS customer_name, o.order_id, 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS order_value
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.company_name, o.order_id
+ORDER BY order_value DESC
+LIMIT 1;","SELECT c.contact_name AS customer_name, o.order_id, 
+       SUM(od.unit_price * od.quantity * (1 - od.discount)) AS order_value
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.contact_name, o.order_id
+ORDER BY order_value DESC
+LIMIT 1;
+",0.0
+45.1,"Top 3 employees with the most distinct customers? Show 'first_name', 'last_name', 'unique_customers'.","SELECT e.first_name, e.last_name, COUNT(DISTINCT o.customer_id) AS unique_customers
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY unique_customers DESC
+LIMIT 3;","SELECT e.first_name, e.last_name, COUNT(DISTINCT o.customer_id) AS unique_customers
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY unique_customers DESC
+LIMIT 3;",1.0
+45.2,"Top 3 karyawan yang handle customer unik paling banyak? Tampilkan 'first_name', 'last_name', 'unique_customers'.","SELECT e.first_name, e.last_name, COUNT(DISTINCT o.customer_id) AS unique_customers
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY unique_customers DESC
+LIMIT 3;","SELECT e.first_name, e.last_name, COUNT(DISTINCT o.customer_id) AS unique_customers
+FROM employees e
+JOIN orders o ON e.employee_id = o.employee_id
+GROUP BY e.employee_id, e.first_name, e.last_name
+ORDER BY unique_customers DESC
+LIMIT 3;",1.0
+46.1,Top 1 popular category by quantity ordered? Show 'category_name' and 'total_quantity'.,"SELECT c.category_name, SUM(od.quantity) AS total_quantity
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+JOIN categories c ON p.category_id = c.category_id
+GROUP BY c.category_name
+ORDER BY total_quantity DESC
+LIMIT 1;","SELECT c.category_name, SUM(od.quantity) AS total_quantity
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+JOIN categories c ON p.category_id = c.category_id
+GROUP BY c.category_name
+ORDER BY total_quantity DESC
+LIMIT 1;
+",1.0
+46.2,Top 1 kategori produk paling populer berdasarkan jumlah order? Tampilkan 'category_name' dan 'total_quantity'.,"SELECT c.category_name, SUM(od.quantity) AS total_quantity
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+JOIN categories c ON p.category_id = c.category_id
+GROUP BY c.category_name
+ORDER BY total_quantity DESC
+LIMIT 1;","SELECT c.category_name, SUM(od.quantity) AS total_quantity
+FROM order_details od
+JOIN products p ON od.product_id = p.product_id
+JOIN categories c ON p.category_id = c.category_id
+GROUP BY c.category_name
+ORDER BY total_quantity DESC
+LIMIT 1;
+",1.0
+47.1,"Show customers (not company) and how many employees they’ve dealt with. Show 'customer_name', 'employee_count'.","SELECT c.contact_name AS customer_name, COUNT(DISTINCT o.employee_id) AS employee_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.contact_name;","SELECT c.contact_name AS customer_name, COUNT(DISTINCT o.employee_id) AS employee_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.contact_name
+ORDER BY employee_count DESC;",1.0
+47.2,Tampilkan nama customer (bukan nama perusahaan) dan berapa banyak karyawan berbeda yang pernah menangani pesanan mereka. Tampilkan 'customer_name' dan 'employee_count'.,"SELECT c.contact_name AS customer_name, COUNT(DISTINCT o.employee_id) AS employee_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.contact_name
+ORDER BY employee_count DESC;","SELECT c.contact_name AS customer_name, COUNT(DISTINCT o.employee_id) AS employee_count
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.contact_name
+ORDER BY employee_count DESC;",1.0
+48.1,Total orders per country shipped to? Show 'ship_country' and 'total_orders'.,"SELECT ship_country, COUNT(order_id) AS total_orders
+FROM orders
+GROUP BY ship_country
+ORDER BY total_orders DESC;","SELECT ship_country, COUNT(order_id) AS total_orders
+FROM orders
+GROUP BY ship_country
+ORDER BY total_orders DESC;
+",1.0
+48.2,Jumlah order per negara tujuan pengiriman berapa aja? Tampilkan 'ship_country' dan 'total_orders'.,"SELECT ship_country, COUNT(order_id) AS total_orders
+FROM orders
+GROUP BY ship_country
+ORDER BY total_orders DESC;","SELECT ship_country, COUNT(order_id) AS total_orders
+FROM orders
+GROUP BY ship_country
+ORDER BY total_orders DESC;
+",1.0
+49.1,"How many orders per shipper per year? Show 'shipper_name', 'order_year', 'order_count'.","SELECT s.company_name AS shipper_name,
+       EXTRACT(YEAR FROM o.order_date) AS order_year,
+       COUNT(o.order_id) AS order_count
+FROM orders o
+JOIN shippers s ON o.ship_via = s.shipper_id
+GROUP BY s.company_name, order_year
+ORDER BY shipper_name, order_year;","SELECT s.company_name AS shipper_name,
+       EXTRACT(YEAR FROM o.order_date) AS order_year,
+       COUNT(o.order_id) AS order_count
+FROM orders o
+JOIN shippers s ON o.ship_via = s.shipper_id
+GROUP BY s.company_name, order_year
+ORDER BY shipper_name, order_year;",1.0
+49.2,"Jumlah order per shipper per tahun berapa aja? Tampilkan 'shipper_name', 'order_year', 'order_count'.","SELECT s.company_name AS shipper_name,
+       EXTRACT(YEAR FROM o.order_date) AS order_year,
+       COUNT(o.order_id) AS order_count
+FROM orders o
+JOIN shippers s ON o.ship_via = s.shipper_id
+GROUP BY s.company_name, order_year
+ORDER BY shipper_name, order_year;","SELECT s.company_name AS shipper_name,
+       EXTRACT(YEAR FROM o.order_date) AS order_year,
+       COUNT(o.order_id) AS order_count
+FROM orders o
+JOIN shippers s ON o.ship_via = s.shipper_id
+GROUP BY s.company_name, order_year
+ORDER BY shipper_name, order_year;",1.0
+50.1,How many different products has each customer bought more than once? Show customer_name and the number of repeated products as repeated_products.,"SELECT c.contact_name AS customer_name, COUNT(DISTINCT od.product_id) AS repeated_products
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.contact_name
+HAVING COUNT(od.product_id) > 1;","SELECT c.contact_name AS customer_name, COUNT(DISTINCT od.product_id) AS repeated_products
+FROM Customers c
+JOIN Orders o ON c.customer_id = o.customer_id
+JOIN Order_Details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, customer_name
+HAVING COUNT(*) > 1;",1.0
+50.2,Berapa banyak produk berbeda yang pernah dibeli lebih dari satu kali oleh setiap customer? Tampilkan customer sebagai customer_name dan jumlah produk yang diulang sebagai repeated_products.,"SELECT c.contact_name AS customer_name, COUNT(DISTINCT od.product_id) AS repeated_products
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN order_details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, c.contact_name
+HAVING COUNT(od.product_id) > COUNT(DISTINCT od.order_id);","SELECT c.contact_name AS customer_name, COUNT(DISTINCT od.product_id) AS repeated_products
+FROM Customers c
+JOIN Orders o ON c.customer_id = o.customer_id
+JOIN Order_Details od ON o.order_id = od.order_id
+GROUP BY c.customer_id, customer_name
+HAVING COUNT(*) > 1;",0.0

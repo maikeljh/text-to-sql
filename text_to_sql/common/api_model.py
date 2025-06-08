@@ -1,8 +1,9 @@
 import requests
+import time
 
 
 class APIModel:
-    def __init__(self, api_key: str, provider: str = "openai", model: str = "gpt-4"):
+    def __init__(self, api_key: str, provider: str = "openai", model: str = "gpt-4", timeout: int = 300):
         """
         Initializes the API model for text generation.
 
@@ -13,6 +14,7 @@ class APIModel:
         self.api_key = api_key
         self.provider = provider.lower()
         self.model = model
+        self.timeout = timeout
         self._initialize_client()
 
     def _initialize_client(self):
@@ -90,14 +92,25 @@ class APIModel:
         else:
             raise ValueError(f"Unsupported provider: {self.provider}")
 
-        response = requests.post(url, headers=headers, json=payload)
+        # Retry until success
+        while True:
+            try:
+                response = requests.post(url, headers=headers, json=payload, timeout=self.timeout)
+                response.raise_for_status()
 
-        if response.status_code == 200:
-            if self.provider == "gemini":
-                return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-            else:
-                return response.json()["choices"][0]["message"]["content"]
-        else:
-            raise Exception(
-                f"API request failed: {response.status_code} - {response.text}"
-            )
+                if self.provider == "gemini":
+                    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+                else:
+                    return response.json()["choices"][0]["message"]["content"]
+
+            except (requests.ConnectionError, requests.Timeout) as e:
+                print(f"[Retrying] Connection failed: {e}")
+                time.sleep(5)
+
+            except requests.HTTPError as e:
+                print(f"[Abort] Server responded with error {e.response.status_code}: {e.response.text}")
+                raise
+
+            except Exception as e:
+                print(f"[Abort] Unexpected error: {e}")
+                raise

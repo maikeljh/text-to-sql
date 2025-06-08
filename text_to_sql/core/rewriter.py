@@ -30,5 +30,15 @@ class RewriterPrompt(BaseLLM):
         rewritten_prompt = self.model.generate(
             system_prompt=self.system_prompt, user_prompt=user_prompt
         )
-        print(f"Rewritten Prompt: {rewritten_prompt}")
-        return rewritten_prompt
+        
+        final_prompt = f"""
+        Original user prompt:
+        {user_prompt}
+
+        Rewritten user prompt:
+        {rewritten_prompt}
+
+        Please use the most complete one for generating the SQL query
+        """
+
+        return final_prompt

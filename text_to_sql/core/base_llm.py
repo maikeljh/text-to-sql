@@ -48,6 +48,7 @@ class BaseLLM(ABC):
             api_key=self.config.api_key,
             model=self.config.model,
             provider=self.config.provider,
+            timeout=self.config.timeout,
         )
 
     def _load_system_prompt(self, system_prompt_path: Optional[str] = None) -> str:

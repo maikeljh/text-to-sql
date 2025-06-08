@@ -1,0 +1,101 @@
+prompt,is_related,predicted_is_related,predicted_is_related_baseline
+Which actor has never appeared in any R-rated movie?,1,1,1
+Which language shows up the most in our movie list?,1,1,1
+Which customers have rented the same film more than once?,1,1,1
+Which movies are in the top 10% by total revenue?,1,1,1
+Bahasa apa yang paling sering muncul di daftar film kita?,1,1,1
+Which films have been rented more than the average number of rentals for their category?,1,1,1
+Who are the top 5 customers based on how many movies they've rented?,1,1,1
+Siapa pelanggan yang sudah menyewa semua film dalam satu genre (misalnya genre 'Action')?,1,1,1
+Siapa staf yang memproses pembayaran dengan total terbesar?,1,1,1
+Which films are in the top 5 most rented film categories?,1,1,1
+"Are there any movies in our collection that have never been rented at all, across any store?",1,1,1
+How many different last_name values are there among all the actors?,1,1,1
+Which customers have rented films from exactly 2 categories?,1,1,1
+Which actors have never appeared in any films with a rating of 'R'?,1,1,1
+Which films were never rented but are in the 5 most rented film categories?,1,1,1
+Ada gak pelanggan yang nyewa film dari tepat 2 kategori?,1,1,1
+Tampilkan daftar film yang disewakan pada bulan Januari.,1,1,1
+Siapa pelanggan yang paling sering menyewa film horor?,1,1,1
+Berapa total pendapatan dari penyewaan film tahun 2024?,1,1,1
+Film apa yang memiliki rating tertinggi dari pelanggan?,1,1,1
+Berapa jumlah pelanggan yang berasal dari kota Jakarta?,1,1,1
+Apa saja nama film yang belum pernah disewa?,1,1,1
+Siapa aktor yang membintangi film terbanyak?,1,1,1
+Tampilkan 5 pelanggan terakhir yang menyewa film.,1,1,1
+Berapa banyak film yang berdurasi lebih dari 2 jam?,1,1,1
+Apa genre film yang paling banyak disewa tahun ini?,1,1,1
+Tampilkan rata-rata lama penyewaan film.,1,1,1
+Siapa pelanggan yang menyewa film terbanyak dalam 1 minggu?,1,1,1
+Film apa yang disewa oleh pelanggan bernama Andi?,1,1,1
+Berapa jumlah total penyewaan dalam satu hari?,1,1,1
+Siapa staf yang memproses penyewaan terbanyak?,1,1,1
+Apa saja film yang disutradarai oleh Steven Spielberg?,1,1,1
+Tampilkan daftar film dengan judul mengandung kata 'Cinta'.,1,1,1
+Berapa banyak pelanggan yang memiliki nama depan 'Budi'?,1,1,1
+Tampilkan film yang disewa pada tanggal 1 Januari 2023.,1,1,1
+Apa film pertama yang disewa oleh pelanggan ID 102?,1,1,1
+Tampilkan pelanggan yang belum pernah menyewa film.,1,1,1
+Siapa aktor dengan nama belakang 'Santoso'?,1,1,1
+Film apa yang paling sering disewa oleh pelanggan wanita?,1,1,1
+"Film mana yang menghasilkan pendapatan paling tinggi per hari sewa di seluruh store, hanya berdasarkan sewaan yang sudah dikembalikan?",1,1,1
+Tiap toko dapet pemasukan berapa kalau dilihat dari pembayaran oleh staffnya?,1,1,1
+Film apa aja yang masuk 10% teratas berdasarkan pendapatan?,1,1,1
+"Siapa staf yang paling banyak memproses pembayaran, dan berapa total yang mereka proses?",1,1,1
+Pasangan aktor mana saja yang paling sering main film bareng?,1,1,1
+"Which films earn the most revenue per rental day across all stores, based only on rentals that have been returned?",1,1,1
+Siapa aja pelanggan yang nyewa film yang sama lebih dari sekali?,1,1,1
+Which pairs of actors have appeared together in the most films?,1,1,1
+Tampilkan total penyewaan film untuk tiap genre.,1,1,1
+List all films that have never been rented.,1,1,1
+Which customers have rented more than 10 times in the last month?,1,1,1
+Apa itu docker?,0,0,0
+"If a movie could talk, what would it say to you?",0,0,0
+What is the meaning of life in cinema?,0,0,0
+"Kalau bisa ngobrol sama tokoh film, kamu pilih siapa?",0,0,0
+"Kalau disuruh jadi produser, kamu pilih genre apa?",0,0,0
+What's your favorite actor of all time?,0,0,0
+Siapa yang menurutmu cocok main jadi villain di film superhero?,0,0,0
+"Kalau bisa bikin film sendiri, kamu mau bikin tentang apa?",0,0,0
+"Kalau kamu bisa liburan ke mana aja sekarang, kamu mau ke mana?",0,0,0
+What's your comfort movie?,0,0,0
+Apa kamu pernah nonton film lebih dari 5 kali?,0,0,1
+Coba kerjakan PR saya,0,0,1
+Siapa penyanyi favoritmu waktu SMA?,0,0,0
+Apa pendapatmu soal film yang durasinya lebih dari 3 jam?,0,0,0
+Can you tell me a joke about movies?,0,0,0
+Kenapa banyak orang suka nonton film?,0,0,1
+Aktor siapa yang paling kamu suka?,0,0,1
+Berapa lama Anda memikirkan cara mendapatkan data film?,0,0,1
+Tolong jelaskan apa itu pair programming,0,0,0
+Ceritain tentang film paling aneh yang pernah kamu tonton!,0,0,0
+Apa sih yang dimaksud dengan komedi?,0,0,1
+Bagaimana cara memasak wortel?,0,0,0
+Berapa banyak orang yang pernah belajar cara memasak?,0,0,1
+Kenapa database ini populer ya?,0,0,1
+Apa makanan favorit kamu saat kecil?,0,0,1
+"Kalau punya kekuatan super, kamu mau kekuatan apa?",0,0,0
+Apa momen paling lucu yang pernah kamu alami?,0,0,1
+"Kalau bisa ke masa lalu, kamu mau ketemu siapa?",0,0,0
+Apa pendapatmu tentang teknologi masa depan?,0,0,0
+Ceritakan liburan impian kamu!,0,0,0
+Apa lagu yang bikin kamu semangat setiap pagi?,0,0,0
+"Menurut kamu, apa arti sukses?",0,0,0
+"Kalau kamu jadi hewan sehari, kamu mau jadi apa?",0,0,0
+Apa buku terakhir yang kamu baca?,0,0,1
+Siapa orang yang paling menginspirasi kamu?,0,0,1
+"Kalau disuruh tinggal di planet lain, kamu pilih yang mana?",0,0,0
+Apa kegiatan favorit kamu saat akhir pekan?,0,0,0
+"Kalau punya robot, kamu mau robot itu ngapain aja?",0,0,0
+Apa film paling berkesan yang pernah kamu tonton?,0,0,0
+Apa cita-cita kamu waktu kecil?,0,0,0
+"Kalau bisa pilih pekerjaan apa pun, kamu mau jadi apa?",0,0,0
+Apa makanan yang paling kamu hindari?,0,0,0
+"Kalau kamu bisa belajar skill baru dalam semalam, kamu pilih apa?",0,0,0
+Apa pendapatmu tentang AI dan robot?,0,0,0
+"Kalau kamu punya waktu 1 minggu tanpa internet, kamu akan ngapain?",0,0,1
+Apa tempat paling indah yang pernah kamu kunjungi?,0,0,0
+"Kalau bisa ngobrol sama hewan, kamu pilih hewan apa?",0,0,0
+Apa genre film favorit kamu?,0,0,0
+Apa kebiasaan unik yang kamu punya?,0,0,0
+"Kalau kamu bisa jadi karakter film, kamu mau jadi siapa?",0,0,0

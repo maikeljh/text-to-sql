@@ -15,227 +15,203 @@ from core import (
 
 
 class TextToSQL:
+    """Main class for generating and evaluating SQL queries from natural language prompts."""
+
     def __init__(self, config: Config):
+        """Initialize all core modules with given configuration."""
         self.config = config
         self._load_modules()
 
     def _load_modules(self):
+        """Load core modules for text-to-SQL pipeline."""
         self.rewriter = RewriterPrompt(config=self.config.rewriter_config)
         self.query_generator = QueryGenerator(config=self.config.query_generator_config)
         self.schema_linker = SchemaLinker(config=self.config.schema_linker_config)
-        self.retrieve_context = RetrieveContext(
-            config=self.config.retrieve_context_config
-        )
+        self.retrieve_context = RetrieveContext(config=self.config.retrieve_context_config)
         self.query_executor = QueryExecutor(config=self.config.query_executor_config)
         self.evaluator = QueryEvaluator()
 
-    def generate_baseline(self, user_prompt, method):
-        # Baseline:
-        # 1. No schema filter
-        # 2. No relevant retrieval
-        # 3. No prompt rewriter
+    def generate_baseline(self, user_prompt: str) -> str:
+        """Generate baseline SQL query without context, rewriter, or error handling."""
         schema = self.schema_linker.generate(user_prompt=user_prompt)
-        if method == "Multistage":
-            attempts_left = self.config.max_retry_attempt
-            query = self.query_generator.generate_baseline(
-                user_prompt=user_prompt,
-                schema=schema,
-            )
-            while attempts_left > 0:
-                try:
-                    self.query_executor.execute_query(query)
-                    break
-                except Exception as e:
-                    attempts_left -= 1
-                    query = self.query_generator.fix_query(
-                        user_prompt=user_prompt,
-                        sql_query=query,
-                        error_message=str(e),
-                        schema=schema,
-                    )
-        elif method == "Incremental":
-            step_split_prompt = (
-                f"You are given a complex natural language question about a database.\n"
-                f"Your task is to break this question into a series of step-by-step sub-questions "
-                f"that build towards the final answer.\n\n"
-                f"Database Schema:\n{schema}\n\n"
-                f"Question: {user_prompt}\n\n"
-                f"Return a list of step-by-step sub-questions."
-            )
+        return self.query_generator.generate_baseline(user_prompt=user_prompt, schema=schema)
 
-            # Step 1: Split into incremental sub-questions
-            subquestions_text = self.query_generator.model.generate(
-                system_prompt="You are a helpful assistant who splits complex questions into logical, incremental steps.",
-                user_prompt=step_split_prompt,
-            )
-
-            # Parse subquestions into a list (could be numbered list or newline-separated)
-            subquestions = [
-                line.strip("- ").strip()
-                for line in subquestions_text.strip().splitlines()
-                if line.strip()
-            ]
-
-            # Step 2: Generate SQL for each step
-            intermediate_queries = []
-            for step in subquestions:
-                step_sql = self.query_generator.generate_baseline(
-                    user_prompt=step,
-                    schema=schema,
-                )
-                intermediate_queries.append({"step": step, "sql": step_sql})
-
-            # Step 3: Generate final query based on all steps
-            final_sql_prompt = (
-                f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
-                f"Original Question: {user_prompt}\n\n"
-                f"Steps:\n"
-            )
-            for i, q in enumerate(intermediate_queries, 1):
-                final_sql_prompt += f"Step {i}: {q['step']}\nSQL: {q['sql']}\n\n"
-
-            final_sql_prompt += "Return only the final SQL query that answers the full question."
-
-            final_query = self.query_generator.generate_baseline(
-                user_prompt=final_sql_prompt,
-                schema=schema,
-            )
-
-            return final_query.strip()
-        else:
-            query = self.query_generator.generate_baseline(
-                user_prompt=user_prompt,
-                schema=schema,
-            )
-        return query
-
-    def generate_v1(self, user_prompt, method):
-        # Baseline:
-        # 1. No schema filter
-        # 2. Yes relevant retrieval
-        # 3. Yes prompt rewriter
+    def generate_v1(self, user_prompt: str) -> str:
+        """Generate SQL using rewritten prompt and retrieved context, no error handling."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
         schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
-        if method == "Multistage":
-            relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
-            attempts_left = self.config.max_retry_attempt
+        relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
+        return self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
 
-            # Create user prompt
-            final_user_prompt = f"""
-            Original user prompt:
-            {user_prompt}
+    def generate_v2(self, user_prompt: str) -> str:
+        """Same as V1, but adds multistage error handling."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
+        attempts_left = self.config.max_retry_attempt
+        query = self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
 
-            Rewritten user prompt:
-            {rewritten_prompt}
-
-            Please use the most complete one for generating the SQL query
-            """
-
-            query = self.query_generator.generate_v1(
-                user_prompt=final_user_prompt,
-                schema=schema,
-                example=relevant_example,
-            )
-            while attempts_left > 0:
-                try:
-                    self.query_executor.execute_query(query)
-                    break
-                except Exception as e:
-                    attempts_left -= 1
-                    query = self.query_generator.fix_query(
-                        user_prompt=final_user_prompt,
-                        sql_query=query,
-                        error_message=str(e),
-                        schema=schema,
-                    )
-        elif method == "Incremental":
-            step_split_prompt = (
-                f"You are given a complex natural language question about a database.\n"
-                f"Your task is to break this question into a series of step-by-step sub-questions "
-                f"that build towards the final answer.\n\n"
-                f"Database Schema:\n{schema}\n\n"
-                f"Original Question: {user_prompt}\n\n"
-                f"Rewritten Question: {rewritten_prompt}\n\n"
-                f"Please use the most complete question\n\n"
-                f"Return a list of step-by-step sub-questions."
-            )
-
-            # Step 1: Split into incremental sub-questions
-            subquestions_text = self.query_generator.model.generate(
-                system_prompt="You are a helpful assistant who splits complex questions into logical, incremental steps.",
-                user_prompt=step_split_prompt,
-            )
-
-            # Parse subquestions into a list (could be numbered list or newline-separated)
-            subquestions = [
-                line.strip("- ").strip()
-                for line in subquestions_text.strip().splitlines()
-                if line.strip()
-            ]
-
-            # Step 2: Generate SQL for each step
-            intermediate_queries = []
-            for step in subquestions:
-                relevant_example = self.retrieve_context.generate(user_prompt=step)
-                step_sql = self.query_generator.generate_v1(
-                    user_prompt=step,
+        while attempts_left > 0:
+            try:
+                self.query_executor.execute_query(query)
+                break
+            except Exception as e:
+                attempts_left -= 1
+                query = self.query_generator.fix_query(
+                    user_prompt=rewritten_prompt,
+                    sql_query=query,
+                    error_message=str(e),
                     schema=schema,
-                    example=relevant_example,
                 )
-                intermediate_queries.append({"step": step, "sql": step_sql})
-
-            # Step 3: Generate final query based on all steps
-            final_sql_prompt = (
-                f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
-                f"Original Question: {user_prompt}\n\n"
-                f"Rewritten Question: {rewritten_prompt}\n\n"
-                f"Please use the most complete question\n\n"
-                f"Steps:\n"
-            )
-            for i, q in enumerate(intermediate_queries, 1):
-                final_sql_prompt += f"Step {i}: {q['step']}\nSQL: {q['sql']}\n\n"
-
-            final_sql_prompt += "Return only the final SQL query that answers the full question."
-
-            relevant_example = self.retrieve_context.generate(user_prompt=final_sql_prompt)
-            final_query = self.query_generator.generate_v1(
-                user_prompt=final_sql_prompt,
-                schema=schema,
-                example=relevant_example,
-            )
-
-            return final_query.strip()
-        else:
-            # Create user prompt
-            final_user_prompt = f"""
-            Original user prompt:
-            {user_prompt}
-
-            Rewritten user prompt:
-            {rewritten_prompt}
-
-            Please use the most complete one for generating the SQL query
-            """
-
-            query = self.query_generator.generate_v1(
-                user_prompt=final_user_prompt,
-                schema=schema,
-                example=relevant_example,
-            )
         return query
 
+    def generate_v3(self, user_prompt: str) -> str:
+        """Same as V2, but adds schema filtering."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
+        relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
+        attempts_left = self.config.max_retry_attempt
+        query = self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
+
+        while attempts_left > 0:
+            try:
+                self.query_executor.execute_query(query)
+                break
+            except Exception as e:
+                attempts_left -= 1
+                query = self.query_generator.fix_query(
+                    user_prompt=rewritten_prompt,
+                    sql_query=query,
+                    error_message=str(e),
+                    schema=schema,
+                )
+        return query
+
+    def _generate_incremental_query_baseline(self, user_prompt: str, schema: str) -> str:
+        """Split question into sub-steps and build final SQL incrementally."""
+        step_split_prompt = (
+            f"You are given a complex natural language question about a database.\n"
+            f"Your task is to break this question into a series of step-by-step sub-questions that build towards the final answer.\n\n"
+            f"Database Schema:\n{schema}\n\n"
+            f"{user_prompt}\nReturn a list of step-by-step sub-questions."
+        )
+
+        subquestions_text = self.query_generator.model.generate(
+            system_prompt="You are a helpful assistant who splits complex questions into logical, incremental steps.",
+            user_prompt=step_split_prompt,
+        )
+
+        subquestions = [line.strip("- ").strip() for line in subquestions_text.strip().splitlines() if line.strip()]
+
+        intermediate_queries = []
+        for step in subquestions:
+            step_sql = self.query_generator.generate_baseline(user_prompt=step, schema=schema)
+            intermediate_queries.append({"step": step, "sql": step_sql})
+
+        final_sql_prompt = (
+            f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
+            f"{user_prompt}\nPlease use the most complete question\n\nSteps:\n"
+        )
+        for i, q in enumerate(intermediate_queries, 1):
+            final_sql_prompt += f"Step {i}: {q['step']}\nSQL: {q['sql']}\n\n"
+        final_sql_prompt += "Return only the final SQL query that answers the full question."
+
+        return self.query_generator.generate_baseline(
+            user_prompt=final_sql_prompt, schema=schema
+        ).strip()
+
+    def _generate_incremental_query_v1(self, user_prompt: str, schema: str) -> str:
+        """Split question into sub-steps and build final SQL incrementally."""
+        step_split_prompt = (
+            f"You are given a complex natural language question about a database.\n"
+            f"Your task is to break this question into a series of step-by-step sub-questions that build towards the final answer.\n\n"
+            f"Database Schema:\n{schema}\n\n"
+            f"{user_prompt}\nReturn a list of step-by-step sub-questions."
+        )
+
+        subquestions_text = self.query_generator.model.generate(
+            system_prompt="You are a helpful assistant who splits complex questions into logical, incremental steps.",
+            user_prompt=step_split_prompt,
+        )
+
+        subquestions = [line.strip("- ").strip() for line in subquestions_text.strip().splitlines() if line.strip()]
+
+        intermediate_queries = []
+        for step in subquestions:
+            relevant_example = self.retrieve_context.generate(user_prompt=step)
+            step_sql = self.query_generator.generate_v1(user_prompt=step, schema=schema, example=relevant_example)
+            intermediate_queries.append({"step": step, "sql": step_sql})
+
+        final_sql_prompt = (
+            f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
+            f"{user_prompt}\nPlease use the most complete question\n\nSteps:\n"
+        )
+        for i, q in enumerate(intermediate_queries, 1):
+            final_sql_prompt += f"Step {i}: {q['step']}\nSQL: {q['sql']}\n\n"
+        final_sql_prompt += "Return only the final SQL query that answers the full question."
+
+        relevant_example = self.retrieve_context.generate(user_prompt=final_sql_prompt)
+        return self.query_generator.generate_v1(
+            user_prompt=final_sql_prompt, schema=schema, example=relevant_example
+        ).strip()
+
+    def generate_v4(self, user_prompt: str) -> str:
+        """Uses incremental sub-question splitting and multistage error correction."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        final_query = self._generate_incremental_query_v1(rewritten_prompt, schema)
+        attempts_left = self.config.max_retry_attempt
+
+        while attempts_left > 0:
+            try:
+                self.query_executor.execute_query(final_query)
+                break
+            except Exception as e:
+                attempts_left -= 1
+                final_query = self.query_generator.fix_query(
+                    user_prompt=rewritten_prompt,
+                    sql_query=final_query,
+                    error_message=str(e),
+                    schema=schema,
+                )
+        return final_query
+
+    def generate_v5(self, user_prompt: str) -> str:
+        """Same as V4 but includes schema filtering."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
+        final_query = self._generate_incremental_query_v1(rewritten_prompt, schema)
+        attempts_left = self.config.max_retry_attempt
+
+        while attempts_left > 0:
+            try:
+                self.query_executor.execute_query(final_query)
+                break
+            except Exception as e:
+                attempts_left -= 1
+                final_query = self.query_generator.fix_query(
+                    user_prompt=rewritten_prompt,
+                    sql_query=final_query,
+                    error_message=str(e),
+                    schema=schema,
+                )
+        return final_query
+
     def clean_sql_query(self, query: str) -> str:
+        """Clean SQL query string by removing code block markers and comments."""
         query = re.sub(r"```sql|```", "", query, flags=re.IGNORECASE)
         query = re.sub(r"--.*", "", query)
         query = re.sub(r"\n\s*\n", "\n", query).strip()
-        
         return query
 
-    def evaluate(self, query, true_query, expected_columns):
+    def evaluate(self, query: str, true_query: str, expected_columns: list) -> float:
+        """Compare actual SQL query result with true query result.
+
+        Returns accuracy score between 0.0 and 1.0.
+        """
         try:
             query = self.clean_sql_query(query)
             true_query = self.clean_sql_query(true_query)
-
             predicted_result = self.query_executor.execute_query(query)
             expected_result = self.query_executor.execute_query(true_query)
 
@@ -244,24 +220,61 @@ class TextToSQL:
                 for row in expected_result
             ]
 
-            acc = self.evaluator.calculate_accuracy(
-                expected=filtered_expected_result,
-                actual=predicted_result
+            return self.evaluator.calculate_accuracy(
+                expected=filtered_expected_result, actual=predicted_result
             )
-            return acc
         except Exception as e:
             print(f"Evaluation error: {e}")
             return 0.0
 
-    def execute_query(self, query: str):
-        """
-        Execute a raw SQL query using the configured QueryExecutor.
-        Returns:
-            - result: Query result as a list of rows or values
-            - error: If execution fails, return error message
-        """
+    def execute_query(self, query: str) -> dict:
+        """Execute raw SQL query and return result or error message."""
         try:
             result = self.query_executor.execute_query(query)
             return {"result": result}
         except Exception as e:
             return {"error": str(e)}
+
+    # For experiment use only
+    def predict_schema_only(self, user_prompt: str) -> str:
+        """Return the filtered schema for the given prompt."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
+        return schema
+
+    def predict_sql_multistage_only(self, user_prompt: str) -> str:
+        """Generate SQL with multistage error handling only (no rewriter or example)."""
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
+        query = self.query_generator.generate_baseline(user_prompt=user_prompt, schema=schema)
+        attempts_left = self.config.max_retry_attempt
+
+        while attempts_left > 0:
+            try:
+                self.query_executor.execute_query(query)
+                break
+            except Exception as e:
+                attempts_left -= 1
+                query = self.query_generator.fix_query(
+                    user_prompt=user_prompt,
+                    sql_query=query,
+                    error_message=str(e),
+                    schema=schema,
+                )
+        return query
+
+    def predict_sql_incremental_only(self, user_prompt: str) -> str:
+        """Generate SQL by incrementally breaking down the question only."""
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
+        return self._generate_incremental_query_baseline(user_prompt=user_prompt, schema=schema)
+
+    def predict_sql_rewriter_only(self, user_prompt: str) -> str:
+        """Generate SQL using rewriter only (no example or error handling)."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        return self.query_generator.generate_baseline(user_prompt=rewritten_prompt, schema=schema)
+
+    def predict_sql_with_example_only(self, user_prompt: str) -> str:
+        """Generate SQL using relevant example only (no rewriter or error handling)."""
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
+        example = self.retrieve_context.generate(user_prompt=user_prompt)
+        return self.query_generator.generate_v1(user_prompt=user_prompt, schema=schema, example=example)

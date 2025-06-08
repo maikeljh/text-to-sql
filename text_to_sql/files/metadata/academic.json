@@ -1,0 +1,1608 @@
+{
+  "database": "academic",
+  "tables": [
+    {
+      "name": "Fakultas",
+      "description": "Table containing faculty information.",
+      "columns": [
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Faculty ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the faculty."
+        },
+        {
+          "key": "jumlah_dosen",
+          "name": "jumlah_dosen",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Number of lecturers."
+        },
+        {
+          "key": "id_kepala",
+          "name": "id_kepala",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Head of faculty (FK to Dosen)."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "Fakultas",
+          "join": "Fakultas.id_kepala = Dosen.id_dosen",
+          "description": "Each faculty has one head (dosen)."
+        },
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "Fakultas",
+          "join": "Dosen.id_fakultas = Fakultas.id_fakultas",
+          "description": "Faculty has many dosen."
+        },
+        {
+          "foreign_table": "Jurusan",
+          "primary_table": "Fakultas",
+          "join": "Jurusan.id_fakultas = Fakultas.id_fakultas",
+          "description": "Faculty has many departments."
+        }
+      ]
+    },
+    {
+      "name": "Dosen",
+      "description": "Table containing lecturer information.",
+      "columns": [
+        {
+          "key": "id_dosen",
+          "name": "id_dosen",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Lecturer ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the lecturer."
+        },
+        {
+          "key": "jabatan",
+          "name": "jabatan",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Job title."
+        },
+        {
+          "key": "email",
+          "name": "email",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Email address."
+        },
+        {
+          "key": "telepon",
+          "name": "telepon",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Faculty ID the lecturer belongs to."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "Dosen",
+          "join": "Dosen.id_fakultas = Fakultas.id_fakultas",
+          "description": "Lecturer is part of a faculty."
+        }
+      ]
+    },
+    {
+      "name": "Jurusan",
+      "description": "Table containing department information.",
+      "columns": [
+        {
+          "key": "id_jurusan",
+          "name": "id_jurusan",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Department ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Department name."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Faculty to which the department belongs."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "Jurusan",
+          "join": "Jurusan.id_fakultas = Fakultas.id_fakultas",
+          "description": "Department belongs to a faculty."
+        }
+      ]
+    },
+    {
+      "name": "Mahasiswa",
+      "description": "Table containing student information.",
+      "columns": [
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Student ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Student name."
+        },
+        {
+          "key": "tanggal_lahir",
+          "name": "tanggal_lahir",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date of birth."
+        },
+        {
+          "key": "email",
+          "name": "email",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Email address."
+        },
+        {
+          "key": "telepon",
+          "name": "telepon",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number."
+        },
+        {
+          "key": "alamat",
+          "name": "alamat",
+          "type": "TEXT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Address."
+        },
+        {
+          "key": "tanggal_masuk",
+          "name": "tanggal_masuk",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Admission date."
+        },
+        {
+          "key": "id_jurusan",
+          "name": "id_jurusan",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Jurusan",
+            "column": "id_jurusan"
+          },
+          "description": "Department ID."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Faculty ID."
+        },
+        {
+          "key": "id_pembimbing",
+          "name": "id_pembimbing",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Supervisor (Dosen)."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Jurusan",
+          "primary_table": "Mahasiswa",
+          "join": "Mahasiswa.id_jurusan = Jurusan.id_jurusan",
+          "description": "Student belongs to a department."
+        },
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "Mahasiswa",
+          "join": "Mahasiswa.id_fakultas = Fakultas.id_fakultas",
+          "description": "Student belongs to a faculty."
+        },
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "Mahasiswa",
+          "join": "Mahasiswa.id_pembimbing = Dosen.id_dosen",
+          "description": "Student is supervised by a lecturer."
+        }
+      ]
+    },
+    {
+      "name": "MataKuliah",
+      "description": "Table containing course information.",
+      "columns": [
+        {
+          "key": "id_mk",
+          "name": "id_mk",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Course ID."
+        },
+        {
+          "key": "judul",
+          "name": "judul",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the course."
+        },
+        {
+          "key": "deskripsi",
+          "name": "deskripsi",
+          "type": "TEXT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the course."
+        },
+        {
+          "key": "sks",
+          "name": "sks",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Credit units."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Faculty ID."
+        },
+        {
+          "key": "id_jurusan",
+          "name": "id_jurusan",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Jurusan",
+            "column": "id_jurusan"
+          },
+          "description": "Department ID."
+        },
+        {
+          "key": "id_pengajar",
+          "name": "id_pengajar",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Lecturer teaching the course."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "MataKuliah",
+          "join": "MataKuliah.id_fakultas = Fakultas.id_fakultas",
+          "description": "Course belongs to a faculty."
+        },
+        {
+          "foreign_table": "Jurusan",
+          "primary_table": "MataKuliah",
+          "join": "MataKuliah.id_jurusan = Jurusan.id_jurusan",
+          "description": "Course belongs to a department."
+        },
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "MataKuliah",
+          "join": "MataKuliah.id_pengajar = Dosen.id_dosen",
+          "description": "Course is taught by a lecturer."
+        }
+      ]
+    },
+    {
+      "name": "Kelas",
+      "description": "Class enrollment for specific courses.",
+      "columns": [
+        {
+          "key": "id_kelas",
+          "name": "id_kelas",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Class ID."
+        },
+        {
+          "key": "id_mk",
+          "name": "id_mk",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "MataKuliah",
+            "column": "id_mk"
+          },
+          "description": "Course ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "MataKuliah",
+          "primary_table": "Kelas",
+          "join": "Kelas.id_mk = MataKuliah.id_mk",
+          "description": "Class relates to a specific course."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "Kelas",
+          "join": "Kelas.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Class includes a specific student."
+        }
+      ]
+    },
+    {
+      "name": "ProyekPenelitian",
+      "description": "Research project data.",
+      "columns": [
+        {
+          "key": "id_proyek",
+          "name": "id_proyek",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Project ID."
+        },
+        {
+          "key": "judul",
+          "name": "judul",
+          "type": "VARCHAR(150)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the research."
+        },
+        {
+          "key": "tanggal_mulai",
+          "name": "tanggal_mulai",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Start date."
+        },
+        {
+          "key": "tanggal_selesai",
+          "name": "tanggal_selesai",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "End date."
+        },
+        {
+          "key": "id_dosen",
+          "name": "id_dosen",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Project leader (lecturer)."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Associated faculty."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "ProyekPenelitian",
+          "join": "ProyekPenelitian.id_dosen = Dosen.id_dosen",
+          "description": "Research led by a lecturer."
+        },
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "ProyekPenelitian",
+          "join": "ProyekPenelitian.id_fakultas = Fakultas.id_fakultas",
+          "description": "Research associated with a faculty."
+        }
+      ]
+    },
+    {
+      "name": "PartisipasiPenelitian",
+      "description": "Participation of students in research projects.",
+      "columns": [
+        {
+          "key": "id_partisipasi",
+          "name": "id_partisipasi",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Participation ID."
+        },
+        {
+          "key": "id_proyek",
+          "name": "id_proyek",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "ProyekPenelitian",
+            "column": "id_proyek"
+          },
+          "description": "Associated research project."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Participating student."
+        },
+        {
+          "key": "peran",
+          "name": "peran",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Role in the project. Example value: Asisten Peneliti"
+        },
+        {
+          "key": "jam_kontribusi",
+          "name": "jam_kontribusi",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Contribution in hours."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "ProyekPenelitian",
+          "primary_table": "PartisipasiPenelitian",
+          "join": "PartisipasiPenelitian.id_proyek = ProyekPenelitian.id_proyek",
+          "description": "Participation in a project."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "PartisipasiPenelitian",
+          "join": "PartisipasiPenelitian.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Student participant."
+        }
+      ]
+    },
+    {
+      "name": "Publikasi",
+      "description": "Academic publications.",
+      "columns": [
+        {
+          "key": "id_publikasi",
+          "name": "id_publikasi",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Publication ID."
+        },
+        {
+          "key": "judul",
+          "name": "judul",
+          "type": "VARCHAR(200)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the publication."
+        },
+        {
+          "key": "tanggal_terbit",
+          "name": "tanggal_terbit",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Publication date."
+        },
+        {
+          "key": "nama_jurnal",
+          "name": "nama_jurnal",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Journal name."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Associated faculty."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "Publikasi",
+          "join": "Publikasi.id_fakultas = Fakultas.id_fakultas",
+          "description": "Publication associated with a faculty."
+        }
+      ]
+    },
+    {
+      "name": "PenulisPublikasi",
+      "description": "Authors involved in publications.",
+      "columns": [
+        {
+          "key": "id_penulis_publikasi",
+          "name": "id_penulis_publikasi",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Author-publication mapping ID."
+        },
+        {
+          "key": "id_publikasi",
+          "name": "id_publikasi",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Publikasi",
+            "column": "id_publikasi"
+          },
+          "description": "Publication ID."
+        },
+        {
+          "key": "id_dosen",
+          "name": "id_dosen",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Authoring lecturer."
+        },
+        {
+          "key": "urutan_penulis",
+          "name": "urutan_penulis",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Author order in publication."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Publikasi",
+          "primary_table": "PenulisPublikasi",
+          "join": "PenulisPublikasi.id_publikasi = Publikasi.id_publikasi",
+          "description": "Author links to publication."
+        },
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "PenulisPublikasi",
+          "join": "PenulisPublikasi.id_dosen = Dosen.id_dosen",
+          "description": "Author is a lecturer."
+        }
+      ]
+    },
+    {
+      "name": "Sesi",
+      "description": "Session schedule for courses.",
+      "columns": [
+        {
+          "key": "id_sesi",
+          "name": "id_sesi",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Session ID."
+        },
+        {
+          "key": "id_mk",
+          "name": "id_mk",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "MataKuliah",
+            "column": "id_mk"
+          },
+          "description": "Course ID."
+        },
+        {
+          "key": "id_pengajar",
+          "name": "id_pengajar",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Lecturer ID."
+        },
+        {
+          "key": "semester",
+          "name": "semester",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Semester information. Example value: Ganjil, Genap"
+        },
+        {
+          "key": "jadwal",
+          "name": "jadwal",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Schedule details. Example value: Senin 08:00-10:00"
+        },
+        {
+          "key": "ruang",
+          "name": "ruang",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Room assignment. Example value: R101"
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "MataKuliah",
+          "primary_table": "Sesi",
+          "join": "Sesi.id_mk = MataKuliah.id_mk",
+          "description": "Session belongs to a course."
+        },
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "Sesi",
+          "join": "Sesi.id_pengajar = Dosen.id_dosen",
+          "description": "Session taught by a lecturer."
+        }
+      ]
+    },
+    {
+      "name": "EnrolmenKelas",
+      "description": "Student enrollments in sessions.",
+      "columns": [
+        {
+          "key": "id_enrolmen_kelas",
+          "name": "id_enrolmen_kelas",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Enrollment ID."
+        },
+        {
+          "key": "id_sesi",
+          "name": "id_sesi",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Sesi",
+            "column": "id_sesi"
+          },
+          "description": "Session ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        },
+        {
+          "key": "kehadiran",
+          "name": "kehadiran",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Attendance percentage."
+        },
+        {
+          "key": "nilai_partisipasi",
+          "name": "nilai_partisipasi",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Participation score."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Sesi",
+          "primary_table": "EnrolmenKelas",
+          "join": "EnrolmenKelas.id_sesi = Sesi.id_sesi",
+          "description": "Enrollment to a session."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "EnrolmenKelas",
+          "join": "EnrolmenKelas.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Enrollment by student."
+        }
+      ]
+    },
+    {
+      "name": "CatatanKehadiran",
+      "description": "Daily attendance records.",
+      "columns": [
+        {
+          "key": "id_kehadiran",
+          "name": "id_kehadiran",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Attendance record ID."
+        },
+        {
+          "key": "id_sesi",
+          "name": "id_sesi",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Sesi",
+            "column": "id_sesi"
+          },
+          "description": "Session ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        },
+        {
+          "key": "tanggal",
+          "name": "tanggal",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date of attendance."
+        },
+        {
+          "key": "status",
+          "name": "status",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Attendance status. Example value: Hadir, Tidak Hadir"
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Sesi",
+          "primary_table": "CatatanKehadiran",
+          "join": "CatatanKehadiran.id_sesi = Sesi.id_sesi",
+          "description": "Attendance recorded per session."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "CatatanKehadiran",
+          "join": "CatatanKehadiran.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Attendance recorded per student."
+        }
+      ]
+    },
+    {
+      "name": "Nilai",
+      "description": "Final grades per student and course.",
+      "columns": [
+        {
+          "key": "id_nilai",
+          "name": "id_nilai",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Grade record ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        },
+        {
+          "key": "id_mk",
+          "name": "id_mk",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "MataKuliah",
+            "column": "id_mk"
+          },
+          "description": "Course ID."
+        },
+        {
+          "key": "semester",
+          "name": "semester",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Semester."
+        },
+        {
+          "key": "nilai_akhir",
+          "name": "nilai_akhir",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Final grade."
+        },
+        {
+          "key": "IPK",
+          "name": "IPK",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Cumulative GPA."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "Nilai",
+          "join": "Nilai.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Grade belongs to student."
+        },
+        {
+          "foreign_table": "MataKuliah",
+          "primary_table": "Nilai",
+          "join": "Nilai.id_mk = MataKuliah.id_mk",
+          "description": "Grade belongs to a course."
+        }
+      ]
+    },
+    {
+      "name": "Ujian",
+      "description": "Exam schedule and details.",
+      "columns": [
+        {
+          "key": "id_ujian",
+          "name": "id_ujian",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Exam ID."
+        },
+        {
+          "key": "id_mk",
+          "name": "id_mk",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "MataKuliah",
+            "column": "id_mk"
+          },
+          "description": "Course ID."
+        },
+        {
+          "key": "tanggal",
+          "name": "tanggal",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Exam date."
+        },
+        {
+          "key": "jenis",
+          "name": "jenis",
+          "type": "VARCHAR(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Type of exam."
+        },
+        {
+          "key": "total_nilai",
+          "name": "total_nilai",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Total score."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "MataKuliah",
+          "primary_table": "Ujian",
+          "join": "Ujian.id_mk = MataKuliah.id_mk",
+          "description": "Exam belongs to a course."
+        }
+      ]
+    },
+    {
+      "name": "HasilUjian",
+      "description": "Exam results per student.",
+      "columns": [
+        {
+          "key": "id_hasil",
+          "name": "id_hasil",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Result ID."
+        },
+        {
+          "key": "id_ujian",
+          "name": "id_ujian",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Ujian",
+            "column": "id_ujian"
+          },
+          "description": "Exam ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        },
+        {
+          "key": "nilai_diperoleh",
+          "name": "nilai_diperoleh",
+          "type": "FLOAT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Score obtained."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Ujian",
+          "primary_table": "HasilUjian",
+          "join": "HasilUjian.id_ujian = Ujian.id_ujian",
+          "description": "Result belongs to an exam."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "HasilUjian",
+          "join": "HasilUjian.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Result belongs to a student."
+        }
+      ]
+    },
+    {
+      "name": "Fasilitas",
+      "description": "Facilities available in the university.",
+      "columns": [
+        {
+          "key": "id_fasilitas",
+          "name": "id_fasilitas",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Facility ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Facility name."
+        },
+        {
+          "key": "lokasi",
+          "name": "lokasi",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Location of the facility."
+        },
+        {
+          "key": "kapasitas",
+          "name": "kapasitas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Capacity of the facility."
+        },
+        {
+          "key": "jam_operasional",
+          "name": "jam_operasional",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Operating hours. Example value: Senin-Jumat 08:00-20:00"
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "FasilitasFakultas",
+          "primary_table": "Fasilitas",
+          "join": "FasilitasFakultas.id_fasilitas = Fasilitas.id_fasilitas",
+          "description": "Facility used by faculties."
+        }
+      ]
+    },
+    {
+      "name": "FasilitasFakultas",
+      "description": "Mapping of facilities to faculties.",
+      "columns": [
+        {
+          "key": "id_fasilitas_fakultas",
+          "name": "id_fasilitas_fakultas",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "ID of the facility-faculty mapping."
+        },
+        {
+          "key": "id_fakultas",
+          "name": "id_fakultas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fakultas",
+            "column": "id_fakultas"
+          },
+          "description": "Faculty ID."
+        },
+        {
+          "key": "id_fasilitas",
+          "name": "id_fasilitas",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Fasilitas",
+            "column": "id_fasilitas"
+          },
+          "description": "Facility ID."
+        },
+        {
+          "key": "tingkat_akses",
+          "name": "tingkat_akses",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Level of access."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Fakultas",
+          "primary_table": "FasilitasFakultas",
+          "join": "FasilitasFakultas.id_fakultas = Fakultas.id_fakultas",
+          "description": "Mapping to faculty."
+        },
+        {
+          "foreign_table": "Fasilitas",
+          "primary_table": "FasilitasFakultas",
+          "join": "FasilitasFakultas.id_fasilitas = Fasilitas.id_fasilitas",
+          "description": "Mapping to facility."
+        }
+      ]
+    },
+    {
+      "name": "BukuPerpustakaan",
+      "description": "Library book information.",
+      "columns": [
+        {
+          "key": "id_buku",
+          "name": "id_buku",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Book ID."
+        },
+        {
+          "key": "judul",
+          "name": "judul",
+          "type": "VARCHAR(150)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Title of the book."
+        },
+        {
+          "key": "penulis",
+          "name": "penulis",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Author of the book."
+        },
+        {
+          "key": "isbn",
+          "name": "isbn",
+          "type": "VARCHAR(20)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "ISBN number."
+        },
+        {
+          "key": "tahun_terbit",
+          "name": "tahun_terbit",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Year of publication."
+        },
+        {
+          "key": "kategori",
+          "name": "kategori",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Category of the book."
+        },
+        {
+          "key": "salinan_tersedia",
+          "name": "salinan_tersedia",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Number of available copies."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "PeminjamanBuku",
+          "primary_table": "BukuPerpustakaan",
+          "join": "PeminjamanBuku.id_buku = BukuPerpustakaan.id_buku",
+          "description": "Book can be borrowed."
+        }
+      ]
+    },
+    {
+      "name": "PeminjamanBuku",
+      "description": "Book loan records.",
+      "columns": [
+        {
+          "key": "id_peminjaman",
+          "name": "id_peminjaman",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Loan ID."
+        },
+        {
+          "key": "id_buku",
+          "name": "id_buku",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "BukuPerpustakaan",
+            "column": "id_buku"
+          },
+          "description": "Book ID."
+        },
+        {
+          "key": "id_peminjam",
+          "name": "id_peminjam",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Borrower ID (can be student or lecturer)."
+        },
+        {
+          "key": "tanggal_pinjam",
+          "name": "tanggal_pinjam",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Borrowing date."
+        },
+        {
+          "key": "tanggal_kembali",
+          "name": "tanggal_kembali",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Due date."
+        },
+        {
+          "key": "tanggal_dikembalikan",
+          "name": "tanggal_dikembalikan",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Returned date."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "BukuPerpustakaan",
+          "primary_table": "PeminjamanBuku",
+          "join": "PeminjamanBuku.id_buku = BukuPerpustakaan.id_buku",
+          "description": "Loan refers to a book."
+        }
+      ]
+    },
+    {
+      "name": "OrganisasiKlub",
+      "description": "Student clubs and organizations.",
+      "columns": [
+        {
+          "key": "id_klub",
+          "name": "id_klub",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Club ID."
+        },
+        {
+          "key": "nama",
+          "name": "nama",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Club name."
+        },
+        {
+          "key": "id_pembimbing_dosen",
+          "name": "id_pembimbing_dosen",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Dosen",
+            "column": "id_dosen"
+          },
+          "description": "Supervising lecturer ID."
+        },
+        {
+          "key": "tipe",
+          "name": "tipe",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Type of club."
+        },
+        {
+          "key": "deskripsi",
+          "name": "deskripsi",
+          "type": "TEXT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the club."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "Dosen",
+          "primary_table": "OrganisasiKlub",
+          "join": "OrganisasiKlub.id_pembimbing_dosen = Dosen.id_dosen",
+          "description": "Club is supervised by a lecturer."
+        }
+      ]
+    },
+    {
+      "name": "KeanggotaanKlub",
+      "description": "Membership information for student clubs.",
+      "columns": [
+        {
+          "key": "id_keanggotaan",
+          "name": "id_keanggotaan",
+          "type": "INT",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Membership ID."
+        },
+        {
+          "key": "id_klub",
+          "name": "id_klub",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "OrganisasiKlub",
+            "column": "id_klub"
+          },
+          "description": "Club ID."
+        },
+        {
+          "key": "id_mahasiswa",
+          "name": "id_mahasiswa",
+          "type": "INT",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "Mahasiswa",
+            "column": "id_mahasiswa"
+          },
+          "description": "Student ID."
+        },
+        {
+          "key": "peran",
+          "name": "peran",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Role in the club. Example value: Ketua"
+        },
+        {
+          "key": "tanggal_gabung",
+          "name": "tanggal_gabung",
+          "type": "DATE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Join date."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "OrganisasiKlub",
+          "primary_table": "KeanggotaanKlub",
+          "join": "KeanggotaanKlub.id_klub = OrganisasiKlub.id_klub",
+          "description": "Membership in a club."
+        },
+        {
+          "foreign_table": "Mahasiswa",
+          "primary_table": "KeanggotaanKlub",
+          "join": "KeanggotaanKlub.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "description": "Membership by a student."
+        }
+      ]
+    }
+  ]
+}

@@ -8,7 +8,7 @@
         {
           "key": "actor_id",
           "name": "actor_id",
-          "type": "NUMBER(22)",
+          "type": "integer",
           "nullable": false,
           "attributes": ["PRIMARY KEY"],
           "references": null,
@@ -17,7 +17,7 @@
         {
           "key": "first_name",
           "name": "first_name",
-          "type": "VARCHAR2(45)",
+          "type": "VARCHAR(45)",
           "nullable": false,
           "attributes": [],
           "references": null,
@@ -26,7 +26,7 @@
         {
           "key": "last_name",
           "name": "last_name",
-          "type": "VARCHAR2(45)",
+          "type": "VARCHAR(45)",
           "nullable": false,
           "attributes": [],
           "references": null,
@@ -58,25 +58,43 @@
         {
           "key": "film_id",
           "name": "film_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": ["PRIMARY KEY", "DEFAULT nextval('film_film_id_seq')"],
           "references": null,
           "description": "Unique identifier for each film."
         },
         {
           "key": "title",
           "name": "title",
-          "type": "VARCHAR2(255)",
+          "type": "VARCHAR(255)",
           "nullable": false,
           "attributes": [],
           "references": null,
           "description": "Title of the film."
         },
         {
+          "key": "description",
+          "name": "description",
+          "type": "TEXT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description or summary of the film."
+        },
+        {
+          "key": "release_year",
+          "name": "release_year",
+          "type": "YEAR",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Year the film was released."
+        },
+        {
           "key": "language_id",
           "name": "language_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -84,6 +102,90 @@
             "column": "language_id"
           },
           "description": "Foreign key referencing the language of the film."
+        },
+        {
+          "key": "original_language_id",
+          "name": "original_language_id",
+          "type": "INTEGER",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "language",
+            "column": "language_id"
+          },
+          "description": "Original language of the film, if different from the main language."
+        },
+        {
+          "key": "rental_duration",
+          "name": "rental_duration",
+          "type": "SMALLINT",
+          "nullable": false,
+          "attributes": ["DEFAULT 3"],
+          "references": null,
+          "description": "Duration for which the film can be rented in days. Example value: 4"
+        },
+        {
+          "key": "rental_rate",
+          "name": "rental_rate",
+          "type": "NUMERIC(4,2)",
+          "nullable": false,
+          "attributes": ["DEFAULT 4.99"],
+          "references": null,
+          "description": "Rate charged for renting the film. Example value: 4.99"
+        },
+        {
+          "key": "length",
+          "name": "length",
+          "type": "SMALLINT",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Length of the film in minutes."
+        },
+        {
+          "key": "replacement_cost",
+          "name": "replacement_cost",
+          "type": "NUMERIC(5,2)",
+          "nullable": false,
+          "attributes": ["DEFAULT 19.99"],
+          "references": null,
+          "description": "Cost to replace the film if lost. Example value: 22.99"
+        },
+        {
+          "key": "rating",
+          "name": "rating",
+          "type": "MPAA_RATING",
+          "nullable": true,
+          "attributes": ["DEFAULT 'G'"],
+          "references": null,
+          "description": "MPAA rating of the film. Example value: R"
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Last time the record was updated."
+        },
+        {
+          "key": "special_features",
+          "name": "special_features",
+          "type": "TEXT[]",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Array of special features available for the film."
+        },
+        {
+          "key": "fulltext",
+          "name": "fulltext",
+          "type": "TSVECTOR",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Full-text search vector for the film."
         }
       ],
       "relations": [
@@ -91,25 +193,31 @@
           "foreign_table": "language",
           "primary_table": "film",
           "join": "film.language_id = language.language_id",
-          "description": "Film table references the language table to store the language of the film."
+          "description": "Film references the language table to store spoken language."
+        },
+        {
+          "foreign_table": "language",
+          "primary_table": "film",
+          "join": "film.original_language_id = language.language_id",
+          "description": "Film references the language table for its original language."
         },
         {
           "foreign_table": "film_actor",
           "primary_table": "film",
           "join": "film.film_id = film_actor.film_id",
-          "description": "Film table references the film_actor table to map actors and films."
+          "description": "Maps films to actors appearing in them."
         },
         {
           "foreign_table": "inventory",
           "primary_table": "film",
           "join": "film.film_id = inventory.film_id",
-          "description": "Film table references the inventory table to track available copies of films."
+          "description": "Tracks physical copies of each film."
         },
         {
           "foreign_table": "film_category",
           "primary_table": "film",
           "join": "film.film_id = film_category.film_id",
-          "description": "Film table references the film_category table to store categories of the film."
+          "description": "Associates films with their genres or categories."
         }
       ]
     },
@@ -120,7 +228,7 @@
         {
           "key": "actor_id",
           "name": "actor_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": ["PRIMARY KEY"],
           "references": {
@@ -132,7 +240,7 @@
         {
           "key": "film_id",
           "name": "film_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": ["PRIMARY KEY"],
           "references": {
@@ -140,6 +248,15 @@
             "column": "film_id"
           },
           "description": "Foreign key referencing film_id in the film table."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Last time the relationship record was updated."
         }
       ],
       "relations": [
@@ -147,13 +264,13 @@
           "foreign_table": "actor",
           "primary_table": "film_actor",
           "join": "film_actor.actor_id = actor.actor_id",
-          "description": "Actor is related to films via the film_actor table, representing the films in which the actor appeared."
+          "description": "Links actor information to films."
         },
         {
           "foreign_table": "film",
           "primary_table": "film_actor",
           "join": "film_actor.film_id = film.film_id",
-          "description": "Film is related to actors via the film_actor table, representing the actors appearing in the films."
+          "description": "Links film information to actors."
         }
       ]
     },
@@ -164,16 +281,19 @@
         {
           "key": "customer_id",
           "name": "customer_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('customer_customer_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each customer."
         },
         {
           "key": "store_id",
           "name": "store_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -181,6 +301,81 @@
             "column": "store_id"
           },
           "description": "Foreign key referencing the store where the customer is registered."
+        },
+        {
+          "key": "first_name",
+          "name": "first_name",
+          "type": "VARCHAR(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "First name of the customer."
+        },
+        {
+          "key": "last_name",
+          "name": "last_name",
+          "type": "VARCHAR(45)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Last name of the customer."
+        },
+        {
+          "key": "email",
+          "name": "email",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Email address of the customer."
+        },
+        {
+          "key": "address_id",
+          "name": "address_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "address",
+            "column": "address_id"
+          },
+          "description": "Foreign key referencing the customer's address."
+        },
+        {
+          "key": "activebool",
+          "name": "activebool",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "attributes": ["DEFAULT true"],
+          "references": null,
+          "description": "Indicates whether the customer is active."
+        },
+        {
+          "key": "create_date",
+          "name": "create_date",
+          "type": "DATE",
+          "nullable": false,
+          "attributes": ["DEFAULT now()::date"],
+          "references": null,
+          "description": "Date when the customer account was created."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp of the last update to the customer record."
+        },
+        {
+          "key": "active",
+          "name": "active",
+          "type": "INTEGER",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Legacy active flag (may be redundant with activebool). 0 for not active, 1 for active"
         }
       ],
       "relations": [
@@ -191,36 +386,45 @@
           "description": "Customer is linked to the store where they registered."
         },
         {
-          "foreign_table": "rental",
-          "primary_table": "customer",
-          "join": "customer.customer_id = rental.customer_id",
-          "description": "Customers are linked to rentals through the rental table, tracking their rental history."
-        },
-        {
           "foreign_table": "address",
           "primary_table": "customer",
           "join": "customer.address_id = address.address_id",
-          "description": "Customers reference their registered address."
+          "description": "Customer references the address they reside at."
+        },
+        {
+          "foreign_table": "rental",
+          "primary_table": "customer",
+          "join": "customer.customer_id = rental.customer_id",
+          "description": "Customers are linked to rental transactions."
+        },
+        {
+          "foreign_table": "payment",
+          "primary_table": "customer",
+          "join": "customer.customer_id = payment.customer_id",
+          "description": "Customer payments are recorded in the payment table."
         }
       ]
     },
     {
       "name": "inventory",
-      "description": "Table for storing film inventory.",
+      "description": "Table for storing film inventory available in stores.",
       "columns": [
         {
           "key": "inventory_id",
           "name": "inventory_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('inventory_inventory_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each inventory item."
         },
         {
           "key": "film_id",
           "name": "film_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -228,6 +432,27 @@
             "column": "film_id"
           },
           "description": "Foreign key referencing the film in inventory."
+        },
+        {
+          "key": "store_id",
+          "name": "store_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "store",
+            "column": "store_id"
+          },
+          "description": "Foreign key referencing the store that owns the inventory item."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Time when the inventory record was last updated."
         }
       ],
       "relations": [
@@ -235,13 +460,19 @@
           "foreign_table": "film",
           "primary_table": "inventory",
           "join": "inventory.film_id = film.film_id",
-          "description": "Inventory table references films to track available copies."
+          "description": "Inventory item refers to the associated film."
         },
         {
           "foreign_table": "store",
           "primary_table": "inventory",
           "join": "inventory.store_id = store.store_id",
-          "description": "Inventory items are associated with a specific store."
+          "description": "Inventory item is assigned to a specific store."
+        },
+        {
+          "foreign_table": "rental",
+          "primary_table": "inventory",
+          "join": "inventory.inventory_id = rental.inventory_id",
+          "description": "Each inventory item may be referenced in rental transactions."
         }
       ]
     },
@@ -252,11 +483,77 @@
         {
           "key": "rental_id",
           "name": "rental_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('rental_rental_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each rental transaction."
+        },
+        {
+          "key": "rental_date",
+          "name": "rental_date",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Timestamp of when the rental was made."
+        },
+        {
+          "key": "inventory_id",
+          "name": "inventory_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "inventory",
+            "column": "inventory_id"
+          },
+          "description": "Foreign key referencing the inventory item being rented."
+        },
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "customer",
+            "column": "customer_id"
+          },
+          "description": "Foreign key referencing the customer who made the rental."
+        },
+        {
+          "key": "return_date",
+          "name": "return_date",
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Timestamp when the rented item was returned."
+        },
+        {
+          "key": "staff_id",
+          "name": "staff_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "staff",
+            "column": "staff_id"
+          },
+          "description": "Foreign key referencing the staff member who handled the rental."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp of the last update to this rental record."
         }
       ],
       "relations": [
@@ -277,6 +574,12 @@
           "primary_table": "rental",
           "join": "rental.staff_id = staff.staff_id",
           "description": "Rental transactions reference staff members who process the rentals."
+        },
+        {
+          "foreign_table": "payment",
+          "primary_table": "rental",
+          "join": "payment.rental_id = rental.rental_id",
+          "description": "Each rental can have an associated payment."
         }
       ]
     },
@@ -287,20 +590,40 @@
         {
           "key": "category_id",
           "name": "category_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('category_category_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each film category."
         },
         {
           "key": "name",
           "name": "name",
-          "type": "VARCHAR2(25)",
+          "type": "VARCHAR(25)",
           "nullable": false,
           "attributes": [],
           "references": null,
           "description": "Name of the film category."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp of the last update to the category record."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "film_category",
+          "primary_table": "category",
+          "join": "film_category.category_id = category.category_id",
+          "description": "Categories are linked to films through the film_category table."
         }
       ]
     },
@@ -331,6 +654,15 @@
             "column": "category_id"
           },
           "description": "Foreign key referencing category_id in the category table."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp for the last update of the record."
         }
       ],
       "relations": [
@@ -369,6 +701,15 @@
           "attributes": [],
           "references": null,
           "description": "Name of the language."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp for the last update of the record."
         }
       ]
     },
@@ -379,16 +720,19 @@
         {
           "key": "payment_id",
           "name": "payment_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('payment_payment_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each payment transaction."
         },
         {
           "key": "customer_id",
           "name": "customer_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -396,6 +740,48 @@
             "column": "customer_id"
           },
           "description": "Foreign key referencing the customer making the payment."
+        },
+        {
+          "key": "staff_id",
+          "name": "staff_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "staff",
+            "column": "staff_id"
+          },
+          "description": "Foreign key referencing the staff member who processed the payment."
+        },
+        {
+          "key": "rental_id",
+          "name": "rental_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "rental",
+            "column": "rental_id"
+          },
+          "description": "Foreign key referencing the rental associated with the payment."
+        },
+        {
+          "key": "amount",
+          "name": "amount",
+          "type": "NUMERIC(5,2)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Amount paid by the customer."
+        },
+        {
+          "key": "payment_date",
+          "name": "payment_date",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Timestamp when the payment was made."
         }
       ],
       "relations": [
@@ -403,7 +789,7 @@
           "foreign_table": "customer",
           "primary_table": "payment",
           "join": "payment.customer_id = customer.customer_id",
-          "description": "Payments are linked to customers who make the payment transactions."
+          "description": "Payments are linked to customers who make the transactions."
         },
         {
           "foreign_table": "rental",
@@ -426,23 +812,80 @@
         {
           "key": "address_id",
           "name": "address_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('address_address_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each address."
         },
         {
+          "key": "address",
+          "name": "address",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Primary address line."
+        },
+        {
+          "key": "address2",
+          "name": "address2",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Secondary address line (optional)."
+        },
+        {
+          "key": "district",
+          "name": "district",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "District or region of the address."
+        },
+        {
           "key": "city_id",
           "name": "city_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
             "table": "city",
             "column": "city_id"
           },
-          "description": "Foreign key referencing city_id in the city table."
+          "description": "Foreign key referencing the city."
+        },
+        {
+          "key": "postal_code",
+          "name": "postal_code",
+          "type": "VARCHAR(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Postal code for the address."
+        },
+        {
+          "key": "phone",
+          "name": "phone",
+          "type": "VARCHAR(20)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number for the address."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Time when the address record was last updated."
         }
       ],
       "relations": [
@@ -461,23 +904,41 @@
         {
           "key": "city_id",
           "name": "city_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": ["PRIMARY KEY", "DEFAULT nextval('city_city_id_seq')"],
           "references": null,
           "description": "Unique identifier for each city."
         },
         {
+          "key": "city",
+          "name": "city",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the city."
+        },
+        {
           "key": "country_id",
           "name": "country_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
             "table": "country",
             "column": "country_id"
           },
-          "description": "Foreign key referencing country_id in the country table."
+          "description": "Foreign key referencing the country."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Time when the city record was last updated."
         }
       ],
       "relations": [
@@ -486,6 +947,12 @@
           "primary_table": "city",
           "join": "city.country_id = country.country_id",
           "description": "Cities reference the country they belong to."
+        },
+        {
+          "foreign_table": "address",
+          "primary_table": "city",
+          "join": "address.city_id = city.city_id",
+          "description": "Cities are referenced by the address table."
         }
       ]
     },
@@ -496,53 +963,40 @@
         {
           "key": "country_id",
           "name": "country_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('country_country_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each country."
         },
         {
-          "key": "name",
-          "name": "name",
-          "type": "VARCHAR2(50)",
+          "key": "country",
+          "name": "country",
+          "type": "VARCHAR(50)",
           "nullable": false,
           "attributes": [],
           "references": null,
           "description": "Name of the country."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Time when the country record was last updated."
         }
-      ]
-    },
-    {
-      "name": "film_text",
-      "description": "Table for storing film descriptions.",
-      "columns": [
+      ],
+      "relations": [
         {
-          "key": "film_id",
-          "name": "film_id",
-          "type": "NUMBER(22)",
-          "nullable": false,
-          "attributes": ["PRIMARY KEY"],
-          "references": null,
-          "description": "Unique identifier for each film."
-        },
-        {
-          "key": "title",
-          "name": "title",
-          "type": "VARCHAR2(255)",
-          "nullable": false,
-          "attributes": [],
-          "references": null,
-          "description": "Title of the film."
-        },
-        {
-          "key": "description",
-          "name": "description",
-          "type": "CLOB",
-          "nullable": true,
-          "attributes": [],
-          "references": null,
-          "description": "Description of the film."
+          "foreign_table": "city",
+          "primary_table": "country",
+          "join": "city.country_id = country.country_id",
+          "description": "Country is referenced by cities."
         }
       ]
     },
@@ -553,16 +1007,19 @@
         {
           "key": "staff_id",
           "name": "staff_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('staff_staff_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each staff member."
         },
         {
           "key": "first_name",
           "name": "first_name",
-          "type": "VARCHAR2(45)",
+          "type": "VARCHAR(45)",
           "nullable": false,
           "attributes": [],
           "references": null,
@@ -571,16 +1028,37 @@
         {
           "key": "last_name",
           "name": "last_name",
-          "type": "VARCHAR2(45)",
+          "type": "VARCHAR(45)",
           "nullable": false,
           "attributes": [],
           "references": null,
           "description": "Last name of the staff member."
         },
         {
+          "key": "address_id",
+          "name": "address_id",
+          "type": "INTEGER",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "address",
+            "column": "address_id"
+          },
+          "description": "Foreign key referencing the staff member's address."
+        },
+        {
+          "key": "email",
+          "name": "email",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Email address of the staff member."
+        },
+        {
           "key": "store_id",
           "name": "store_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -588,20 +1066,65 @@
             "column": "store_id"
           },
           "description": "Foreign key referencing the store where the staff member works."
+        },
+        {
+          "key": "active",
+          "name": "active",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "attributes": ["DEFAULT true"],
+          "references": null,
+          "description": "Whether the staff member is currently active."
+        },
+        {
+          "key": "username",
+          "name": "username",
+          "type": "VARCHAR(16)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Login username of the staff member."
+        },
+        {
+          "key": "password",
+          "name": "password",
+          "type": "VARCHAR(40)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Login password of the staff member (hashed)."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp of the last update to the staff record."
+        },
+        {
+          "key": "picture",
+          "name": "picture",
+          "type": "BYTEA",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Photograph of the staff member."
         }
       ],
       "relations": [
-        {
-          "foreign_table": "store",
-          "primary_table": "staff",
-          "join": "staff.store_id = store.store_id",
-          "description": "Staff members are linked to the store where they work."
-        },
         {
           "foreign_table": "address",
           "primary_table": "staff",
           "join": "staff.address_id = address.address_id",
           "description": "Staff members reference their address."
+        },
+        {
+          "foreign_table": "store",
+          "primary_table": "staff",
+          "join": "staff.store_id = store.store_id",
+          "description": "Staff members are assigned to a store."
         }
       ]
     },
@@ -612,16 +1135,19 @@
         {
           "key": "store_id",
           "name": "store_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
-          "attributes": ["PRIMARY KEY"],
+          "attributes": [
+            "PRIMARY KEY",
+            "DEFAULT nextval('store_store_id_seq')"
+          ],
           "references": null,
           "description": "Unique identifier for each store."
         },
         {
           "key": "manager_staff_id",
           "name": "manager_staff_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -633,7 +1159,7 @@
         {
           "key": "address_id",
           "name": "address_id",
-          "type": "NUMBER(22)",
+          "type": "INTEGER",
           "nullable": false,
           "attributes": [],
           "references": {
@@ -641,6 +1167,15 @@
             "column": "address_id"
           },
           "description": "Foreign key referencing the store's address."
+        },
+        {
+          "key": "last_update",
+          "name": "last_update",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "attributes": ["DEFAULT now()"],
+          "references": null,
+          "description": "Timestamp of the last update to the store record."
         }
       ],
       "relations": [

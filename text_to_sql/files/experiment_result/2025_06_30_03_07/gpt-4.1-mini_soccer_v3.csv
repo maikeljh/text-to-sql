@@ -1,0 +1,990 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,"Can you show me the players who scored more than 2 goals in one game? I’d like to see their player_id, name, match number, and how many goals they scored.","SELECT gd.player_id, pm.player_name, gd.match_no, COUNT(*) AS total_goals
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+GROUP BY gd.player_id, pm.player_name, gd.match_no
+HAVING COUNT(*) > 2;","SELECT gd.player_id, pm.player_name, gd.match_no, COUNT(*) AS total_goals
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  GROUP BY gd.player_id, pm.player_name, gd.match_no
+  HAVING COUNT(*) > 2;",1.0
+1.2,"Tolong tampilkan pemain yang mencetak lebih dari 2 gol dalam satu pertandingan. Saya mau lihat player_id, nama pemain, match_no, dan total golnya.","SELECT gd.player_id, pm.player_name, gd.match_no, COUNT(*) AS total_goals
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+GROUP BY gd.player_id, pm.player_name, gd.match_no
+HAVING COUNT(*) > 2;","SELECT gd.player_id, pm.player_name, gd.match_no, COUNT(*) AS total_goals
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  GROUP BY gd.player_id, pm.player_name, gd.match_no
+  HAVING COUNT(*) > 2;",1.0
+2.1,Show all matches where the final score was a draw. Display the match number.,"SELECT 
+    md1.match_no
+FROM 
+    match_details md1
+JOIN 
+    match_details md2
+    ON md1.match_no = md2.match_no
+    AND md1.team_id <> md2.team_id
+WHERE 
+    md1.goal_score = md2.goal_score
+GROUP BY 
+    md1.match_no, md1.goal_score
+ORDER BY 
+    md1.match_no;","SELECT 
+    md1.match_no
+FROM 
+    match_details md1
+JOIN 
+    match_details md2
+    ON md1.match_no = md2.match_no
+    AND md1.team_id <> md2.team_id
+WHERE 
+    md1.goal_score = md2.goal_score
+GROUP BY 
+    md1.match_no, md1.goal_score
+ORDER BY 
+    md1.match_no;
+",1.0
+2.2,Tampilkan semua pertandingan yang berakhir imbang. Sertakan nomor pertandingan.,"SELECT 
+    md1.match_no
+FROM 
+    match_details md1
+JOIN 
+    match_details md2
+    ON md1.match_no = md2.match_no
+    AND md1.team_id <> md2.team_id
+WHERE 
+    md1.goal_score = md2.goal_score
+GROUP BY 
+    md1.match_no, md1.goal_score
+ORDER BY 
+    md1.match_no;","SELECT 
+    md1.match_no
+FROM 
+    match_details md1
+JOIN 
+    match_details md2
+    ON md1.match_no = md2.match_no
+    AND md1.team_id <> md2.team_id
+WHERE 
+    md1.goal_score = md2.goal_score
+GROUP BY 
+    md1.match_no, md1.goal_score
+ORDER BY 
+    md1.match_no;
+",1.0
+3.1,Which teams managed to win all their group stage matches? I need to see team_id and how many matches they won.,"SELECT team_id, COUNT(*) AS total_wins
+FROM match_details
+WHERE play_stage = 'G' AND win_lose = 'W'
+GROUP BY team_id
+HAVING COUNT(*) = (
+  SELECT COUNT(*)
+  FROM match_details md2
+  WHERE md2.team_id = match_details.team_id AND play_stage = 'G'
+);","SELECT team_id, COUNT(*) AS total_wins
+  FROM match_details
+  WHERE play_stage = 'G' AND win_lose = 'W'
+  GROUP BY team_id
+  HAVING COUNT(*) = (
+  SELECT COUNT(*) FROM match_details md2
+  WHERE md2.team_id = match_details.team_id AND play_stage = 'G'
+  );",1.0
+3.2,Tim mana saja yang menang terus di babak grup? Tampilkan team_id dan total menangnya.,"SELECT team_id, COUNT(*) AS total_wins
+FROM match_details
+WHERE play_stage = 'G' AND win_lose = 'W'
+GROUP BY team_id
+HAVING COUNT(*) = (
+  SELECT COUNT(*) 
+  FROM match_details md2
+  WHERE md2.team_id = match_details.team_id AND play_stage = 'G'
+);","SELECT team_id, COUNT(*) AS total_wins
+  FROM match_details
+  WHERE play_stage = 'G' AND win_lose = 'W'
+  GROUP BY team_id
+  HAVING COUNT(*) = (
+  SELECT COUNT(*) FROM match_details md2
+  WHERE md2.team_id = match_details.team_id AND play_stage = 'G'
+  );",1.0
+4.1,"Can you list referees who led more than 3 matches? I want their referee_id, name, and total matches they officiated.","SELECT rm.referee_id, rm.referee_name, COUNT(*) AS total_matches
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+GROUP BY rm.referee_id, rm.referee_name
+HAVING COUNT(*) > 3;","SELECT rm.referee_id, rm.referee_name, COUNT(*) AS total_matches
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  GROUP BY rm.referee_id, rm.referee_name
+  HAVING COUNT(*) > 3;",1.0
+4.2,"Saya ingin tahu wasit yang memimpin lebih dari 3 pertandingan. Tampilkan referee_id, nama wasit, dan jumlah pertandingan.","SELECT rm.referee_id, rm.referee_name, COUNT(*) AS total_matches
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+GROUP BY rm.referee_id, rm.referee_name
+HAVING COUNT(*) > 3;","SELECT rm.referee_id, rm.referee_name, COUNT(*) AS total_matches
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  GROUP BY rm.referee_id, rm.referee_name
+  HAVING COUNT(*) > 3;",1.0
+5.1,"Show me which players were both substituted in and out in the same game. Include player_id, name, and match number.","SELECT DISTINCT pio.player_id, pm.player_name, pio.match_no
+FROM player_in_out pio
+JOIN player_mast pm ON pio.player_id = pm.player_id
+WHERE EXISTS (
+  SELECT 1
+  FROM player_in_out p2
+  WHERE p2.player_id = pio.player_id
+    AND p2.match_no = pio.match_no
+    AND p2.in_out != pio.in_out
+);","SELECT DISTINCT pio.player_id, pm.player_name, pio.match_no
+  FROM player_in_out pio
+  JOIN player_mast pm ON pio.player_id = pm.player_id
+  WHERE EXISTS (
+  SELECT 1 FROM player_in_out p2
+  WHERE p2.player_id = pio.player_id AND p2.match_no = pio.match_no
+  AND p2.in_out != pio.in_out
+  );",1.0
+5.2,"Tampilkan pemain yang pernah diganti masuk dan juga diganti keluar di satu pertandingan yang sama. Sertakan player_id, nama, dan nomor pertandingannya.","SELECT DISTINCT pio.player_id, pm.player_name, pio.match_no
+FROM player_in_out pio
+JOIN player_mast pm ON pio.player_id = pm.player_id
+WHERE EXISTS (
+    SELECT 1
+    FROM player_in_out p2
+    WHERE p2.player_id = pio.player_id 
+      AND p2.match_no = pio.match_no
+      AND p2.in_out != pio.in_out
+);","SELECT DISTINCT pio.player_id, pm.player_name, pio.match_no
+  FROM player_in_out pio
+  JOIN player_mast pm ON pio.player_id = pm.player_id
+  WHERE EXISTS (
+  SELECT 1 FROM player_in_out p2
+  WHERE p2.player_id = pio.player_id AND p2.match_no = pio.match_no
+  AND p2.in_out != pio.in_out
+  );",1.0
+6.1,"Which players got a card and also scored a goal in the same match? I’d like to see player_id, player name, and match number.","SELECT DISTINCT pb.player_id, pm.player_name, pb.match_no
+FROM player_booked pb
+JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no
+JOIN player_mast pm ON pb.player_id = pm.player_id;","SELECT DISTINCT pb.player_id, pm.player_name, pb.match_no
+  FROM player_booked pb
+  JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no
+  JOIN player_mast pm ON pb.player_id = pm.player_id;",1.0
+6.2,"Siapa saja pemain yang dapat kartu dan cetak gol di pertandingan yang sama? Tampilkan player_id, nama pemain, dan nomor pertandingannya.","SELECT DISTINCT pb.player_id, pm.player_name, pb.match_no
+FROM player_booked pb
+JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no
+JOIN player_mast pm ON pb.player_id = pm.player_id;","SELECT DISTINCT pb.player_id, pm.player_name, pb.match_no
+  FROM player_booked pb
+  JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no
+  JOIN player_mast pm ON pb.player_id = pm.player_id;",1.0
+7.1,"Can you list teams that scored more goals than they conceded in the tournament? I want team_id, goal_for, goal_agnst, and goal_diff.","SELECT team_id, goal_for, goal_agnst, goal_diff
+FROM soccer_team
+WHERE goal_for > goal_agnst;","SELECT team_id, goal_for, goal_agnst, goal_diff
+  FROM soccer_team
+  WHERE goal_for > goal_agnst;",1.0
+7.2,"Tampilkan tim-tim yang jumlah gol masuknya lebih banyak dari gol kebobolannya. Saya butuh team_id, goal_for, goal_agnst, dan goal_diff.","SELECT team_id, goal_for, goal_agnst AS goal_against, goal_diff
+FROM soccer_team
+WHERE goal_for > goal_agnst;","SELECT team_id, goal_for, goal_agnst, goal_diff
+  FROM soccer_team
+  WHERE goal_for > goal_agnst;",1.0
+8.1,Who are the goalkeepers that played the most matches? I need their player_id and how many matches they appeared in.,"SELECT player_gk AS player_id, COUNT(*) AS match_count
+FROM match_details
+WHERE player_gk IS NOT NULL
+GROUP BY player_gk
+ORDER BY match_count DESC;","SELECT player_gk AS player_id, COUNT(*) AS match_count
+  FROM match_details
+  WHERE player_gk IS NOT NULL
+  GROUP BY player_gk
+  ORDER BY match_count DESC;",1.0
+8.2,Kiper mana saja yang paling sering tampil sebagai penjaga gawang? Tampilkan player_id dan jumlah pertandingan yang mereka ikuti.,"SELECT player_gk AS player_id, COUNT(match_no) AS match_count
+FROM match_details
+WHERE player_gk IS NOT NULL
+GROUP BY player_gk
+ORDER BY match_count DESC;","SELECT player_gk AS player_id, COUNT(*) AS match_count
+  FROM match_details
+  WHERE player_gk IS NOT NULL
+  GROUP BY player_gk
+  ORDER BY match_count DESC;",1.0
+9.1,"Show me the venues where audience attendance reached the highest. I want venue_name, the city, and the max audience number. Sort from highest.","SELECT sv.venue_name, sc.city, MAX(mm.audence) AS max_audience
+FROM match_mast mm
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sv.venue_name, sc.city
+ORDER BY max_audience DESC;","SELECT sv.venue_name, sc.city, MAX(mm.audence) AS max_audience
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sv.venue_name, sc.city
+  ORDER BY max_audience DESC;",1.0
+9.2,"Venue mana saja yang penontonnya banyak? Saya mau lihat nama venue, kota, dan jumlah penonton terbanyaknya. Urutkan dari yang terbanyak.","SELECT sv.venue_name, sc.city, MAX(mm.audence) AS max_attendees
+FROM match_mast mm
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sv.venue_name, sc.city
+ORDER BY max_attendees DESC;","SELECT sv.venue_name, sc.city, MAX(mm.audence) AS max_audience
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sv.venue_name, sc.city
+  ORDER BY max_audience DESC;",1.0
+10.1,Find the players who were never substituted out in any match. Please show player_id and their name.,"SELECT DISTINCT pm.player_id, pm.player_name
+FROM player_mast pm
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM player_in_out pio
+    WHERE pio.player_id = pm.player_id
+      AND pio.in_out = 'O'
+);","SELECT DISTINCT pm.player_id, pm.player_name
+  FROM player_mast pm
+  WHERE NOT EXISTS (
+  SELECT 1 FROM player_in_out pio
+  WHERE pio.player_id = pm.player_id AND pio.in_out = 'O'
+  );",1.0
+10.2,Tampilkan pemain yang tidak pernah diganti keluar selama pertandingan. Sertakan player_id dan nama pemainnya.,"SELECT DISTINCT pm.player_id, pm.player_name
+FROM player_mast pm
+WHERE NOT EXISTS (
+    SELECT 1 FROM player_in_out pio
+    WHERE pio.player_id = pm.player_id AND pio.in_out = 'O'
+);","SELECT DISTINCT pm.player_id, pm.player_name
+  FROM player_mast pm
+  WHERE NOT EXISTS (
+  SELECT 1 FROM player_in_out pio
+  WHERE pio.player_id = pm.player_id AND pio.in_out = 'O'
+  );",1.0
+11.1,"Which matches had 3 or more players from the same team getting booked? Show match number, team_id, and how many players were booked.","SELECT match_no, team_id, COUNT(player_id) AS booked_count
+FROM player_booked
+GROUP BY match_no, team_id
+HAVING COUNT(player_id) >= 3;","SELECT match_no, team_id, COUNT(player_id) AS booked_count
+  FROM player_booked
+  GROUP BY match_no, team_id
+  HAVING COUNT(player_id) > 2;",1.0
+11.2,"Pertandingan mana yang punya 3 atau lebih pemain dari satu tim yang kena kartu? Tampilkan match_no, team_id, dan jumlah pemain yang kena kartu.","SELECT match_no, team_id, COUNT(DISTINCT player_id) AS players_with_cards
+FROM player_booked
+GROUP BY match_no, team_id
+HAVING COUNT(DISTINCT player_id) >= 3;","SELECT match_no, team_id, COUNT(player_id) AS booked_count
+  FROM player_booked
+  GROUP BY match_no, team_id
+  HAVING COUNT(player_id) > 2;",0.96875
+12.1,"Can you show players who scored in both the first and second halves of a game? I want player_id, name, and match number.","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+WHERE gd.goal_half = 1
+AND EXISTS (
+    SELECT 1 
+    FROM goal_details gd2
+    WHERE gd2.player_id = gd.player_id 
+      AND gd2.match_no = gd.match_no 
+      AND gd2.goal_half = 2
+);","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  WHERE goal_half = 1
+  AND EXISTS (
+  SELECT 1 FROM goal_details gd2
+  WHERE gd2.player_id = gd.player_id AND gd2.match_no = gd.match_no AND gd2.goal_half = 2
+  );",1.0
+12.2,"Tampilkan pemain yang cetak gol di babak pertama dan kedua di satu pertandingan. Saya mau lihat player_id, nama, dan match_no-nya.","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+WHERE gd.goal_half = 1
+AND EXISTS (
+    SELECT 1
+    FROM goal_details gd2
+    WHERE gd2.player_id = gd.player_id
+      AND gd2.match_no = gd.match_no
+      AND gd2.goal_half = 2
+);","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  WHERE goal_half = 1
+  AND EXISTS (
+  SELECT 1 FROM goal_details gd2
+  WHERE gd2.player_id = gd.player_id AND gd2.match_no = gd.match_no AND gd2.goal_half = 2
+  );",1.0
+13.1,"Which players were both involved in goals and received bookings? Show their player_id, name, and how many goals and bookings.","SELECT
+  p.player_id,
+  p.player_name,
+  COUNT(g.goal_id) AS total_goals,
+  COUNT(b.match_no) AS total_bookings
+FROM player_mast p
+JOIN goal_details g ON p.player_id = g.player_id
+JOIN player_booked b ON p.player_id = b.player_id
+GROUP BY p.player_id, p.player_name;","SELECT
+  p.player_id,
+  p.player_name,
+  COUNT(g.goal_id) AS goal_count,
+  COUNT(b.match_no) AS booking_count
+FROM player_mast AS p
+LEFT JOIN goal_details AS g ON p.player_id = g.player_id
+LEFT JOIN player_booked AS b ON p.player_id = b.player_id
+GROUP BY p.player_id, p.player_name
+HAVING COUNT(g.goal_id) > 0 AND COUNT(b.match_no) > 0;",1.0
+13.2,"Siapa saja pemain yang pernah cetak gol dan juga kena kartu? Tampilkan player_id, nama, total gol dan jumlah kartu.","SELECT
+  p.player_id,
+  p.player_name,
+  COUNT(DISTINCT g.goal_id) AS total_goals,
+  COUNT(DISTINCT b.match_no || '-' || b.booking_time) AS total_cards
+FROM player_mast p
+LEFT JOIN goal_details g ON p.player_id = g.player_id
+LEFT JOIN player_booked b ON p.player_id = b.player_id
+GROUP BY p.player_id, p.player_name
+HAVING COUNT(g.goal_id) > 0 AND COUNT(b.match_no) > 0;","SELECT
+  p.player_id,
+  p.player_name,
+  COUNT(g.goal_id) AS goal_count,
+  COUNT(b.match_no) AS booking_count
+FROM player_mast AS p
+LEFT JOIN goal_details AS g ON p.player_id = g.player_id
+LEFT JOIN player_booked AS b ON p.player_id = b.player_id
+GROUP BY p.player_id, p.player_name
+HAVING COUNT(g.goal_id) > 0 AND COUNT(b.match_no) > 0;",0.9696969696969697
+14.1,List matches where both assistant referees were from the same country. Show match number and country_id.,"SELECT md.match_no, arm.country_id
+FROM match_details md
+JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+GROUP BY md.match_no, arm.country_id
+HAVING COUNT(DISTINCT arm.ass_ref_id) > 1;","SELECT md.match_no, arm.country_id
+  FROM match_details md
+  JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+  GROUP BY md.match_no, arm.country_id
+  HAVING COUNT(DISTINCT arm.ass_ref_id) > 1;",1.0
+14.2,Pertandingan mana yang dua asisten wasitnya dari negara yang sama? Tampilkan match_no dan country_id-nya.,"SELECT md.match_no, arm.country_id
+FROM match_details md
+JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+GROUP BY md.match_no, arm.country_id
+HAVING COUNT(DISTINCT arm.ass_ref_id) > 1;","SELECT md.match_no, arm.country_id
+  FROM match_details md
+  JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+  GROUP BY md.match_no, arm.country_id
+  HAVING COUNT(DISTINCT arm.ass_ref_id) > 1;",1.0
+15.1,Who are the goalkeepers that played for more than one team? Show their player_id and number of teams.,"SELECT player_gk AS player_id, COUNT(DISTINCT team_id) AS team_count
+FROM match_details
+WHERE player_gk IS NOT NULL
+GROUP BY player_gk
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_gk AS player_id, COUNT(DISTINCT team_id) AS team_count
+  FROM match_details
+  WHERE player_gk IS NOT NULL
+  GROUP BY player_gk
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+15.2,Kiper mana yang pernah main untuk lebih dari satu tim? Saya mau lihat player_id dan jumlah timnya.,"SELECT player_gk AS player_id, COUNT(DISTINCT team_id) AS team_count
+FROM match_details
+WHERE player_gk IS NOT NULL
+GROUP BY player_gk
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_gk AS player_id, COUNT(DISTINCT team_id) AS team_count
+  FROM match_details
+  WHERE player_gk IS NOT NULL
+  GROUP BY player_gk
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+16.1,"Which venues hosted more than 3 different matches? Please show venue_id, venue name, and match count.","SELECT sv.venue_id, sv.venue_name, COUNT(DISTINCT mm.match_no) AS match_count
+FROM soccer_venue sv
+JOIN match_mast mm ON sv.venue_id = mm.venue_id
+GROUP BY sv.venue_id, sv.venue_name
+HAVING COUNT(DISTINCT mm.match_no) > 3;","SELECT sv.venue_id, sv.venue_name, COUNT(*) AS match_count
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  GROUP BY sv.venue_id, sv.venue_name
+  HAVING COUNT(*) > 3;",1.0
+16.2,"Venue mana yang jadi tempat 3 pertandingan atau lebih? Tampilkan venue_id, nama venue, dan jumlah pertandingan.","SELECT sv.venue_id, sv.venue_name, COUNT(mm.match_no) AS match_count
+FROM match_mast mm
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+GROUP BY sv.venue_id, sv.venue_name
+HAVING COUNT(mm.match_no) >= 3;","SELECT sv.venue_id, sv.venue_name, COUNT(*) AS match_count
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  GROUP BY sv.venue_id, sv.venue_name
+  HAVING COUNT(*) > 3;",1.0
+17.1,"List cities that had matches with more than 50,000 audience members. Show city, match_no, and audience.","SELECT sc.city, mm.match_no, mm.audence
+FROM match_mast mm
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+WHERE mm.audence > 50000;","SELECT sc.city, mm.match_no, mm.audence
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  WHERE mm.audence > 50000;",1.0
+17.2,"Kota mana yang punya pertandingan dengan penonton lebih dari 50 ribu? Saya butuh nama kota, nomor pertandingan, dan jumlah penonton.","SELECT sc.city, mm.match_no, mm.audence
+FROM match_mast mm
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+WHERE mm.audence > 50000;","SELECT sc.city, mm.match_no, mm.audence
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  WHERE mm.audence > 50000;",1.0
+18.1,Which teams had more than 2 different coaches? Show team_id and how many coaches they had.,"SELECT team_id, COUNT(DISTINCT coach_id) AS coach_count
+FROM team_coaches
+GROUP BY team_id
+HAVING COUNT(DISTINCT coach_id) > 2;","SELECT team_id, COUNT(DISTINCT coach_id) AS coach_count
+  FROM team_coaches
+  GROUP BY team_id
+  HAVING COUNT(DISTINCT coach_id) > 2;",1.0
+18.2,Tim mana yang pelatihnya ganti-ganti sampai lebih dari 2 kali? Tampilkan team_id dan jumlah pelatihnya.,"SELECT team_id, COUNT(coach_id) AS coach_count
+FROM team_coaches
+GROUP BY team_id
+HAVING COUNT(coach_id) > 2;","SELECT team_id, COUNT(DISTINCT coach_id) AS coach_count
+  FROM team_coaches
+  GROUP BY team_id
+  HAVING COUNT(DISTINCT coach_id) > 2;",1.0
+19.1,Find players who’ve played over 3 matches and have never received any bookings in any of those games. Show their player_id and how many matches they’ve played.,"SELECT p.player_id, COUNT(DISTINCT pio.match_no) AS matches_played
+FROM player_mast p
+JOIN player_in_out pio ON p.player_id = pio.player_id
+LEFT JOIN player_booked pb ON p.player_id = pb.player_id AND pio.match_no = pb.match_no
+GROUP BY p.player_id
+HAVING COUNT(DISTINCT pio.match_no) > 3 AND COUNT(pb.player_id) = 0;","SELECT p.player_id, COUNT(DISTINCT(m.match_no)) AS matches_played
+FROM player_mast p
+JOIN player_in_out pio ON p.player_id = pio.player_id
+JOIN match_mast m ON pio.match_no = m.match_no
+LEFT JOIN player_booked pb ON p.player_id = pb.player_id AND pio.match_no = pb.match_no
+GROUP BY p.player_id
+HAVING COUNT(DISTINCT(m.match_no)) > 3 AND COUNT(pb.player_id) = 0;",1.0
+19.2,Tampilkan pemain yang pernah bermain lebih dari 3 pertandingan dan tidak pernah mendapatkan kartu di pertandingan-pertandingan tersebut. Tampilkan player_id dan jumlah pertandingan yang dimainkan.,"SELECT p.player_id, COUNT(DISTINCT pio.match_no) AS matches_played
+FROM player_mast p
+JOIN player_in_out pio ON p.player_id = pio.player_id
+LEFT JOIN player_booked pb ON p.player_id = pb.player_id AND pio.match_no = pb.match_no
+GROUP BY p.player_id
+HAVING COUNT(DISTINCT pio.match_no) > 3 AND COUNT(pb.player_id) = 0;","SELECT p.player_id, COUNT(DISTINCT(m.match_no)) AS matches_played
+FROM player_mast p
+JOIN player_in_out pio ON p.player_id = pio.player_id
+JOIN match_mast m ON pio.match_no = m.match_no
+LEFT JOIN player_booked pb ON p.player_id = pb.player_id AND pio.match_no = pb.match_no
+GROUP BY p.player_id
+HAVING COUNT(DISTINCT(m.match_no)) > 3 AND COUNT(pb.player_id) = 0;",1.0
+20.1,"Which referees handled matches with average audience over 40,000? I want referee_id, name, and average audience.","SELECT rm.referee_id, rm.referee_name, AVG(mm.audence) AS avg_audience
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+GROUP BY rm.referee_id, rm.referee_name
+HAVING AVG(mm.audence) > 40000;","SELECT rm.referee_id, rm.referee_name, AVG(mm.audence) AS avg_audience
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  GROUP BY rm.referee_id, rm.referee_name
+  HAVING AVG(mm.audence) > 40000;",1.0
+20.2,"Wasit mana yang rata-rata penonton di pertandingannya lebih dari 40 ribu? Tampilkan referee_id, nama wasit, dan rata-rata penonton.","SELECT rm.referee_id, rm.referee_name, AVG(mm.audence) AS avg_audience
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+GROUP BY rm.referee_id, rm.referee_name
+HAVING AVG(mm.audence) > 40000;","SELECT rm.referee_id, rm.referee_name, AVG(mm.audence) AS avg_audience
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  GROUP BY rm.referee_id, rm.referee_name
+  HAVING AVG(mm.audence) > 40000;",1.0
+21.1,"Which captains also managed to score unique goals? I want to see their player_id, name, number of goals, and how many matches they were captain.","SELECT mc.player_captain AS player_id, pm.player_name,
+  COUNT(DISTINCT gd.goal_id) AS total_goals,
+  COUNT(DISTINCT mc.match_no) AS total_captain_matches
+FROM match_captain mc
+JOIN goal_details gd ON mc.player_captain = gd.player_id
+JOIN player_mast pm ON mc.player_captain = pm.player_id
+GROUP BY mc.player_captain, pm.player_name;","SELECT mc.player_captain AS player_id, pm.player_name,
+  COUNT(DISTINCT gd.goal_id) AS total_goals,
+  COUNT(DISTINCT mc.match_no) AS total_captain_matches
+  FROM match_captain mc
+  JOIN goal_details gd ON mc.player_captain = gd.player_id
+  JOIN player_mast pm ON mc.player_captain = pm.player_id
+  GROUP BY mc.player_captain, pm.player_name;",1.0
+21.2,"Siapa aja pemain yang jadi kapten sekaligus mencetak goal? Tampilkan player_id, nama, jumlah gol yang unik, dan berapa kali dia jadi kapten di pertandingan yang unik.","SELECT 
+  mc.player_captain AS player_id, 
+  pm.player_name AS name,
+  COUNT(DISTINCT gd.goal_id) AS unique_goals,
+  COUNT(DISTINCT mc.match_no) AS unique_captain_matches
+FROM 
+  match_captain mc
+JOIN 
+  goal_details gd ON mc.player_captain = gd.player_id
+JOIN 
+  player_mast pm ON mc.player_captain = pm.player_id
+GROUP BY 
+  mc.player_captain, pm.player_name;","SELECT mc.player_captain AS player_id, pm.player_name,
+  COUNT(DISTINCT gd.goal_id) AS total_goals,
+  COUNT(DISTINCT mc.match_no) AS total_captain_matches
+  FROM match_captain mc
+  JOIN goal_details gd ON mc.player_captain = gd.player_id
+  JOIN player_mast pm ON mc.player_captain = pm.player_id
+  GROUP BY mc.player_captain, pm.player_name;",1.0
+22.1,List all teams where there is a player that has been both booked and scored in the same match. Show team_id and match_no.,"SELECT DISTINCT pb.team_id, pb.match_no
+FROM player_booked pb
+JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no;","SELECT DISTINCT pb.team_id, pb.match_no
+  FROM player_booked pb
+  JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no;",1.0
+22.2,Pertandingan mana aja yang ada pemain dari satu tim yang cetak gol dan juga kena kartu? Saya mau lihat team_id dan match_no.,"SELECT DISTINCT gd.team_id, gd.match_no
+FROM goal_details gd
+JOIN player_booked pb ON gd.player_id = pb.player_id AND gd.match_no = pb.match_no AND gd.team_id = pb.team_id;","SELECT DISTINCT pb.team_id, pb.match_no
+  FROM player_booked pb
+  JOIN goal_details gd ON pb.player_id = gd.player_id AND pb.match_no = gd.match_no;",1.0
+23.1,"What is the total number of substitutions (counting both in and out) per match, divided by 2? Show match_no and average_subs.","SELECT match_no, COUNT(*)::float / 2 AS average_subs
+FROM player_in_out
+GROUP BY match_no;","SELECT match_no, COUNT(*)::float / 2 AS average_subs
+  FROM player_in_out
+  GROUP BY match_no;",1.0
+23.2,"Hitung total pergantian pemain (masuk dan keluar) per pertandingan, lalu bagi dua. Tampilkan match_no dan rata-rata pergantian pemain.","SELECT match_no, COUNT(*)::float / 2 AS average_subs
+FROM player_in_out
+GROUP BY match_no;","SELECT match_no, COUNT(*)::float / 2 AS average_subs
+  FROM player_in_out
+  GROUP BY match_no;",1.0
+24.1,Which cities had matches where the player of the match also scored? Show me unique city name and match number.,"SELECT DISTINCT sc.city, mm.match_no
+FROM match_mast mm
+JOIN goal_details gd ON mm.match_no = gd.match_no
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+WHERE mm.plr_of_match = gd.player_id;","SELECT DISTINCT sc.city, mm.match_no
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  JOIN goal_details gd ON gd.match_no = mm.match_no AND gd.player_id = mm.plr_of_match;",1.0
+24.2,Kota mana aja yang punya pertandingan di mana player of the match-nya juga cetak gol? Tampilkan nama kota dan match_no-nya secara unik.,"SELECT DISTINCT sc.city, mm.match_no
+FROM match_mast mm
+JOIN goal_details gd ON mm.match_no = gd.match_no AND mm.plr_of_match = gd.player_id
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id;","SELECT DISTINCT sc.city, mm.match_no
+  FROM match_mast mm
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  JOIN goal_details gd ON gd.match_no = mm.match_no AND gd.player_id = mm.plr_of_match;",1.0
+25.1,Which matches had all goals scored in the first half only? Show match number and number of goals.,"SELECT match_no, COUNT(*) AS total_goals
+FROM goal_details
+GROUP BY match_no
+HAVING SUM(CASE WHEN goal_half <> 1 THEN 1 ELSE 0 END) = 0;","SELECT match_no, COUNT(*) AS goal_count
+  FROM goal_details
+  GROUP BY match_no
+  HAVING SUM(CASE WHEN goal_half = 2 THEN 1 ELSE 0 END) = 0;",1.0
+25.2,Pertandingan mana yang semua golnya tercipta di babak pertama? Saya mau lihat match_no dan jumlah golnya.,"SELECT match_no, COUNT(*) AS total_goals
+FROM goal_details
+GROUP BY match_no
+HAVING SUM(CASE WHEN goal_half = 2 THEN 1 ELSE 0 END) = 0;","SELECT match_no, COUNT(*) AS goal_count
+  FROM goal_details
+  GROUP BY match_no
+  HAVING SUM(CASE WHEN goal_half = 2 THEN 1 ELSE 0 END) = 0;",1.0
+26.1,Which teams have high goal difference divided by match played? I need team_id and the average value. Sort by value descending,"SELECT team_id, goal_diff / NULLIF(match_played, 0) AS avg_goal_diff
+FROM soccer_team
+WHERE match_played > 0
+ORDER BY avg_goal_diff DESC;","SELECT team_id, goal_diff / match_played AS avg_goal_diff
+  FROM soccer_team
+  WHERE match_played > 0
+  ORDER BY avg_goal_diff DESC;",1.0
+26.2,Tim mana yang punya selisih gol dibagi dengan jumlah match yang dimainkan tinggi? Tampilkan team_id dan rata-ratanya. Urutkan dari yang tertinggi,"SELECT team_id, goal_diff / NULLIF(match_played, 0) AS avg_goal_diff
+FROM soccer_team
+WHERE match_played > 0
+ORDER BY avg_goal_diff DESC;","SELECT team_id, goal_diff / match_played AS avg_goal_diff
+  FROM soccer_team
+  WHERE match_played > 0
+  ORDER BY avg_goal_diff DESC;",1.0
+27.1,Show assistant referees who officiated matches with above average audience. I want the referee name and the average.,"SELECT arm.ass_ref_name, AVG(mm.audence) AS avg_audience
+FROM match_details md
+JOIN match_mast mm ON md.match_no = mm.match_no
+JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+GROUP BY arm.ass_ref_name
+HAVING AVG(mm.audence) > (SELECT AVG(audence) FROM match_mast WHERE audence IS NOT NULL);","SELECT arm.ass_ref_name, AVG(mm.audence) AS avg_audience
+  FROM match_details md
+  JOIN match_mast mm ON md.match_no = mm.match_no
+  JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+  GROUP BY arm.ass_ref_name
+  HAVING AVG(mm.audence) > (
+  SELECT AVG(audence) FROM match_mast
+  );",1.0
+27.2,Asisten wasit mana yang pertandingan yang dia bantu punya penonton di atas rata-rata? Saya mau nama wasit dan rata-rata penontonnya.,"SELECT arm.ass_ref_name, AVG(mm.audence) AS avg_audience
+FROM match_details md
+JOIN match_mast mm ON md.match_no = mm.match_no
+JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+GROUP BY arm.ass_ref_name
+HAVING AVG(mm.audence) > (
+  SELECT AVG(audence) FROM match_mast
+);","SELECT arm.ass_ref_name, AVG(mm.audence) AS avg_audience
+  FROM match_details md
+  JOIN match_mast mm ON md.match_no = mm.match_no
+  JOIN asst_referee_mast arm ON md.ass_ref = arm.ass_ref_id
+  GROUP BY arm.ass_ref_name
+  HAVING AVG(mm.audence) > (
+  SELECT AVG(audence) FROM match_mast
+  );",1.0
+28.1,Which matches had more than 5 total substitutions? Show match number and how many subs.,"SELECT match_no, COUNT(*) AS total_subs
+FROM player_in_out
+GROUP BY match_no
+HAVING COUNT(*) > 5;","SELECT match_no, COUNT(*) AS total_subs
+  FROM player_in_out
+  GROUP BY match_no
+  HAVING COUNT(*) > 5;",1.0
+28.2,Pertandingan mana aja yang pergantian pemainnya lebih dari 5 kali? Tampilkan match_no dan jumlahnya.,"SELECT match_no, COUNT(*) AS total_subs
+FROM player_in_out
+GROUP BY match_no
+HAVING COUNT(*) > 5;","SELECT match_no, COUNT(*) AS total_subs
+  FROM player_in_out
+  GROUP BY match_no
+  HAVING COUNT(*) > 5;",1.0
+29.1,Which countries had referees that officiated more than 2 matches? I want the country name and number of matches.,"SELECT sc.country_name, COUNT(*) AS match_count
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+JOIN soccer_country sc ON rm.country_id = sc.country_id
+GROUP BY sc.country_name
+HAVING COUNT(*) > 2;","SELECT sc.country_name, COUNT(*) AS match_count
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  JOIN soccer_country sc ON rm.country_id = sc.country_id
+  GROUP BY sc.country_name
+  HAVING COUNT(*) > 2;",1.0
+29.2,Negara mana yang punya wasit yang memimpin lebih dari 2 pertandingan? Saya mau nama negara dan jumlah pertandingan.,"SELECT sc.country_name, COUNT(*) AS match_count
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+JOIN soccer_country sc ON rm.country_id = sc.country_id
+GROUP BY sc.country_name
+HAVING COUNT(*) > 2;","SELECT sc.country_name, COUNT(*) AS match_count
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  JOIN soccer_country sc ON rm.country_id = sc.country_id
+  GROUP BY sc.country_name
+  HAVING COUNT(*) > 2;",1.0
+30.1,List matches where the goalkeeper was also the one who scored a goal. Show match number and player ID.,"SELECT DISTINCT md.match_no, md.player_gk AS player_id
+FROM match_details md
+JOIN goal_details gd ON md.player_gk = gd.player_id AND md.match_no = gd.match_no;","SELECT DISTINCT md.match_no, md.player_gk AS player_id
+  FROM match_details md
+  JOIN goal_details gd ON md.player_gk = gd.player_id AND md.match_no = gd.match_no;",1.0
+30.2,Pertandingan mana yang kipernya juga cetak gol? Saya mau lihat match_no dan player_id-nya.,"SELECT DISTINCT md.match_no, md.player_gk AS player_id
+FROM match_details md
+JOIN goal_details gd ON md.player_gk = gd.player_id AND md.match_no = gd.match_no;","SELECT DISTINCT md.match_no, md.player_gk AS player_id
+  FROM match_details md
+  JOIN goal_details gd ON md.player_gk = gd.player_id AND md.match_no = gd.match_no;",1.0
+31.1,Which matches had goalkeepers who were also the team captains? Show match number and player ID.,"SELECT DISTINCT md.match_no, md.player_gk AS player_id
+FROM match_details md
+JOIN match_captain mc ON md.match_no = mc.match_no AND md.team_id = mc.team_id
+WHERE md.player_gk = mc.player_captain;","SELECT DISTINCT md.match_no, md.player_gk AS player_id
+  FROM match_details md
+  JOIN match_captain mc ON md.match_no = mc.match_no AND md.team_id = mc.team_id
+  WHERE md.player_gk = mc.player_captain;",1.0
+31.2,Pertandingan mana aja yang kipernya juga merangkap jadi kapten? Tampilkan match_no dan player_id-nya.,"SELECT DISTINCT md.match_no, md.player_gk AS player_id
+FROM match_details md
+JOIN match_captain mc ON md.match_no = mc.match_no AND md.team_id = mc.team_id
+WHERE md.player_gk = mc.player_captain;","SELECT DISTINCT md.match_no, md.player_gk AS player_id
+  FROM match_details md
+  JOIN match_captain mc ON md.match_no = mc.match_no AND md.team_id = mc.team_id
+  WHERE md.player_gk = mc.player_captain;",1.0
+32.1,"List players who scored and also got subbed out in the same game. Show unique player_id, name, and match number.","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+FROM goal_details gd
+JOIN player_in_out pio ON gd.player_id = pio.player_id AND gd.match_no = pio.match_no AND pio.in_out = 'O'
+JOIN player_mast pm ON gd.player_id = pm.player_id;","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+  FROM goal_details gd
+  JOIN player_in_out pio ON gd.player_id = pio.player_id AND gd.match_no = pio.match_no AND pio.in_out = 'O'
+  JOIN player_mast pm ON gd.player_id = pm.player_id;",1.0
+32.2,"Pemain mana yang cetak gol lalu diganti keluar di pertandingan yang sama? Saya mau lihat unik player_id, nama, dan match_no.","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+FROM goal_details gd
+JOIN player_in_out pio ON gd.player_id = pio.player_id AND gd.match_no = pio.match_no AND pio.in_out = 'O'
+JOIN player_mast pm ON gd.player_id = pm.player_id;","SELECT DISTINCT gd.player_id, pm.player_name, gd.match_no
+  FROM goal_details gd
+  JOIN player_in_out pio ON gd.player_id = pio.player_id AND gd.match_no = pio.match_no AND pio.in_out = 'O'
+  JOIN player_mast pm ON gd.player_id = pm.player_id;",1.0
+33.1,Which matches had at least one goal scored during stoppage time (ST)? Please give match number and goal_id.,"SELECT match_no, goal_id
+FROM goal_details
+WHERE goal_schedule = 'ST';","SELECT match_no, goal_id
+  FROM goal_details
+  WHERE goal_schedule = 'ST';",1.0
+33.2,Pertandingan mana yang ada gol di waktu stoppage (ST)? Tampilkan match_no dan goal_id-nya.,"SELECT match_no, goal_id
+FROM goal_details
+WHERE goal_schedule = 'ST';","SELECT match_no, goal_id
+  FROM goal_details
+  WHERE goal_schedule = 'ST';",1.0
+34.1,Find games where both teams had players getting booked. Show match number and how many teams got cards.,"SELECT match_no, COUNT(DISTINCT team_id) AS team_count_booked
+FROM player_booked
+GROUP BY match_no
+HAVING COUNT(DISTINCT team_id) = 2;","SELECT match_no, COUNT(DISTINCT team_id) AS team_count_booked
+  FROM player_booked
+  GROUP BY match_no
+  HAVING COUNT(DISTINCT team_id) = 2;",1.0
+34.2,Pertandingan mana aja yang kedua timnya punya pemain yang kena kartu? Tampilkan match_no dan jumlah tim yang kena kartu.,"SELECT match_no, COUNT(DISTINCT team_id) AS team_count_booked
+FROM player_booked
+GROUP BY match_no
+HAVING COUNT(DISTINCT team_id) = 2;","SELECT match_no, COUNT(DISTINCT team_id) AS team_count_booked
+  FROM player_booked
+  GROUP BY match_no
+  HAVING COUNT(DISTINCT team_id) = 2;",1.0
+35.1,Which coaches were assigned to more than one team? Show coach_id and how many teams.,"SELECT coach_id, COUNT(DISTINCT team_id) AS total_teams
+FROM team_coaches
+GROUP BY coach_id
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT coach_id, COUNT(DISTINCT team_id) AS total_teams
+  FROM team_coaches
+  GROUP BY coach_id
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+35.2,Pelatih mana yang pernah melatih lebih dari satu tim? Saya mau lihat coach_id dan jumlah timnya.,"SELECT coach_id, COUNT(DISTINCT team_id) AS total_teams
+FROM team_coaches
+GROUP BY coach_id
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT coach_id, COUNT(DISTINCT team_id) AS total_teams
+  FROM team_coaches
+  GROUP BY coach_id
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+36.1,"List cities whose venues together can seat more than 100,000 people. Show city and total capacity.","SELECT sc.city, SUM(sv.aud_capacity) AS total_capacity
+FROM soccer_venue sv
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sc.city
+HAVING SUM(sv.aud_capacity) > 100000;","SELECT sc.city, SUM(sv.aud_capacity) AS total_capacity
+  FROM soccer_venue sv
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sc.city
+  HAVING SUM(sv.aud_capacity) > 100000;",1.0
+36.2,Kota mana yang total kapasitas stadionnya lebih dari 100 ribu? Tampilkan nama kota dan total kapasitasnya.,"SELECT sc.city, SUM(sv.aud_capacity) AS total_capacity
+FROM soccer_venue sv
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sc.city
+HAVING SUM(sv.aud_capacity) > 100000;","SELECT sc.city, SUM(sv.aud_capacity) AS total_capacity
+  FROM soccer_venue sv
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sc.city
+  HAVING SUM(sv.aud_capacity) > 100000;",1.0
+37.1,Find matches where a player took part in a penalty shootout (dont consider success or not) and also scored a non-penalty goal. Show match_no and player_id.,"SELECT ps.match_no, ps.player_id
+FROM penalty_shootout ps
+JOIN goal_details gd ON ps.match_no = gd.match_no AND ps.player_id = gd.player_id
+WHERE gd.goal_type IS DISTINCT FROM 'P';","SELECT ps.match_no, ps.player_id
+FROM penalty_shootout ps
+JOIN goal_details gd ON ps.match_no = gd.match_no AND ps.player_id = gd.player_id
+WHERE gd.goal_type IS DISTINCT FROM 'P';",1.0
+37.2,Cari pertandingan di mana seorang pemain ikut dalam adu penalti (tidak peduli masuk atau tidak) dan juga mencetak gol (bukan dari penalti). Tampilkan match_no dan player_id.,"SELECT ps.match_no, ps.player_id
+FROM penalty_shootout ps
+JOIN goal_details gd ON ps.match_no = gd.match_no AND ps.player_id = gd.player_id
+WHERE gd.goal_type IS DISTINCT FROM 'P';","SELECT ps.match_no, ps.player_id
+FROM penalty_shootout ps
+JOIN goal_details gd ON ps.match_no = gd.match_no AND ps.player_id = gd.player_id
+WHERE gd.goal_type IS DISTINCT FROM 'P';",1.0
+38.1,"Which teams let in more goals than they scored? I need team_id, goal_for, and goal_agnst.","SELECT team_id, goal_for, goal_agnst
+FROM soccer_team
+WHERE goal_agnst > goal_for;","SELECT team_id, goal_for, goal_agnst
+  FROM soccer_team
+  WHERE goal_agnst > goal_for;",1.0
+38.2,"Tim mana yang kebobolannya lebih banyak daripada gol yang mereka cetak? Tampilkan team_id, goal_for, dan goal_agnst.","SELECT team_id, goal_for, goal_agnst
+FROM soccer_team
+WHERE goal_agnst > goal_for;","SELECT team_id, goal_for, goal_agnst
+  FROM soccer_team
+  WHERE goal_agnst > goal_for;",1.0
+39.1,Find players who changed teams but kept the same jersey number. Show player_id and jersey_no.,"SELECT player_id, jersey_no
+FROM player_mast
+GROUP BY player_id, jersey_no
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_id, jersey_no
+  FROM player_mast
+  GROUP BY player_id, jersey_no
+  HAVING COUNT(DISTINCT playing_club) > 1;",1.0
+39.2,Pemain mana saja yang ganti tim tapi tetap pakai nomor jersey yang sama? Saya mau lihat player_id dan nomor kausnya.,"SELECT player_id, jersey_no
+FROM player_mast
+GROUP BY player_id, jersey_no
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_id, jersey_no
+  FROM player_mast
+  GROUP BY player_id, jersey_no
+  HAVING COUNT(DISTINCT playing_club) > 1;",1.0
+40.1,List referees who have officiated matches in more than one city. Show referee_id and how many cities.,"SELECT rm.referee_id, COUNT(DISTINCT sc.city) AS city_count
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY rm.referee_id
+HAVING COUNT(DISTINCT sc.city) > 1;","SELECT rm.referee_id, COUNT(DISTINCT sc.city) AS city_count
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY rm.referee_id
+  HAVING COUNT(DISTINCT sc.city) > 1;",1.0
+40.2,Wasit mana yang pernah memimpin pertandingan di lebih dari satu kota? Tampilkan referee_id dan jumlah kotanya.,"SELECT rm.referee_id, COUNT(DISTINCT sc.city) AS city_count
+FROM match_mast mm
+JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY rm.referee_id
+HAVING COUNT(DISTINCT sc.city) > 1;","SELECT rm.referee_id, COUNT(DISTINCT sc.city) AS city_count
+  FROM match_mast mm
+  JOIN referee_mast rm ON mm.referee_id = rm.referee_id
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY rm.referee_id
+  HAVING COUNT(DISTINCT sc.city) > 1;",1.0
+41.1,Which matches had players from more than 3 different clubs scoring goals? Show match number and number of clubs.,"SELECT gd.match_no, COUNT(DISTINCT pm.playing_club) AS club_count
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+GROUP BY gd.match_no
+HAVING COUNT(DISTINCT pm.playing_club) > 3;","SELECT gd.match_no, COUNT(DISTINCT pm.playing_club) AS club_count
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  GROUP BY gd.match_no
+  HAVING COUNT(DISTINCT pm.playing_club) > 3;",1.0
+41.2,Pertandingan mana saja yang memiliki pemain dari lebih dari 3 klub berbeda yang mencetak gol? Tampilkan match_no dan jumlah klubnya.,"SELECT gd.match_no, COUNT(DISTINCT pm.playing_club) AS club_count
+FROM goal_details gd
+JOIN player_mast pm ON gd.player_id = pm.player_id
+GROUP BY gd.match_no
+HAVING COUNT(DISTINCT pm.playing_club) > 3;","SELECT gd.match_no, COUNT(DISTINCT pm.playing_club) AS club_count
+  FROM goal_details gd
+  JOIN player_mast pm ON gd.player_id = pm.player_id
+  GROUP BY gd.match_no
+  HAVING COUNT(DISTINCT pm.playing_club) > 3;",1.0
+42.1,List players who were captains and also got a red card. Show their player_id and match number.,"SELECT DISTINCT pb.player_id, pb.match_no
+FROM player_booked pb
+JOIN match_captain mc ON pb.player_id = mc.player_captain AND pb.match_no = mc.match_no
+WHERE pb.sent_off = 'Y';","SELECT DISTINCT pb.player_id, pb.match_no
+  FROM player_booked pb
+  JOIN match_captain mc ON pb.player_id = mc.player_captain AND pb.match_no = mc.match_no
+  WHERE pb.sent_off = 'Y';",1.0
+42.2,Pemain mana yang jadi kapten dan juga kena kartu merah? Saya butuh player_id dan match_no-nya.,"SELECT DISTINCT pb.player_id, pb.match_no
+FROM player_booked pb
+JOIN match_captain mc ON pb.player_id = mc.player_captain AND pb.match_no = mc.match_no
+WHERE pb.sent_off = 'Y';","SELECT DISTINCT pb.player_id, pb.match_no
+  FROM player_booked pb
+  JOIN match_captain mc ON pb.player_id = mc.player_captain AND pb.match_no = mc.match_no
+  WHERE pb.sent_off = 'Y';",1.0
+43.1,"Find matches where one team took more than 2 penalty shots. Show match number, team_id, and kick count.","SELECT match_no, team_id, COUNT(*) AS kick_count
+FROM penalty_shootout
+GROUP BY match_no, team_id
+HAVING COUNT(*) > 2;","SELECT match_no, team_id, COUNT(*) AS kick_count
+  FROM penalty_shootout
+  GROUP BY match_no, team_id
+  HAVING COUNT(*) > 2;",1.0
+43.2,"Pertandingan mana yang satu timnya ambil penalti lebih dari dua kali? Tampilkan match_no, team_id, dan jumlah tendangannya.","SELECT match_no, team_id, COUNT(*) AS kick_count
+FROM penalty_shootout
+GROUP BY match_no, team_id
+HAVING COUNT(*) > 2;","SELECT match_no, team_id, COUNT(*) AS kick_count
+  FROM penalty_shootout
+  GROUP BY match_no, team_id
+  HAVING COUNT(*) > 2;",1.0
+44.1,Who are the top 3 goal scorers in group stages? Show their player_id and how many goals they scored.,"SELECT player_id, COUNT(*) AS total_goals
+FROM goal_details
+WHERE play_stage = 'G'
+GROUP BY player_id
+ORDER BY total_goals DESC
+LIMIT 3;","SELECT player_id, COUNT(*) AS total_goals
+  FROM goal_details
+  WHERE play_stage = 'G'
+  GROUP BY player_id
+  ORDER BY total_goals DESC
+  LIMIT 3;",1.0
+44.2,Siapa 3 pencetak gol terbanyak di babak group? Tampilkan player_id dan total golnya.,"SELECT player_id, COUNT(*) AS total_goals
+FROM goal_details
+WHERE play_stage = 'G'
+GROUP BY player_id
+ORDER BY total_goals DESC
+LIMIT 3;","SELECT player_id, COUNT(*) AS total_goals
+  FROM goal_details
+  WHERE play_stage = 'G'
+  GROUP BY player_id
+  ORDER BY total_goals DESC
+  LIMIT 3;",1.0
+45.1,Which cities hosted matches where more than 4 goals were scored? Show city and match number.,"SELECT DISTINCT sc.city, gd.match_no
+FROM goal_details gd
+JOIN match_mast mm ON gd.match_no = mm.match_no
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sc.city, gd.match_no
+HAVING COUNT(gd.goal_id) > 4;","SELECT DISTINCT sc.city, gd.match_no
+  FROM goal_details gd
+  JOIN match_mast mm ON gd.match_no = mm.match_no
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sc.city, gd.match_no
+  HAVING COUNT(gd.goal_id) > 4;",1.0
+45.2,Kota mana yang punya pertandingan dengan lebih dari 4 gol? Saya mau lihat nama kota dan match_no-nya.,"SELECT DISTINCT sc.city, gd.match_no
+FROM goal_details gd
+JOIN match_mast mm ON gd.match_no = mm.match_no
+JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+JOIN soccer_city sc ON sv.city_id = sc.city_id
+GROUP BY sc.city, gd.match_no
+HAVING COUNT(gd.goal_id) > 4;","SELECT DISTINCT sc.city, gd.match_no
+  FROM goal_details gd
+  JOIN match_mast mm ON gd.match_no = mm.match_no
+  JOIN soccer_venue sv ON mm.venue_id = sv.venue_id
+  JOIN soccer_city sc ON sv.city_id = sc.city_id
+  GROUP BY sc.city, gd.match_no
+  HAVING COUNT(gd.goal_id) > 4;",1.0
+46.1,Find players who played for more than one team. Show player_id and how many teams.,"SELECT player_id, COUNT(DISTINCT team_id) AS team_count
+FROM player_mast
+GROUP BY player_id
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_id, COUNT(DISTINCT team_id) AS team_count
+  FROM player_mast
+  GROUP BY player_id
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+46.2,Pemain mana yang pernah main di lebih dari satu tim? Tampilkan player_id dan jumlah timnya.,"SELECT player_id, COUNT(DISTINCT team_id) AS team_count
+FROM player_mast
+GROUP BY player_id
+HAVING COUNT(DISTINCT team_id) > 1;","SELECT player_id, COUNT(DISTINCT team_id) AS team_count
+  FROM player_mast
+  GROUP BY player_id
+  HAVING COUNT(DISTINCT team_id) > 1;",1.0
+47.1,Which coaches worked with teams that never won a single match? Show coach_id and team_id.,"SELECT DISTINCT tc.coach_id, tc.team_id
+FROM team_coaches tc
+JOIN soccer_team st ON tc.team_id = st.team_id
+WHERE st.won = 0;","SELECT DISTINCT tc.coach_id, tc.team_id
+  FROM team_coaches tc
+  JOIN soccer_team st ON tc.team_id = st.team_id
+  WHERE st.won = 0;",1.0
+47.2,Pelatih mana yang timnya nggak pernah menang? Saya mau lihat coach_id dan team_id-nya.,"SELECT DISTINCT tc.coach_id, tc.team_id
+FROM team_coaches tc
+JOIN soccer_team st ON tc.team_id = st.team_id
+WHERE st.won = 0;","SELECT DISTINCT tc.coach_id, tc.team_id
+  FROM team_coaches tc
+  JOIN soccer_team st ON tc.team_id = st.team_id
+  WHERE st.won = 0;",1.0
+48.1,List top 3 referees who officiated matches with the highest total audience. Show referee_id and audience sum.,"SELECT referee_id, SUM(audence) AS total_audience
+FROM match_mast
+GROUP BY referee_id
+ORDER BY total_audience DESC
+LIMIT 3;","SELECT referee_id, SUM(audence) AS total_audience
+  FROM match_mast
+  GROUP BY referee_id
+  ORDER BY total_audience DESC
+  LIMIT 3;",1.0
+48.2,Siapa 3 wasit dengan total penonton terbanyak di semua pertandingan yang mereka pimpin? Tampilkan referee_id dan total penontonnya.,"SELECT referee_id, SUM(audence) AS total_attendance
+FROM match_mast
+GROUP BY referee_id
+ORDER BY total_attendance DESC
+LIMIT 3;","SELECT referee_id, SUM(audence) AS total_audience
+  FROM match_mast
+  GROUP BY referee_id
+  ORDER BY total_audience DESC
+  LIMIT 3;",1.0
+49.1,"For each match, how many different players were involved (played, booked, or scored)? Show match_no and total players.","SELECT match_no, COUNT(DISTINCT player_id) AS total_players
+FROM (
+  SELECT match_no, player_id FROM player_in_out
+  UNION
+  SELECT match_no, player_id FROM player_booked
+  UNION
+  SELECT match_no, player_id FROM goal_details
+) AS combined
+GROUP BY match_no;","SELECT match_no, COUNT(DISTINCT player_id) AS total_players
+  FROM (
+  SELECT match_no, player_id FROM player_in_out
+  UNION
+  SELECT match_no, player_id FROM player_booked
+  UNION
+  SELECT match_no, player_id FROM goal_details
+  ) AS combined
+  GROUP BY match_no;",1.0
+49.2,"Di tiap pertandingan, berapa banyak pemain yang terlibat (main, dapat kartu, atau cetak gol)? Saya mau lihat match_no dan jumlah pemainnya.","SELECT match_no, COUNT(DISTINCT player_id) AS number_of_players
+FROM (
+    SELECT match_no, player_id FROM player_in_out
+    UNION
+    SELECT match_no, player_id FROM player_booked
+    UNION
+    SELECT match_no, player_id FROM goal_details
+) AS all_players
+GROUP BY match_no
+ORDER BY match_no;","SELECT match_no, COUNT(DISTINCT player_id) AS total_players
+  FROM (
+  SELECT match_no, player_id FROM player_in_out
+  UNION
+  SELECT match_no, player_id FROM player_booked
+  UNION
+  SELECT match_no, player_id FROM goal_details
+  ) AS combined
+  GROUP BY match_no;",1.0
+50.1,Which venues hosted the most matches that ended in penalty shootouts? Show venue_id and number of matches.,"SELECT mm.venue_id, COUNT(mm.match_no) AS match_count
+FROM match_mast mm
+JOIN match_details md ON mm.match_no = md.match_no
+WHERE md.decided_by = 'P'
+GROUP BY mm.venue_id
+HAVING COUNT(mm.match_no) = (
+    SELECT MAX(match_count)
+    FROM (
+        SELECT COUNT(mm2.match_no) AS match_count
+        FROM match_mast mm2
+        JOIN match_details md2 ON mm2.match_no = md2.match_no
+        WHERE md2.decided_by = 'P'
+        GROUP BY mm2.venue_id
+    ) sub
+);","SELECT mm.venue_id, COUNT(DISTINCT mm.match_no) AS penalty_match_count
+  FROM match_mast mm
+  JOIN match_details md ON mm.match_no = md.match_no
+  WHERE md.decided_by = 'P'
+  GROUP BY mm.venue_id
+  ORDER BY penalty_match_count DESC;",0.0
+50.2,Venue mana yang paling sering jadi tempat pertandingan yang berakhir dengan adu penalti? Saya butuh venue_id dan jumlah pertandingannya.,"SELECT mm.venue_id, COUNT(mm.match_no) AS penalty_shootout_match_count
+FROM match_mast mm
+JOIN match_details md ON mm.match_no = md.match_no
+WHERE md.decided_by = 'P'
+GROUP BY mm.venue_id
+ORDER BY penalty_shootout_match_count DESC
+LIMIT 1;","SELECT mm.venue_id, COUNT(DISTINCT mm.match_no) AS penalty_match_count
+  FROM match_mast mm
+  JOIN match_details md ON mm.match_no = md.match_no
+  WHERE md.decided_by = 'P'
+  GROUP BY mm.venue_id
+  ORDER BY penalty_match_count DESC;",0.0

@@ -2,7 +2,7 @@
   "database": "academic",
   "tables": [
     {
-      "name": "Fakultas",
+      "name": "fakultas",
       "description": "Table containing faculty information.",
       "columns": [
         {
@@ -41,35 +41,35 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
-          "description": "Head of faculty (FK to Dosen)."
+          "description": "Head of faculty (FK to dosen)."
         }
       ],
       "relations": [
         {
-          "foreign_table": "Dosen",
-          "primary_table": "Fakultas",
-          "join": "Fakultas.id_kepala = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "fakultas",
+          "join": "fakultas.id_kepala = dosen.id_dosen",
           "description": "Each faculty has one head (dosen)."
         },
         {
-          "foreign_table": "Dosen",
-          "primary_table": "Fakultas",
-          "join": "Dosen.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "dosen",
+          "primary_table": "fakultas",
+          "join": "dosen.id_fakultas = fakultas.id_fakultas",
           "description": "Faculty has many dosen."
         },
         {
-          "foreign_table": "Jurusan",
-          "primary_table": "Fakultas",
-          "join": "Jurusan.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "jurusan",
+          "primary_table": "fakultas",
+          "join": "jurusan.id_fakultas = fakultas.id_fakultas",
           "description": "Faculty has many departments."
         }
       ]
     },
     {
-      "name": "Dosen",
+      "name": "dosen",
       "description": "Table containing lecturer information.",
       "columns": [
         {
@@ -126,7 +126,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Faculty ID the lecturer belongs to."
@@ -134,15 +134,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "Dosen",
-          "join": "Dosen.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "dosen",
+          "join": "dosen.id_fakultas = fakultas.id_fakultas",
           "description": "Lecturer is part of a faculty."
         }
       ]
     },
     {
-      "name": "Jurusan",
+      "name": "jurusan",
       "description": "Table containing department information.",
       "columns": [
         {
@@ -172,7 +172,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Faculty to which the department belongs."
@@ -180,15 +180,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "Jurusan",
-          "join": "Jurusan.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "jurusan",
+          "join": "jurusan.id_fakultas = fakultas.id_fakultas",
           "description": "Department belongs to a faculty."
         }
       ]
     },
     {
-      "name": "Mahasiswa",
+      "name": "mahasiswa",
       "description": "Table containing student information.",
       "columns": [
         {
@@ -263,7 +263,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Jurusan",
+            "table": "jurusan",
             "column": "id_jurusan"
           },
           "description": "Department ID."
@@ -275,7 +275,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Faculty ID."
@@ -287,35 +287,35 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
-          "description": "Supervisor (Dosen)."
+          "description": "Supervisor (dosen)."
         }
       ],
       "relations": [
         {
-          "foreign_table": "Jurusan",
-          "primary_table": "Mahasiswa",
-          "join": "Mahasiswa.id_jurusan = Jurusan.id_jurusan",
+          "foreign_table": "jurusan",
+          "primary_table": "mahasiswa",
+          "join": "mahasiswa.id_jurusan = jurusan.id_jurusan",
           "description": "Student belongs to a department."
         },
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "Mahasiswa",
-          "join": "Mahasiswa.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "mahasiswa",
+          "join": "mahasiswa.id_fakultas = fakultas.id_fakultas",
           "description": "Student belongs to a faculty."
         },
         {
-          "foreign_table": "Dosen",
-          "primary_table": "Mahasiswa",
-          "join": "Mahasiswa.id_pembimbing = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "mahasiswa",
+          "join": "mahasiswa.id_pembimbing = dosen.id_dosen",
           "description": "Student is supervised by a lecturer."
         }
       ]
     },
     {
-      "name": "MataKuliah",
+      "name": "matakuliah",
       "description": "Table containing course information.",
       "columns": [
         {
@@ -363,7 +363,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Faculty ID."
@@ -375,7 +375,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Jurusan",
+            "table": "jurusan",
             "column": "id_jurusan"
           },
           "description": "Department ID."
@@ -387,7 +387,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
           "description": "Lecturer teaching the course."
@@ -395,27 +395,27 @@
       ],
       "relations": [
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "MataKuliah",
-          "join": "MataKuliah.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "matakuliah",
+          "join": "matakuliah.id_fakultas = fakultas.id_fakultas",
           "description": "Course belongs to a faculty."
         },
         {
-          "foreign_table": "Jurusan",
-          "primary_table": "MataKuliah",
-          "join": "MataKuliah.id_jurusan = Jurusan.id_jurusan",
+          "foreign_table": "jurusan",
+          "primary_table": "matakuliah",
+          "join": "matakuliah.id_jurusan = jurusan.id_jurusan",
           "description": "Course belongs to a department."
         },
         {
-          "foreign_table": "Dosen",
-          "primary_table": "MataKuliah",
-          "join": "MataKuliah.id_pengajar = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "matakuliah",
+          "join": "matakuliah.id_pengajar = dosen.id_dosen",
           "description": "Course is taught by a lecturer."
         }
       ]
     },
     {
-      "name": "Kelas",
+      "name": "kelas",
       "description": "Class enrollment for specific courses.",
       "columns": [
         {
@@ -436,7 +436,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "MataKuliah",
+            "table": "matakuliah",
             "column": "id_mk"
           },
           "description": "Course ID."
@@ -448,7 +448,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -456,21 +456,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "MataKuliah",
-          "primary_table": "Kelas",
-          "join": "Kelas.id_mk = MataKuliah.id_mk",
+          "foreign_table": "matakuliah",
+          "primary_table": "kelas",
+          "join": "kelas.id_mk = matakuliah.id_mk",
           "description": "Class relates to a specific course."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "Kelas",
-          "join": "Kelas.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "kelas",
+          "join": "kelas.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Class includes a specific student."
         }
       ]
     },
     {
-      "name": "ProyekPenelitian",
+      "name": "proyekpenelitian",
       "description": "Research project data.",
       "columns": [
         {
@@ -518,7 +518,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
           "description": "Project leader (lecturer)."
@@ -530,7 +530,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Associated faculty."
@@ -538,21 +538,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Dosen",
-          "primary_table": "ProyekPenelitian",
-          "join": "ProyekPenelitian.id_dosen = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "proyekpenelitian",
+          "join": "proyekpenelitian.id_dosen = dosen.id_dosen",
           "description": "Research led by a lecturer."
         },
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "ProyekPenelitian",
-          "join": "ProyekPenelitian.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "proyekpenelitian",
+          "join": "proyekpenelitian.id_fakultas = fakultas.id_fakultas",
           "description": "Research associated with a faculty."
         }
       ]
     },
     {
-      "name": "PartisipasiPenelitian",
+      "name": "partisipasipenelitian",
       "description": "Participation of students in research projects.",
       "columns": [
         {
@@ -573,7 +573,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "ProyekPenelitian",
+            "table": "proyekpenelitian",
             "column": "id_proyek"
           },
           "description": "Associated research project."
@@ -585,7 +585,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Participating student."
@@ -611,21 +611,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "ProyekPenelitian",
-          "primary_table": "PartisipasiPenelitian",
-          "join": "PartisipasiPenelitian.id_proyek = ProyekPenelitian.id_proyek",
+          "foreign_table": "proyekpenelitian",
+          "primary_table": "partisipasipenelitian",
+          "join": "partisipasipenelitian.id_proyek = proyekpenelitian.id_proyek",
           "description": "Participation in a project."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "PartisipasiPenelitian",
-          "join": "PartisipasiPenelitian.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "partisipasipenelitian",
+          "join": "partisipasipenelitian.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Student participant."
         }
       ]
     },
     {
-      "name": "Publikasi",
+      "name": "publikasi",
       "description": "Academic publications.",
       "columns": [
         {
@@ -673,7 +673,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Associated faculty."
@@ -681,15 +681,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "Publikasi",
-          "join": "Publikasi.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "publikasi",
+          "join": "publikasi.id_fakultas = fakultas.id_fakultas",
           "description": "Publication associated with a faculty."
         }
       ]
     },
     {
-      "name": "PenulisPublikasi",
+      "name": "penulispublikasi",
       "description": "Authors involved in publications.",
       "columns": [
         {
@@ -710,7 +710,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Publikasi",
+            "table": "publikasi",
             "column": "id_publikasi"
           },
           "description": "Publication ID."
@@ -722,7 +722,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
           "description": "Authoring lecturer."
@@ -739,21 +739,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Publikasi",
-          "primary_table": "PenulisPublikasi",
-          "join": "PenulisPublikasi.id_publikasi = Publikasi.id_publikasi",
+          "foreign_table": "publikasi",
+          "primary_table": "penulispublikasi",
+          "join": "penulispublikasi.id_publikasi = publikasi.id_publikasi",
           "description": "Author links to publication."
         },
         {
-          "foreign_table": "Dosen",
-          "primary_table": "PenulisPublikasi",
-          "join": "PenulisPublikasi.id_dosen = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "penulispublikasi",
+          "join": "penulispublikasi.id_dosen = dosen.id_dosen",
           "description": "Author is a lecturer."
         }
       ]
     },
     {
-      "name": "Sesi",
+      "name": "sesi",
       "description": "Session schedule for courses.",
       "columns": [
         {
@@ -774,7 +774,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "MataKuliah",
+            "table": "matakuliah",
             "column": "id_mk"
           },
           "description": "Course ID."
@@ -786,7 +786,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
           "description": "Lecturer ID."
@@ -821,21 +821,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "MataKuliah",
-          "primary_table": "Sesi",
-          "join": "Sesi.id_mk = MataKuliah.id_mk",
+          "foreign_table": "matakuliah",
+          "primary_table": "sesi",
+          "join": "sesi.id_mk = matakuliah.id_mk",
           "description": "Session belongs to a course."
         },
         {
-          "foreign_table": "Dosen",
-          "primary_table": "Sesi",
-          "join": "Sesi.id_pengajar = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "sesi",
+          "join": "sesi.id_pengajar = dosen.id_dosen",
           "description": "Session taught by a lecturer."
         }
       ]
     },
     {
-      "name": "EnrolmenKelas",
+      "name": "enrolmenkelas",
       "description": "Student enrollments in sessions.",
       "columns": [
         {
@@ -856,7 +856,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Sesi",
+            "table": "sesi",
             "column": "id_sesi"
           },
           "description": "Session ID."
@@ -868,7 +868,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -894,21 +894,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Sesi",
-          "primary_table": "EnrolmenKelas",
-          "join": "EnrolmenKelas.id_sesi = Sesi.id_sesi",
+          "foreign_table": "sesi",
+          "primary_table": "enrolmenkelas",
+          "join": "enrolmenkelas.id_sesi = sesi.id_sesi",
           "description": "Enrollment to a session."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "EnrolmenKelas",
-          "join": "EnrolmenKelas.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "enrolmenkelas",
+          "join": "enrolmenkelas.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Enrollment by student."
         }
       ]
     },
     {
-      "name": "CatatanKehadiran",
+      "name": "catatankehadiran",
       "description": "Daily attendance records.",
       "columns": [
         {
@@ -929,7 +929,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Sesi",
+            "table": "sesi",
             "column": "id_sesi"
           },
           "description": "Session ID."
@@ -941,7 +941,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -967,21 +967,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Sesi",
-          "primary_table": "CatatanKehadiran",
-          "join": "CatatanKehadiran.id_sesi = Sesi.id_sesi",
+          "foreign_table": "sesi",
+          "primary_table": "catatankehadiran",
+          "join": "catatankehadiran.id_sesi = sesi.id_sesi",
           "description": "Attendance recorded per session."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "CatatanKehadiran",
-          "join": "CatatanKehadiran.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "catatankehadiran",
+          "join": "catatankehadiran.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Attendance recorded per student."
         }
       ]
     },
     {
-      "name": "Nilai",
+      "name": "nilai",
       "description": "Final grades per student and course.",
       "columns": [
         {
@@ -1002,7 +1002,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -1014,7 +1014,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "MataKuliah",
+            "table": "matakuliah",
             "column": "id_mk"
           },
           "description": "Course ID."
@@ -1049,21 +1049,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "Nilai",
-          "join": "Nilai.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "nilai",
+          "join": "nilai.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Grade belongs to student."
         },
         {
-          "foreign_table": "MataKuliah",
-          "primary_table": "Nilai",
-          "join": "Nilai.id_mk = MataKuliah.id_mk",
+          "foreign_table": "matakuliah",
+          "primary_table": "nilai",
+          "join": "nilai.id_mk = matakuliah.id_mk",
           "description": "Grade belongs to a course."
         }
       ]
     },
     {
-      "name": "Ujian",
+      "name": "ujian",
       "description": "Exam schedule and details.",
       "columns": [
         {
@@ -1084,7 +1084,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "MataKuliah",
+            "table": "matakuliah",
             "column": "id_mk"
           },
           "description": "Course ID."
@@ -1119,15 +1119,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "MataKuliah",
-          "primary_table": "Ujian",
-          "join": "Ujian.id_mk = MataKuliah.id_mk",
+          "foreign_table": "matakuliah",
+          "primary_table": "ujian",
+          "join": "ujian.id_mk = matakuliah.id_mk",
           "description": "Exam belongs to a course."
         }
       ]
     },
     {
-      "name": "HasilUjian",
+      "name": "hasilujian",
       "description": "Exam results per student.",
       "columns": [
         {
@@ -1148,7 +1148,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Ujian",
+            "table": "ujian",
             "column": "id_ujian"
           },
           "description": "Exam ID."
@@ -1160,7 +1160,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -1177,21 +1177,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Ujian",
-          "primary_table": "HasilUjian",
-          "join": "HasilUjian.id_ujian = Ujian.id_ujian",
+          "foreign_table": "ujian",
+          "primary_table": "hasilujian",
+          "join": "hasilujian.id_ujian = ujian.id_ujian",
           "description": "Result belongs to an exam."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "HasilUjian",
-          "join": "HasilUjian.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "hasilujian",
+          "join": "hasilujian.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Result belongs to a student."
         }
       ]
     },
     {
-      "name": "Fasilitas",
+      "name": "fasilitas",
       "description": "Facilities available in the university.",
       "columns": [
         {
@@ -1244,15 +1244,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "FasilitasFakultas",
-          "primary_table": "Fasilitas",
-          "join": "FasilitasFakultas.id_fasilitas = Fasilitas.id_fasilitas",
+          "foreign_table": "fasilitasfakultas",
+          "primary_table": "fasilitas",
+          "join": "fasilitasfakultas.id_fasilitas = fasilitas.id_fasilitas",
           "description": "Facility used by faculties."
         }
       ]
     },
     {
-      "name": "FasilitasFakultas",
+      "name": "fasilitasfakultas",
       "description": "Mapping of facilities to faculties.",
       "columns": [
         {
@@ -1273,7 +1273,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fakultas",
+            "table": "fakultas",
             "column": "id_fakultas"
           },
           "description": "Faculty ID."
@@ -1285,7 +1285,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Fasilitas",
+            "table": "fasilitas",
             "column": "id_fasilitas"
           },
           "description": "Facility ID."
@@ -1302,21 +1302,21 @@
       ],
       "relations": [
         {
-          "foreign_table": "Fakultas",
-          "primary_table": "FasilitasFakultas",
-          "join": "FasilitasFakultas.id_fakultas = Fakultas.id_fakultas",
+          "foreign_table": "fakultas",
+          "primary_table": "fasilitasfakultas",
+          "join": "fasilitasfakultas.id_fakultas = fakultas.id_fakultas",
           "description": "Mapping to faculty."
         },
         {
-          "foreign_table": "Fasilitas",
-          "primary_table": "FasilitasFakultas",
-          "join": "FasilitasFakultas.id_fasilitas = Fasilitas.id_fasilitas",
+          "foreign_table": "fasilitas",
+          "primary_table": "fasilitasfakultas",
+          "join": "fasilitasfakultas.id_fasilitas = fasilitas.id_fasilitas",
           "description": "Mapping to facility."
         }
       ]
     },
     {
-      "name": "BukuPerpustakaan",
+      "name": "bukuperpustakaan",
       "description": "Library book information.",
       "columns": [
         {
@@ -1387,15 +1387,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "PeminjamanBuku",
-          "primary_table": "BukuPerpustakaan",
-          "join": "PeminjamanBuku.id_buku = BukuPerpustakaan.id_buku",
+          "foreign_table": "peminjamanbuku",
+          "primary_table": "bukuperpustakaan",
+          "join": "peminjamanbuku.id_buku = bukuperpustakaan.id_buku",
           "description": "Book can be borrowed."
         }
       ]
     },
     {
-      "name": "PeminjamanBuku",
+      "name": "peminjamanbuku",
       "description": "Book loan records.",
       "columns": [
         {
@@ -1416,7 +1416,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "BukuPerpustakaan",
+            "table": "bukuperpustakaan",
             "column": "id_buku"
           },
           "description": "Book ID."
@@ -1460,15 +1460,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "BukuPerpustakaan",
-          "primary_table": "PeminjamanBuku",
-          "join": "PeminjamanBuku.id_buku = BukuPerpustakaan.id_buku",
+          "foreign_table": "bukuperpustakaan",
+          "primary_table": "peminjamanbuku",
+          "join": "peminjamanbuku.id_buku = bukuperpustakaan.id_buku",
           "description": "Loan refers to a book."
         }
       ]
     },
     {
-      "name": "OrganisasiKlub",
+      "name": "organisasiklub",
       "description": "Student clubs and organizations.",
       "columns": [
         {
@@ -1498,7 +1498,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Dosen",
+            "table": "dosen",
             "column": "id_dosen"
           },
           "description": "Supervising lecturer ID."
@@ -1524,15 +1524,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "Dosen",
-          "primary_table": "OrganisasiKlub",
-          "join": "OrganisasiKlub.id_pembimbing_dosen = Dosen.id_dosen",
+          "foreign_table": "dosen",
+          "primary_table": "organisasiklub",
+          "join": "organisasiklub.id_pembimbing_dosen = dosen.id_dosen",
           "description": "Club is supervised by a lecturer."
         }
       ]
     },
     {
-      "name": "KeanggotaanKlub",
+      "name": "keanggotaanklub",
       "description": "Membership information for student clubs.",
       "columns": [
         {
@@ -1553,7 +1553,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "OrganisasiKlub",
+            "table": "organisasiklub",
             "column": "id_klub"
           },
           "description": "Club ID."
@@ -1565,7 +1565,7 @@
           "nullable": true,
           "attributes": [],
           "references": {
-            "table": "Mahasiswa",
+            "table": "mahasiswa",
             "column": "id_mahasiswa"
           },
           "description": "Student ID."
@@ -1591,15 +1591,15 @@
       ],
       "relations": [
         {
-          "foreign_table": "OrganisasiKlub",
-          "primary_table": "KeanggotaanKlub",
-          "join": "KeanggotaanKlub.id_klub = OrganisasiKlub.id_klub",
+          "foreign_table": "organisasiklub",
+          "primary_table": "keanggotaanklub",
+          "join": "keanggotaanklub.id_klub = organisasiklub.id_klub",
           "description": "Membership in a club."
         },
         {
-          "foreign_table": "Mahasiswa",
-          "primary_table": "KeanggotaanKlub",
-          "join": "KeanggotaanKlub.id_mahasiswa = Mahasiswa.id_mahasiswa",
+          "foreign_table": "mahasiswa",
+          "primary_table": "keanggotaanklub",
+          "join": "keanggotaanklub.id_mahasiswa = mahasiswa.id_mahasiswa",
           "description": "Membership by a student."
         }
       ]

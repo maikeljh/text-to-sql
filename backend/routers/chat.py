@@ -163,6 +163,7 @@ def get_chat_history_by_id(
                     if isinstance(m.agent_response, str)
                     else m.agent_response
                 ),
+                "query": m.generated_query,
                 "timestamp": m.timestamp.isoformat(),
                 "feedback": m.feedback.feedback if m.feedback else None,
             }

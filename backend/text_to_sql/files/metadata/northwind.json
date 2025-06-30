@@ -1,0 +1,1154 @@
+{
+  "database": "northwind",
+  "tables": [
+    {
+      "name": "categories",
+      "description": "Table for product categories.",
+      "columns": [
+        {
+          "key": "category_id",
+          "name": "category_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique category identifier."
+        },
+        {
+          "key": "category_name",
+          "name": "category_name",
+          "type": "varchar(15)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the category."
+        },
+        {
+          "key": "description",
+          "name": "description",
+          "type": "text",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the category."
+        },
+        {
+          "key": "picture",
+          "name": "picture",
+          "type": "bytea",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Image of the category."
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "customer_demographics",
+      "description": "Demographic information for customers.",
+      "columns": [
+        {
+          "key": "customer_type_id",
+          "name": "customer_type_id",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Customer type identifier."
+        },
+        {
+          "key": "customer_desc",
+          "name": "customer_desc",
+          "type": "text",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Description of customer type."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "customer_customer_demo",
+          "primary_table": "customer_demographics",
+          "join": "customer_customer_demo.customer_type_id = customer_demographics.customer_type_id",
+          "description": "Links customer demographics to customer-customer demo mapping."
+        }
+      ]
+    },
+    {
+      "name": "customers",
+      "description": "Information about customers.",
+      "columns": [
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Customer ID."
+        },
+        {
+          "key": "company_name",
+          "name": "company_name",
+          "type": "varchar(40)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Company name."
+        },
+        {
+          "key": "contact_name",
+          "name": "contact_name",
+          "type": "varchar(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Contact name."
+        },
+        {
+          "key": "contact_title",
+          "name": "contact_title",
+          "type": "varchar(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Contact title."
+        },
+        {
+          "key": "address",
+          "name": "address",
+          "type": "varchar(60)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Address."
+        },
+        {
+          "key": "city",
+          "name": "city",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "City."
+        },
+        {
+          "key": "region",
+          "name": "region",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Region."
+        },
+        {
+          "key": "postal_code",
+          "name": "postal_code",
+          "type": "varchar(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Postal code."
+        },
+        {
+          "key": "country",
+          "name": "country",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Country."
+        },
+        {
+          "key": "phone",
+          "name": "phone",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number."
+        },
+        {
+          "key": "fax",
+          "name": "fax",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Fax number."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "orders",
+          "primary_table": "customers",
+          "join": "orders.customer_id = customers.customer_id",
+          "description": "Customer places many orders."
+        },
+        {
+          "foreign_table": "customer_customer_demo",
+          "primary_table": "customers",
+          "join": "customer_customer_demo.customer_id = customers.customer_id",
+          "description": "Customer linked to demographics via mapping."
+        }
+      ]
+    },
+    {
+      "name": "customer_customer_demo",
+      "description": "Mapping table for customers and demographics.",
+      "columns": [
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "customers",
+            "column": "customer_id"
+          },
+          "description": "Customer ID reference."
+        },
+        {
+          "key": "customer_type_id",
+          "name": "customer_type_id",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "customer_demographics",
+            "column": "customer_type_id"
+          },
+          "description": "Customer type ID reference."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "customers",
+          "primary_table": "customer_customer_demo",
+          "join": "customer_customer_demo.customer_id = customers.customer_id",
+          "description": "Mapping to customer."
+        },
+        {
+          "foreign_table": "customer_demographics",
+          "primary_table": "customer_customer_demo",
+          "join": "customer_customer_demo.customer_type_id = customer_demographics.customer_type_id",
+          "description": "Mapping to customer demographics."
+        }
+      ]
+    },
+    {
+      "name": "employees",
+      "description": "Information about company employees.",
+      "columns": [
+        {
+          "key": "employee_id",
+          "name": "employee_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Employee ID."
+        },
+        {
+          "key": "last_name",
+          "name": "last_name",
+          "type": "varchar(20)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Last name."
+        },
+        {
+          "key": "first_name",
+          "name": "first_name",
+          "type": "varchar(10)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "First name."
+        },
+        {
+          "key": "title",
+          "name": "title",
+          "type": "varchar(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Job title."
+        },
+        {
+          "key": "title_of_courtesy",
+          "name": "title_of_courtesy",
+          "type": "varchar(25)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Courtesy title."
+        },
+        {
+          "key": "birth_date",
+          "name": "birth_date",
+          "type": "date",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date of birth."
+        },
+        {
+          "key": "hire_date",
+          "name": "hire_date",
+          "type": "date",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Hiring date."
+        },
+        {
+          "key": "address",
+          "name": "address",
+          "type": "varchar(60)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Address."
+        },
+        {
+          "key": "city",
+          "name": "city",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "City."
+        },
+        {
+          "key": "region",
+          "name": "region",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Region."
+        },
+        {
+          "key": "postal_code",
+          "name": "postal_code",
+          "type": "varchar(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Postal code."
+        },
+        {
+          "key": "country",
+          "name": "country",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Country."
+        },
+        {
+          "key": "home_phone",
+          "name": "home_phone",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Home phone number."
+        },
+        {
+          "key": "extension",
+          "name": "extension",
+          "type": "varchar(4)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Extension number."
+        },
+        {
+          "key": "photo",
+          "name": "photo",
+          "type": "bytea",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Employee photo."
+        },
+        {
+          "key": "notes",
+          "name": "notes",
+          "type": "text",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Notes about the employee."
+        },
+        {
+          "key": "reports_to",
+          "name": "reports_to",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "employees",
+            "column": "employee_id"
+          },
+          "description": "Supervisor's employee ID."
+        },
+        {
+          "key": "photo_path",
+          "name": "photo_path",
+          "type": "varchar(255)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Path to photo."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "employees",
+          "primary_table": "employees",
+          "join": "employees.reports_to = employees.employee_id",
+          "description": "Self-reference for manager relationships."
+        },
+        {
+          "foreign_table": "orders",
+          "primary_table": "employees",
+          "join": "orders.employee_id = employees.employee_id",
+          "description": "Employee processes many orders."
+        }
+      ]
+    },
+    {
+      "name": "suppliers",
+      "description": "Information about product suppliers.",
+      "columns": [
+        {
+          "key": "supplier_id",
+          "name": "supplier_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Supplier ID."
+        },
+        {
+          "key": "company_name",
+          "name": "company_name",
+          "type": "varchar(40)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Company name of supplier."
+        },
+        {
+          "key": "contact_name",
+          "name": "contact_name",
+          "type": "varchar(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Contact person name."
+        },
+        {
+          "key": "contact_title",
+          "name": "contact_title",
+          "type": "varchar(30)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Contact person title."
+        },
+        {
+          "key": "address",
+          "name": "address",
+          "type": "varchar(60)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Supplier address."
+        },
+        {
+          "key": "city",
+          "name": "city",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "City."
+        },
+        {
+          "key": "region",
+          "name": "region",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Region."
+        },
+        {
+          "key": "postal_code",
+          "name": "postal_code",
+          "type": "varchar(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Postal code."
+        },
+        {
+          "key": "country",
+          "name": "country",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Country."
+        },
+        {
+          "key": "phone",
+          "name": "phone",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number."
+        },
+        {
+          "key": "fax",
+          "name": "fax",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Fax number."
+        },
+        {
+          "key": "homepage",
+          "name": "homepage",
+          "type": "text",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Homepage URL."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "products",
+          "primary_table": "suppliers",
+          "join": "products.supplier_id = suppliers.supplier_id",
+          "description": "Supplier supplies many products."
+        }
+      ]
+    },
+    {
+      "name": "products",
+      "description": "Details of the products being sold.",
+      "columns": [
+        {
+          "key": "product_id",
+          "name": "product_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Product ID."
+        },
+        {
+          "key": "product_name",
+          "name": "product_name",
+          "type": "varchar(40)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the product."
+        },
+        {
+          "key": "supplier_id",
+          "name": "supplier_id",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "suppliers",
+            "column": "supplier_id"
+          },
+          "description": "Supplier reference."
+        },
+        {
+          "key": "category_id",
+          "name": "category_id",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "categories",
+            "column": "category_id"
+          },
+          "description": "Category reference."
+        },
+        {
+          "key": "quantity_per_unit",
+          "name": "quantity_per_unit",
+          "type": "varchar(20)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Quantity per unit. Example value: 10 boxes x 30 bags"
+        },
+        {
+          "key": "unit_price",
+          "name": "unit_price",
+          "type": "real",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Unit price."
+        },
+        {
+          "key": "units_in_stock",
+          "name": "units_in_stock",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Units in stock."
+        },
+        {
+          "key": "units_on_order",
+          "name": "units_on_order",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Units on order."
+        },
+        {
+          "key": "reorder_level",
+          "name": "reorder_level",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Reorder level."
+        },
+        {
+          "key": "discontinued",
+          "name": "discontinued",
+          "type": "integer",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Discontinued flag. 0 for false, 1 for true"
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "suppliers",
+          "primary_table": "products",
+          "join": "products.supplier_id = suppliers.supplier_id",
+          "description": "Each product is supplied by a supplier."
+        },
+        {
+          "foreign_table": "categories",
+          "primary_table": "products",
+          "join": "products.category_id = categories.category_id",
+          "description": "Each product belongs to a category."
+        },
+        {
+          "foreign_table": "order_details",
+          "primary_table": "products",
+          "join": "order_details.product_id = products.product_id",
+          "description": "Products are part of order details."
+        }
+      ]
+    },
+    {
+      "name": "region",
+      "description": "Geographical regions.",
+      "columns": [
+        {
+          "key": "region_id",
+          "name": "region_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Region ID."
+        },
+        {
+          "key": "region_description",
+          "name": "region_description",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Region description."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "territories",
+          "primary_table": "region",
+          "join": "territories.region_id = region.region_id",
+          "description": "Region contains multiple territories."
+        }
+      ]
+    },
+    {
+      "name": "shippers",
+      "description": "Shipping companies used for orders.",
+      "columns": [
+        {
+          "key": "shipper_id",
+          "name": "shipper_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Shipper ID."
+        },
+        {
+          "key": "company_name",
+          "name": "company_name",
+          "type": "varchar(40)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Company name."
+        },
+        {
+          "key": "phone",
+          "name": "phone",
+          "type": "varchar(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Phone number."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "orders",
+          "primary_table": "shippers",
+          "join": "orders.ship_via = shippers.shipper_id",
+          "description": "Shipper is used in many orders."
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "description": "Customer purchase orders.",
+      "columns": [
+        {
+          "key": "order_id",
+          "name": "order_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Order ID."
+        },
+        {
+          "key": "customer_id",
+          "name": "customer_id",
+          "type": "bpchar",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "customers",
+            "column": "customer_id"
+          },
+          "description": "Customer placing the order."
+        },
+        {
+          "key": "employee_id",
+          "name": "employee_id",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "employees",
+            "column": "employee_id"
+          },
+          "description": "Employee who processed the order."
+        },
+        {
+          "key": "order_date",
+          "name": "order_date",
+          "type": "date",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date the order was placed."
+        },
+        {
+          "key": "required_date",
+          "name": "required_date",
+          "type": "date",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Required delivery date."
+        },
+        {
+          "key": "shipped_date",
+          "name": "shipped_date",
+          "type": "date",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date order was shipped."
+        },
+        {
+          "key": "ship_via",
+          "name": "ship_via",
+          "type": "smallint",
+          "nullable": true,
+          "attributes": [],
+          "references": {
+            "table": "shippers",
+            "column": "shipper_id"
+          },
+          "description": "Shipping company."
+        },
+        {
+          "key": "freight",
+          "name": "freight",
+          "type": "real",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Freight cost."
+        },
+        {
+          "key": "ship_name",
+          "name": "ship_name",
+          "type": "varchar(40)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to name."
+        },
+        {
+          "key": "ship_address",
+          "name": "ship_address",
+          "type": "varchar(60)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to address."
+        },
+        {
+          "key": "ship_city",
+          "name": "ship_city",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to city."
+        },
+        {
+          "key": "ship_region",
+          "name": "ship_region",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to region."
+        },
+        {
+          "key": "ship_postal_code",
+          "name": "ship_postal_code",
+          "type": "varchar(10)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to postal code."
+        },
+        {
+          "key": "ship_country",
+          "name": "ship_country",
+          "type": "varchar(15)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Ship to country."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "customers",
+          "primary_table": "orders",
+          "join": "orders.customer_id = customers.customer_id",
+          "description": "Each order is placed by a customer."
+        },
+        {
+          "foreign_table": "employees",
+          "primary_table": "orders",
+          "join": "orders.employee_id = employees.employee_id",
+          "description": "Each order is processed by an employee."
+        },
+        {
+          "foreign_table": "shippers",
+          "primary_table": "orders",
+          "join": "orders.ship_via = shippers.shipper_id",
+          "description": "Each order is shipped via a shipper."
+        },
+        {
+          "foreign_table": "order_details",
+          "primary_table": "orders",
+          "join": "order_details.order_id = orders.order_id",
+          "description": "Orders contain many order details."
+        }
+      ]
+    },
+    {
+      "name": "territories",
+      "description": "Territorial divisions within regions.",
+      "columns": [
+        {
+          "key": "territory_id",
+          "name": "territory_id",
+          "type": "varchar(20)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Territory ID."
+        },
+        {
+          "key": "territory_description",
+          "name": "territory_description",
+          "type": "bpchar",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the territory."
+        },
+        {
+          "key": "region_id",
+          "name": "region_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [],
+          "references": {
+            "table": "region",
+            "column": "region_id"
+          },
+          "description": "Region to which this territory belongs."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "region",
+          "primary_table": "territories",
+          "join": "territories.region_id = region.region_id",
+          "description": "Territories belong to a region."
+        },
+        {
+          "foreign_table": "employee_territories",
+          "primary_table": "territories",
+          "join": "employee_territories.territory_id = territories.territory_id",
+          "description": "Territories are assigned to employees."
+        }
+      ]
+    },
+    {
+      "name": "employee_territories",
+      "description": "Mapping of employees to territories.",
+      "columns": [
+        {
+          "key": "employee_id",
+          "name": "employee_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "employees",
+            "column": "employee_id"
+          },
+          "description": "Employee assigned to territory."
+        },
+        {
+          "key": "territory_id",
+          "name": "territory_id",
+          "type": "varchar(20)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "territories",
+            "column": "territory_id"
+          },
+          "description": "Territory assigned to employee."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "employees",
+          "primary_table": "employee_territories",
+          "join": "employee_territories.employee_id = employees.employee_id",
+          "description": "Mapping to employee."
+        },
+        {
+          "foreign_table": "territories",
+          "primary_table": "employee_territories",
+          "join": "employee_territories.territory_id = territories.territory_id",
+          "description": "Mapping to territory."
+        }
+      ]
+    },
+    {
+      "name": "order_details",
+      "description": "Details of products within each order.",
+      "columns": [
+        {
+          "key": "order_id",
+          "name": "order_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "orders",
+            "column": "order_id"
+          },
+          "description": "Order ID reference."
+        },
+        {
+          "key": "product_id",
+          "name": "product_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": {
+            "table": "products",
+            "column": "product_id"
+          },
+          "description": "Product ID reference."
+        },
+        {
+          "key": "unit_price",
+          "name": "unit_price",
+          "type": "real",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Price per unit."
+        },
+        {
+          "key": "quantity",
+          "name": "quantity",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Quantity ordered."
+        },
+        {
+          "key": "discount",
+          "name": "discount",
+          "type": "real",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Discount applied."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "orders",
+          "primary_table": "order_details",
+          "join": "order_details.order_id = orders.order_id",
+          "description": "Order details belong to orders."
+        },
+        {
+          "foreign_table": "products",
+          "primary_table": "order_details",
+          "join": "order_details.product_id = products.product_id",
+          "description": "Order details refer to products."
+        }
+      ]
+    },
+    {
+      "name": "us_states",
+      "description": "Table containing U.S. states information.",
+      "columns": [
+        {
+          "key": "state_id",
+          "name": "state_id",
+          "type": "smallint",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "State ID."
+        },
+        {
+          "key": "state_name",
+          "name": "state_name",
+          "type": "varchar(100)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the state."
+        },
+        {
+          "key": "state_abbr",
+          "name": "state_abbr",
+          "type": "varchar(2)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Abbreviation of the state."
+        },
+        {
+          "key": "state_region",
+          "name": "state_region",
+          "type": "varchar(50)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Region where the state belongs."
+        }
+      ],
+      "relations": []
+    }
+  ]
+}

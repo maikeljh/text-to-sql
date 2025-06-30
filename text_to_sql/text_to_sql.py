@@ -39,14 +39,14 @@ class TextToSQL:
     def generate_v1(self, user_prompt: str) -> str:
         """Generate SQL using rewritten prompt and retrieved context, no error handling."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
         return self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
 
     def generate_v2(self, user_prompt: str) -> str:
         """Same as V1, but adds multistage error handling."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
         attempts_left = self.config.max_retry_attempt
         query = self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
@@ -68,7 +68,7 @@ class TextToSQL:
     def generate_v3(self, user_prompt: str) -> str:
         """Same as V2, but adds schema filtering."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
+        schema = self.schema_linker.generate(user_prompt=user_prompt, filter=True)
         relevant_example = self.retrieve_context.generate(user_prompt=rewritten_prompt)
         attempts_left = self.config.max_retry_attempt
         query = self.query_generator.generate_v1(user_prompt=rewritten_prompt, schema=schema, example=relevant_example)
@@ -158,7 +158,7 @@ class TextToSQL:
     def generate_v4(self, user_prompt: str) -> str:
         """Uses incremental sub-question splitting and multistage error correction."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         final_query = self._generate_incremental_query_v1(rewritten_prompt, schema)
         attempts_left = self.config.max_retry_attempt
 
@@ -179,7 +179,7 @@ class TextToSQL:
     def generate_v5(self, user_prompt: str) -> str:
         """Same as V4 but includes schema filtering."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
+        schema = self.schema_linker.generate(user_prompt=user_prompt, filter=True)
         final_query = self._generate_incremental_query_v1(rewritten_prompt, schema)
         attempts_left = self.config.max_retry_attempt
 
@@ -235,9 +235,24 @@ class TextToSQL:
         except Exception as e:
             return {"error": str(e)}
 
-    # For experiment use only
+    # For experiment use only 
+    def predict_rewriter_only(self, user_prompt: str) -> str:
+        """Return the rewritten_prompt for the given prompt."""
+        rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
+        return rewritten_prompt
+
     def predict_schema_only(self, user_prompt: str) -> str:
         """Return the filtered schema for the given prompt."""
+        schema = self.schema_linker.generate(user_prompt=user_prompt, filter=True)
+        return schema
+
+    def predict_relevance_only(self, user_prompt: str) -> str:
+        """Return the relevance example for the given prompt."""
+        example = self.retrieve_context.generate(user_prompt=user_prompt)
+        return example
+    
+    def predict_schema_rewriter_only(self, user_prompt: str) -> str:
+        """Return the filtered schema for the rewritten prompt."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
         schema = self.schema_linker.generate(user_prompt=rewritten_prompt, filter=True)
         return schema
@@ -270,7 +285,7 @@ class TextToSQL:
     def predict_sql_rewriter_only(self, user_prompt: str) -> str:
         """Generate SQL using rewriter only (no example or error handling)."""
         rewritten_prompt = self.rewriter.generate(user_prompt=user_prompt)
-        schema = self.schema_linker.generate(user_prompt=rewritten_prompt)
+        schema = self.schema_linker.generate(user_prompt=user_prompt)
         return self.query_generator.generate_baseline(user_prompt=rewritten_prompt, schema=schema)
 
     def predict_sql_with_example_only(self, user_prompt: str) -> str:
@@ -278,3 +293,8 @@ class TextToSQL:
         schema = self.schema_linker.generate(user_prompt=user_prompt)
         example = self.retrieve_context.generate(user_prompt=user_prompt)
         return self.query_generator.generate_v1(user_prompt=user_prompt, schema=schema, example=example)
+
+    def predict_sql_schema_only(self, user_prompt: str) -> str:
+        """Generate SQL using schema linker only (no example or error handling)."""
+        schema = self.schema_linker.generate(user_prompt=user_prompt, filter=True)
+        return self.query_generator.generate_baseline(user_prompt=user_prompt, schema=schema)

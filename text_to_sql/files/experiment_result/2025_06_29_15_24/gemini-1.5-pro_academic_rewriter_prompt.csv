@@ -1,0 +1,1176 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,canyOu teLLzz HIhwEM facutYzz diD EhT MOST hCrESE proJeCTS Ix JUst123 NEEd RET eMaN (AMa) an THE123 nUMbeR oF123 sTcEJoRp (OtAL_ROYEk).,"SELECT D.nama, COUNT(P.id_proyek) AS total_proyek
+FROM Dosen AS D
+JOIN ProyekPenelitian AS P ON D.id_dosen = P.id_dosen
+WHERE P.tanggal_mulai BETWEEN '2023-06-01' AND '2023-06-30'
+GROUP BY D.nama
+ORDER BY total_proyek DESC
+LIMIT 1;","SELECT f.nama, COUNT(p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_proyek DESC
+  LIMIT 1;",0.0
+1.2,fAkUlTaS ANaYaNGzz KaynaBgniLAp biKIN naIILeEpKEYOrP taMpiLkan Nama(naMa) nAD HAlUJ prOeKYa(tOtAL_ProyK).,"SELECT f.nama AS nama_fakultas, j.nama AS nama_jurusan, COUNT(p.id_proyek) AS total_proyek
+FROM Fakultas AS f
+JOIN Jurusan AS j ON f.id_fakultas = j.id_fakultas
+LEFT JOIN ProyekPenelitian AS p ON f.id_fakultas = p.id_fakultas
+GROUP BY f.nama, j.nama;","SELECT f.nama, COUNT(p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_proyek DESC
+  LIMIT 1;",0.0
+2.1,i’M CUrIoUS whICh LerERguIdeSThe Tsm tuDETS.pLeASEzz Showzz theR nam )aMAN( dN hownY STuDnTsthey SUeRVISe(otAL_mAHasiswa_dibMbInG.,"SELECT d.nama, COUNT(m.id_mahasiswa) AS total_students
+FROM Dosen AS d
+JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+JOIN Jurusan AS j ON m.id_jurusan = j.id_jurusan
+WHERE j.nama ILIKE 'TSM'
+GROUP BY d.nama;","SELECT d.nama, COUNT(m.id_mahasiswa) AS total_mahasiswa_dibimbing
+  FROM Dosen d
+  JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  GROUP BY d.nama
+  ORDER BY total_mahasiswa_dibimbing DESC
+  LIMIT 1;",0.0
+2.2,DoSE mANAx yaNG NgeBIBng MAhaSiS paLInx baNYAK? AKU123 Butuh NmAnY NaMA) Nad LAtOt mAAsISWa YNNgnibMIB (OTAL_MAasisWadibIbing).x,"SELECT d.nama, COUNT(m.id_pembimbing) AS total_students
+FROM Dosen AS d
+JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+GROUP BY d.nama
+HAVING COUNT(m.id_pembimbing) = (SELECT MAX(student_count) FROM (SELECT COUNT(id_pembimbing) AS student_count FROM Mahasiswa GROUP BY id_pembimbing) AS subquery);","SELECT d.nama, COUNT(m.id_mahasiswa) AS total_mahasiswa_dibimbing
+  FROM Dosen d
+  JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  GROUP BY d.nama
+  ORDER BY total_mahasiswa_dibimbing DESC
+  LIMIT 1;",0.0
+3.1,WHICh tUDen JOIeD EhT mOS sESSOnS izz TNaw t sEE EIR NAm123 (NA) And123 ynamWOH SESsIonS tHEy123 aTtENDE (tOtAL_keAdIran).,"SELECT m.nama, COUNT(ek.id_sesi) AS total_sesi_dihadiri
+FROM Mahasiswa AS m
+JOIN EnrolmenKelas AS ek ON m.id_mahasiswa = ek.id_mahasiswa
+GROUP BY m.nama
+ORDER BY total_sesi_dihadiri DESC
+LIMIT 1;","SELECT m.nama, COUNT(k.id_kehadiran) AS total_kehadiran
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_kehadiran DESC
+  LIMIT 1;",1.0
+3.2,MahasIsWA mAnayAg PAliNGRAjIn123 ikutsesi KELAs? KSIh Lat nAma (nAA)danzz jUmlah keHaDiRANnYA123 (otaL_KehADIRAn).,"SELECT m.judul, SUM(ek.kehadiran) AS total_kehadiran
+FROM MataKuliah AS m
+JOIN Sesi AS s ON m.id_mk = s.id_mk
+JOIN EnrolmenKelas AS ek ON s.id_sesi = ek.id_sesi
+JOIN Dosen AS d ON s.id_pengajar = d.id_dosen
+WHERE d.nama ILIKE 'MahasIsWA mAnayAg PAliNGRAjIn123'
+GROUP BY m.judul;","SELECT m.nama, COUNT(k.id_kehadiran) AS total_kehadiran
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_kehadiran DESC
+  LIMIT 1;",0.0
+4.1,wHAT RA The TO123 5x TsM pOpULAr coURSes?123 How mEtHex esuOC TitLe jUDUl)zz aNd how maNySudenTs enIoJ (OAL_mahASisw).,"SELECT judul, COUNT(id_mahasiswa) AS total_enrollment FROM MataKuliah JOIN Kelas ON MataKuliah.id_mk = Kelas.id_mk GROUP BY judul ORDER BY total_enrollment DESC LIMIT 5","SELECT mk.judul, COUNT(e.id_mahasiswa) AS total_mahasiswa
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  JOIN EnrolmenKelas e ON s.id_sesi = e.id_sesi
+  GROUP BY mk.judul
+  ORDER BY total_mahasiswa DESC
+  LIMIT 5;",1.0
+4.2,Top 5 ATkul yNg pLNg BANyak DIabilx ApAs AJA ya? TAmpILkan Judu mAtlnyA )lUduj( NaD jULahzz mhASISWa (TOtAl_MhaSIwA).,"SELECT mk.judul, COUNT(k.id_mahasiswa) AS Total_Mahasiswa FROM MataKuliah mk JOIN Kelas k ON mk.id_mk = k.id_mk GROUP BY mk.judul ORDER BY Total_Mahasiswa DESC LIMIT 5","SELECT mk.judul, COUNT(e.id_mahasiswa) AS total_mahasiswa
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  JOIN EnrolmenKelas e ON s.id_sesi = e.id_sesi
+  GROUP BY mk.judul
+  ORDER BY total_mahasiswa DESC
+  LIMIT 5;",1.0
+5.1,WhIchFACLtY USeS EhT MOst FacIItIES?zz i123 DEEn thE fAcUlty EMaN (nAma) AND eHt nUMBEr Of FAciLITeS123 UsEDzz (TotL_asILitAs).x,"SELECT f.nama, COUNT(ff.id_fasilitas) AS total_facilities FROM Fakultas f JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas GROUP BY f.nama ORDER BY total_facilities DESC LIMIT 1","SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas
+  FROM Fakultas f
+  JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_fasilitas DESC 
+  LIMIT 1;",1.0
+5.2,FAKuLtAS NAm yAng palNg bAnyAK PkeFasILiTa?x akuzz maUx liAT AAn (nAmA) DaN mlah123 fasLItaSNyA (tOTL_fasILtaS).,"SELECT F.nama, COUNT(FF.id_fasilitas) AS total_facilities FROM Fakultas AS F JOIN FasilitasFakultas AS FF ON F.id_fakultas = FF.id_fakultas GROUP BY F.nama ORDER BY total_facilities DESC LIMIT 1;","SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas
+  FROM Fakultas f
+  JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_fasilitas DESC 
+  LIMIT 1;",1.0
+6.1,hiC CoUrsEHs thE123 EgaEatsEb MAe sCore? SHO METE tiLe (JUdL)aNd THe avEage scRE(AA_tA_iLai).123,"SELECT AVG(nilai_akhir) AS AA_tA_iLai, judul AS JUdL FROM MataKuliah GROUP BY judul","SELECT mk.judul, AVG(h.nilai_diperoleh) AS rata_rata_nilai
+  FROM MataKuliah mk
+  JOIN Ujian u ON mk.id_mk = u.id_mk
+  JOIN HasilUjian h ON u.id_ujian = h.id_ujian
+  GROUP BY mk.judul
+  ORDER BY rata_rata_nilai DESC
+  LIMIT 1;",0.0
+6.2,MATKUl Anam YANg niLAI ujiANnyA pAIng IggNIT RATA-rATANyAzz kaiHzz uAT JudUlzz (juDuL) dAn naI Ta-rat (raT_Ata_Lai).,"SELECT mk.judul, AVG(hu.nilai_diperoleh) AS average_score
+FROM MataKuliah AS mk
+JOIN Ujian AS u ON mk.id_mk = u.id_mk
+JOIN HasilUjian AS hu ON u.id_ujian = hu.id_ujian
+GROUP BY mk.judul
+ORDER BY average_score DESC
+LIMIT 1;","SELECT mk.judul, AVG(h.nilai_diperoleh) AS rata_rata_nilai
+  FROM MataKuliah mk
+  JOIN Ujian u ON mk.id_mk = u.id_mk
+  JOIN HasilUjian h ON u.id_ujian = h.id_ujian
+  GROUP BY mk.judul
+  ORDER BY rata_rata_nilai DESC
+  LIMIT 1;",1.0
+7.1,SiOhw thelecuRR wItH THe123 MOSt snoTaCILBup jUstzz shw123 rIEhT nAMe (n) ANd hOw MAny ev’YeT DErOhTUa (OTALPubLIKasI).,"SELECT D.nama, COUNT(P.id_publikasi) AS total_publications
+FROM Dosen AS D
+JOIN PenulisPublikasi AS PP ON D.id_dosen = PP.id_dosen
+JOIN Publikasi AS P ON PP.id_publikasi = P.id_publikasi
+GROUP BY D.nama
+ORDER BY total_publications DESC;","SELECT d.nama, COUNT(p.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  JOIN Publikasi p ON pp.id_publikasi = p.id_publikasi
+  GROUP BY d.nama
+  ORDER BY total_publikasi DESC
+  LIMIT 1;",0.0
+7.2,NEsoD ANam YAG pAlInG BANYa NulispublIKaS? tunukIn NaMaNYa )amn( dAn123 ToTAl AYNiSAKiLBuP (tTaL_puBLiki).,"SELECT D.nama, COUNT(PP.id_publikasi) AS total_publications
+FROM Dosen AS D
+JOIN PenulisPublikasi AS PP ON D.id_dosen = PP.id_dosen
+GROUP BY D.nama
+ORDER BY total_publications DESC
+LIMIT 1;","SELECT d.nama, COUNT(p.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  JOIN Publikasi p ON pp.id_publikasi = p.id_publikasi
+  GROUP BY d.nama
+  ORDER BY total_publikasi DESC
+  LIMIT 1;",1.0
+8.1,hCIHw TNeDutS haS deNiOJ eht tsom rseaRCh PRojECTS? I Een ThER123 AMe(nAma) aNd THe TotLx rEbuN (Otl_pARTiSPASi),"SELECT m.nama, COUNT(pp.id_partisipasi) AS total_partisipasi
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+GROUP BY m.nama
+HAVING COUNT(pp.id_partisipasi) = (SELECT MAX(project_count) FROM (SELECT COUNT(*) AS project_count FROM PartisipasiPenelitian GROUP BY id_mahasiswa) AS subquery);","SELECT m.nama, COUNT(pp.id_proyek) AS total_partisipasi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 1;",0.0
+8.2,maHASiSWA anam YaNg pALIG sERIng iKuT123 pryK ?naitileNP TuNjukInnAmAYazz NaMa) dAnx JumLH PaRtIspASnyAzz (TotaL_pARISiPAsi).,"SELECT m.nama, COUNT(pp.id_partisipasi) AS total_participations
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+GROUP BY m.nama
+HAVING COUNT(pp.id_partisipasi) = (SELECT MAX(project_count) FROM (SELECT COUNT(*) AS project_count FROM PartisipasiPenelitian GROUP BY id_mahasiswa) AS subquery);","SELECT m.nama, COUNT(pp.id_proyek) AS total_partisipasi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 1;",0.0
+9.1,"wHO’s dewOrRob Th mosTzz boOk aNG stUDENts, iF123 TIE123 WOhS TsELlAmS STuDNt id? PLSE SHOW tHezz I (Id_pmInjam) dNa totAbORW cOnT (TAl_PEmNJamAN).x","SELECT id_peminjam, COUNT(*) AS Tal_PEmNJamAN FROM PeminjamanBuku GROUP BY id_peminjam HAVING COUNT(*) = (SELECT MAX(borrow_count) FROM (SELECT COUNT(*) AS borrow_count FROM PeminjamanBuku GROUP BY id_peminjam) AS borrow_counts)","SELECT id_peminjam, COUNT(*) AS total_peminjaman
+FROM PeminjamanBuku
+WHERE id_peminjam IN (SELECT id_mahasiswa FROM Mahasiswa)
+GROUP BY id_peminjaman
+ORDER BY id_peminjaman ASC
+LIMIT 1;",0.0
+9.2,siAA gaY pLinG SErinG MIJex bUku ID ntarASiwA-iSWA ?ajAs IliP iD TRKecil JiKax aDA yAng Ama. AkumAU d-Nyazz (id_PemINjM)dan tOAl123 PinJAMaNnYA(TotA_pEinAmA).,"SELECT id_peminjaman, SUM(borrowing_fee) AS total_peminjaman FROM InterlibraryLoanBooks GROUP BY id_peminjaman HAVING COUNT(*) > 1 UNION SELECT id_peminjaman, borrowing_fee AS total_peminjaman FROM InterlibraryLoanBooks WHERE id_peminjaman IN (SELECT id_peminjaman FROM InterlibraryLoanBooks GROUP BY id_peminjaman HAVING COUNT(*) = 1)","SELECT id_peminjam, COUNT(*) AS total_peminjaman
+FROM PeminjamanBuku
+WHERE id_peminjam IN (SELECT id_mahasiswa FROM Mahasiswa)
+GROUP BY id_peminjaman
+ORDER BY id_peminjaman ASC
+LIMIT 1;",0.0
+10.1,WHiCHx bUlC aS hEmOsT MBERs?123 shOwte NaMEx (Nama)123 anD ToTaLx eMBErs .)aTOgga_ltot(,"SELECT ok.nama, COUNT(k.id_mahasiswa) AS total_members FROM OrganisasiKlub AS ok JOIN KeanggotaanKlub AS k ON ok.id_klub = k.id_klub WHERE ok.tipe = 'Badan Semi Otonom' GROUP BY ok.nama ORDER BY total_members DESC LIMIT 1;","SELECT k.nama, COUNT(kk.id_mahasiswa) AS total_anggota
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+  GROUP BY k.nama
+  ORDER BY total_anggota DESC
+  LIMIT 1;",0.0
+10.2,lubx mnax yag aynAToGGA PalINg BanYAk? hisAk tAuNama ayNbULk AMAn( da JMLaH aGGTzz (toAl_aNGOt.,"SELECT nama, COUNT(*) AS total_member_count FROM Mahasiswa GROUP BY nama ORDER BY total_member_count DESC LIMIT 1","SELECT k.nama, COUNT(kk.id_mahasiswa) AS total_anggota
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+  GROUP BY k.nama
+  ORDER BY total_anggota DESC
+  LIMIT 1;",0.0
+11.1,"TNdTSHCIhw as THe HIgHEsTzz MxE erOcS totAL i wANt tox see Id_MahAsWA, NAA, And .ErOs_lATOT","SELECT id_mahasiswa, nama, SUM(nilai_akhir) AS Eros_Total FROM Mahasiswa AS m JOIN Nilai AS n ON m.id_mahasiswa = n.id_mahasiswa WHERE m.nama = 'TNdTSHCIhw' GROUP BY m.id_mahasiswa, m.nama ORDER BY Eros_Total DESC LIMIT 1","SELECT h.id_mahasiswa, m.nama, SUM(h.nilai_diperoleh) AS total_score
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON h.id_mahasiswa = m.id_mahasiswa
+  GROUP BY h.id_mahasiswa, m.nama
+  ORDER BY total_score DESC
+  LIMIT 1;",0.0
+11.2,"MAhASSWa mna GNAy Latot aynIAlIn dArI Umes naIJ AlNg tinGgi?zz aK mAU Id_MAhAsIswA, Ama, dAn toTaL_Scor.","SELECT id_mahasiswa, m.nama, hu.nilai_diperoleh
+FROM Mahasiswa AS m
+JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+WHERE hu.nilai_diperoleh = (SELECT MAX(nilai_diperoleh) FROM HasilUjian);","SELECT h.id_mahasiswa, m.nama, SUM(h.nilai_diperoleh) AS total_score
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON h.id_mahasiswa = m.id_mahasiswa
+  GROUP BY h.id_mahasiswa, m.nama
+  ORDER BY total_score DESC
+  LIMIT 1;",0.0
+12.1,"CaN yOU LiST ALLFaCulTies anD HOw how Many RESeRCh POJEcTS, publictiONs,AN acTivLectuRERS eaCh haS?x shOwzz Nam, oTL_RoEkTOT_pUBliAsI, TOAl_DoSeN_AKTi.","SELECT D.nama, COUNT(DISTINCT PP.id_proyek) AS total_research_projects, COUNT(DISTINCT P.id_publikasi) AS total_publications, COUNT(DISTINCT S.id_sesi) AS total_active_lectures FROM Dosen AS D LEFT JOIN ProyekPenelitian AS PP ON D.id_dosen = PP.id_dosen LEFT JOIN PenulisPublikasi AS PenPub ON D.id_dosen = PenPub.id_dosen LEFT JOIN Publikasi AS P ON PenPub.id_publikasi = P.id_publikasi LEFT JOIN Sesi AS S ON D.id_dosen = S.id_pengajar GROUP BY D.nama","SELECT f.nama,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek,
+  COUNT(DISTINCT pb.id_publikasi) AS total_publikasi,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif
+  FROM Fakultas f
+  LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  LEFT JOIN Publikasi pb ON f.id_fakultas = pb.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  WHERE d.id_dosen IN (
+  SELECT id_dosen FROM PenulisPublikasi
+  UNION
+  SELECT id_dosen FROM ProyekPenelitian
+  )
+  GROUP BY f.nama;",0.0
+12.2,"gNolOT auMESNIliPMAT Fakltas EerTa tTAl PrOYEK, pULIksi, Nad DosEN aKtiFnYA. LoM:zz NAMa, tOtl_pROyek, TOTAL_blIks, TOTal_dOeAKTIf.","SELECT F.nama AS name, COUNT(DISTINCT PP.id_proyek) AS total_projects, COUNT(DISTINCT P.id_publikasi) AS total_publications, COUNT(DISTINCT D.id_dosen) AS total_active_lecturers
+FROM Fakultas AS F
+LEFT JOIN ProyekPenelitian AS PP ON F.id_fakultas = PP.id_fakultas
+LEFT JOIN Publikasi AS P ON F.id_fakultas = P.id_fakultas
+LEFT JOIN Dosen AS D ON F.id_fakultas = D.id_fakultas
+WHERE F.nama ILIKE 'Faculty of Mathematics and Natural Sciences'
+GROUP BY F.nama;","SELECT f.nama,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek,
+  COUNT(DISTINCT pb.id_publikasi) AS total_publikasi,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif
+  FROM Fakultas f
+  LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  LEFT JOIN Publikasi pb ON f.id_fakultas = pb.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  WHERE d.id_dosen IN (
+  SELECT id_dosen FROM PenulisPublikasi
+  UNION
+  SELECT id_dosen FROM ProyekPenelitian
+  )
+  GROUP BY f.nama;",0.0
+13.1,"wHIch lEURr HAS TAugT tHe mostx dIFfeReNT SbJecs?SHOwzz Em rihT ,NesOd_i Nama,123 AND HoW maNysUBjcTzz (ttAL_MK_dIaJAR).","SELECT id_pengajar, D.nama, COUNT(DISTINCT id_mk) AS total_subjects_taught
+FROM MataKuliah AS MK
+JOIN Dosen AS D ON MK.id_pengajar = D.id_dosen
+GROUP BY id_pengajar, D.nama
+ORDER BY total_subjects_taught DESC
+LIMIT 1;","SELECT d.id_dosen, d.nama, COUNT(DISTINCT mk.id_mk) AS total_mk_diajar
+  FROM Dosen d
+  JOIN Sesi s ON d.id_dosen = s.id_pengajar
+  JOIN MataKuliah mk ON mk.id_mk = s.id_mk
+  GROUP BY d.id_dosen, d.nama
+  ORDER BY total_mk_diajar DESC
+  LIMIT 1;",1.0
+13.2,"DOSen Ana Ng pERnHgajr Mata kUliaHpAlNg ak? kSiHid_DsEN, NAMa Dan jUMlAH mAtKUL (Tota_Mk_diAJAR).","SELECT d.id_dosen, d.nama, COUNT(m.id_mk) AS total_courses_taught
+FROM Dosen AS d
+LEFT JOIN MataKuliah AS m ON d.id_dosen = m.id_pengajar
+GROUP BY d.id_dosen, d.nama;","SELECT d.id_dosen, d.nama, COUNT(DISTINCT mk.id_mk) AS total_mk_diajar
+  FROM Dosen d
+  JOIN Sesi s ON d.id_dosen = s.id_pengajar
+  JOIN MataKuliah mk ON mk.id_mk = s.id_mk
+  GROUP BY d.id_dosen, d.nama
+  ORDER BY total_mk_diajar DESC
+  LIMIT 1;",0.0
+14.1,"Ohw arex th Top 3123 stuDEnts iTh EHt tsE tOTaL PATiCipaTiONsCrES? i waNT Id_AHASIsWa, NaMA,x NDtTal_ArTIsIPA.","SELECT id_mahasiswa, nama, SUM(nilai_partisipasi) AS total_participation_score FROM Mahasiswa JOIN EnrolmenKelas ON Mahasiswa.id_mahasiswa = EnrolmenKelas.id_mahasiswa GROUP BY id_mahasiswa, nama ORDER BY total_participation_score DESC LIMIT 3123","SELECT m.id_mahasiswa, m.nama, SUM(e.nilai_partisipasi) AS total_partisipasi
+  FROM EnrolmenKelas e
+  JOIN Mahasiswa m ON m.id_mahasiswa = e.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 3;",0.0
+14.2,"ToLong123 NIkjNuT 3 maHAsA deNgAN nILAi parTiSipASI eRTINgi. :mOL ,awSiSaHaM_di ,AmAN .isAPISiTrAp_lAtoT","SELECT nama AS Mol, email AS Awsisaham_di, telepon AS Aman, alamat AS Isapisitrap_latot FROM Mahasiswa ORDER BY tanggal_masuk DESC LIMIT 3;","SELECT m.id_mahasiswa, m.nama, SUM(e.nilai_partisipasi) AS total_partisipasi
+  FROM EnrolmenKelas e
+  JOIN Mahasiswa m ON m.id_mahasiswa = e.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 3;",0.0
+15.1,"HcIH STUdEn JoIned MOe TAN2x PROeCTs DNa ARe iN Azz CLU? soW ,awIshAM_Di nAma,totalPrOyeK, and .blk_LTo","SELECT m.nama AS lawisham_di_nama, COUNT(DISTINCT pp.id_proyek) AS totalProyek, 'blk_LTo' AS blk_LTo
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+GROUP BY m.id_mahasiswa
+HAVING COUNT(DISTINCT pp.id_proyek) > 2
+AND NOT EXISTS (
+    SELECT 1
+    FROM OrganisasiKlub AS ok
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM KeanggotaanKlub AS kk
+        WHERE kk.id_klub = ok.id_klub
+        AND kk.id_mahasiswa = m.id_mahasiswa
+    )
+);","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT pp.id_proyek) > 2;",1.0
+15.2,"apais jA MaHSiSWA gnAY IKut LEBiH iRAD 2 PRoyEK An JuG aKIFx d KlUb?tAMPilKAN ,AmaN,aWSiSahaM_i toTAL_poyek tOtAlKlub.","SELECT m.nama, m.id_mahasiswa, COUNT(DISTINCT pp.id_proyek) AS total_projects, COUNT(DISTINCT kk.id_klub) AS total_clubs
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT pp.id_proyek) > 2 AND COUNT(DISTINCT kk.id_klub) >= 2;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT pp.id_proyek) > 2;",1.0
+16.1,"whatarthe pOt 5zz FACIltIes hTiw THe HIGheSTx Egrva ACcESS? shw123 id_FASitas123 naMA,123 And VgakseS.","SELECT id_fasilitas, nama, tingkat_akses FROM FasilitasFakultas JOIN Fasilitas ON FasilitasFakultas.id_fasilitas = Fasilitas.id_fasilitas ORDER BY tingkat_akses DESC LIMIT 5","SELECT f.id_fasilitas, f.nama, AVG(ff.tingkat_akses) AS avg_akses
+  FROM Fasilitas f
+  JOIN FasilitasFakultas ff ON f.id_fasilitas = ff.id_fasilitas
+  GROUP BY f.id_fasilitas, f.nama
+  ORDER BY avg_akses DESC
+  LIMIT 5;",0.0
+16.2,"TP 5 FaSIlItAS Pa AJaYang RTA-RtA tnGAt123 AkSesnYA123 pIng TINgGI? aKu ,SaTilISaf_iUAm namA,avG_aKseS.123","SELECT id_fasilitas, AVG(tingkat_akses) AS average_access_rating FROM FasilitasFakultas GROUP BY id_fasilitas ORDER BY average_access_rating DESC LIMIT 5","SELECT f.id_fasilitas, f.nama, AVG(ff.tingkat_akses) AS avg_akses
+  FROM Fasilitas f
+  JOIN FasilitasFakultas ff ON f.id_fasilitas = ff.id_fasilitas
+  GROUP BY f.id_fasilitas, f.nama
+  ORDER BY avg_akses DESC
+  LIMIT 5;",0.0
+17.1,"fInd em lecTUrers who BohSuPervIsE123 sTNEuts DnA pUbLiSh papEs.x ShO iD_dOSEn NaMA, totA_maHSisWA_bImBINAn,TOTAl_PLikaSI.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_students, COUNT(DISTINCT p.id_publikasi) AS total_publications
+FROM Dosen AS d
+LEFT JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+LEFT JOIN Publikasi AS p ON pp.id_publikasi = p.id_publikasi
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT m.id_mahasiswa) > 0 AND COUNT(DISTINCT p.id_publikasi) > 0;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  LEFT JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  LEFT JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  WHERE m.id_mahasiswa IS NOT NULL AND pp.id_publikasi IS NOT NULL
+  GROUP BY d.id_dosen, d.nama;",1.0
+17.2,"dOse Mana YaNG BIBIg mAhAsisWa sEkaLiGUS123 nKib pUbLIksI? tAMPIkaNzz ID_dOSEN,nama, totAl_MahaSIsWa_bImBinGAN,123 toTal_PUblIKaSi.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_dibimbing, COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+FROM Dosen AS d
+LEFT JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT pp.id_publikasi) > 0;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  LEFT JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  LEFT JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  WHERE m.id_mahasiswa IS NOT NULL AND pp.id_publikasi IS NOT NULL
+  GROUP BY d.id_dosen, d.nama;",0.0
+18.1,"wHic stnEdutS bo BOrOWBOKs AND TtenD 10+SEssiONs? SHow D_mAHAISw, NAM,oTAl_bUkU_DIPinjam, .ISEs_LatoT","SELECT m.id_mahasiswa AS D_mAHAISw, m.nama AS NAM, COUNT(pb.id_buku) AS oTAl_bUkU_DIPinjam, COUNT(DISTINCT ek.id_sesi) AS ISEs_LatoT FROM Mahasiswa AS m JOIN PeminjamanBuku AS pb ON m.id_mahasiswa = pb.id_peminjam JOIN EnrolmenKelas AS ek ON m.id_mahasiswa = ek.id_mahasiswa GROUP BY m.id_mahasiswa, m.nama HAVING COUNT(DISTINCT ek.id_sesi) > 10;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam,
+  COUNT(DISTINCT ck.id_sesi) AS total_sesi
+  FROM Mahasiswa m
+  LEFT JOIN PeminjamanBuku pb ON m.id_mahasiswa = pb.id_peminjam
+  LEFT JOIN CatatanKehadiran ck ON m.id_mahasiswa = ck.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT ck.id_sesi) >= 10 AND COUNT(DISTINCT pb.id_peminjaman) > 0;",1.0
+18.2,"maHAIswa MAnAzz Ja YnGx suk minJem ukU dan123 ridH ID hBeL dARi10x ?iSes tampIlKAN iD_MaHSisWa, ,MaJNiPId_KUb_LAoTa tOTal_sESI.zz","SELECT id_mahasiswa, id_jurusan, COUNT(id_sesi) AS total_sessions
+FROM Mahasiswa AS m
+JOIN EnrolmenKelas AS ek ON m.id_mahasiswa = ek.id_mahasiswa
+WHERE m.nama ILIKE 'Mana Ja Yngx Suk Minjem Uku Dan123 Ridh' AND m.id_mahasiswa > 10
+GROUP BY id_mahasiswa, id_jurusan;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam,
+  COUNT(DISTINCT ck.id_sesi) AS total_sesi
+  FROM Mahasiswa m
+  LEFT JOIN PeminjamanBuku pb ON m.id_mahasiswa = pb.id_peminjam
+  LEFT JOIN CatatanKehadiran ck ON m.id_mahasiswa = ck.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT ck.id_sesi) >= 10 AND COUNT(DISTINCT pb.id_peminjaman) > 0;",0.0
+19.1,"HiHW sEsrUOC iNCDe hTOB SESsiOn ANDx aeXaM? JUSTzz SHOw ,KmI judUL, ,riHk_IALIn_gVA aND AVg_nILai_ujIAn.","SELECT mk.judul, m.nama, (COALESCE(AVG(hu.nilai_diperoleh), 0) + COALESCE(AVG(n.nilai_akhir), 0)) / 2 AS average_nilai
+FROM Mahasiswa AS m
+JOIN Kelas AS k ON m.id_mahasiswa = k.id_mahasiswa
+JOIN MataKuliah AS mk ON k.id_mk = mk.id_mk
+LEFT JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+LEFT JOIN Nilai AS n ON m.id_mahasiswa = n.id_mahasiswa
+WHERE m.nama ILIKE 'KM Judul' OR m.nama ILIKE 'Rihk Ial Ingva'
+GROUP BY mk.judul, m.nama;","SELECT 
+    mk.id_mk,
+    mk.judul,
+    AVG(n.nilai_akhir) AS avg_nilai_akhir,
+    AVG(hu.nilai_diperoleh) AS avg_nilai_ujian
+FROM 
+    MataKuliah mk
+JOIN 
+    Sesi s ON mk.id_mk = s.id_mk
+JOIN 
+    Ujian u ON mk.id_mk = u.id_mk
+JOIN 
+    Nilai n ON mk.id_mk = n.id_mk
+JOIN 
+    HasilUjian hu ON u.id_ujian = hu.id_ujian
+GROUP BY 
+    mk.id_mk, mk.judul;",0.0
+19.2,"lUKAm Apa AjA siH YaNGx PUNya SESI aNjIAn? TaMpILKaN ID_mk, JDUL, avg_NIli_khIr, nAD AVg_ila_UjIan.","SELECT mk.id_mk, mk.judul, AVG(n.nilai_akhir) AS avg_final_score, AVG(u.total_nilai) AS avg_quiz_score
+FROM MataKuliah AS mk
+JOIN Sesi AS s ON mk.id_mk = s.id_mk
+JOIN Nilai AS n ON mk.id_mk = n.id_mk
+JOIN Ujian AS u ON mk.id_mk = u.id_mk
+GROUP BY mk.id_mk, mk.judul
+HAVING COUNT(DISTINCT s.id_sesi) > 0;","SELECT 
+    mk.id_mk,
+    mk.judul,
+    AVG(n.nilai_akhir) AS avg_nilai_akhir,
+    AVG(hu.nilai_diperoleh) AS avg_nilai_ujian
+FROM 
+    MataKuliah mk
+JOIN 
+    Sesi s ON mk.id_mk = s.id_mk
+JOIN 
+    Ujian u ON mk.id_mk = u.id_mk
+JOIN 
+    Nilai n ON mk.id_mk = n.id_mk
+JOIN 
+    HasilUjian hu ON u.id_ujian = hu.id_ujian
+GROUP BY 
+    mk.id_mk, mk.judul;",0.0
+20.1,"hcI SEItLCAF HaV tHe tsM VaRiEtY studNt SROJaM pARtiCIpaTING123 NI CLuBs? sO me ,ALkAF_Di naMa, And HOw mANY difFeReNt aJorS tHOe CLU meMbERs emo FrM CAL t123 TOta_RuAN_KLUb. sOrT b tHT In DeSCnDg orDER.","SELECT k.nama, COUNT(DISTINCT m.id_jurusan) AS distinct_majors
+FROM OrganisasiKlub AS k
+JOIN KeanggotaanKlub AS kk ON k.id_klub = kk.id_klub
+JOIN Mahasiswa AS m ON kk.id_mahasiswa = m.id_mahasiswa
+JOIN Jurusan AS j ON m.id_jurusan = j.id_jurusan
+JOIN Fakultas AS f ON j.id_fakultas = f.id_fakultas
+WHERE f.nama ILIKE 'HCI SEIT'
+GROUP BY k.nama
+ORDER BY distinct_majors DESC;","SELECT f.id_fakultas, f.nama, COUNT(DISTINCT j.id_jurusan) AS total_jurusan_klub
+  FROM Fakultas f
+  JOIN Mahasiswa m ON f.id_fakultas = m.id_fakultas
+  JOIN Jurusan j ON j.id_jurusan = m.id_jurusan
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY f.id_fakultas, f.nama
+  ORDER BY total_jurusan_klub DESC;",0.0
+20.2,"iwANT tOseE WhICH sEitlucaF HaVe StUdENtSFROMzz tHE Ms DIVErsE mAJRsx gNNIJ CLuBS. ShOW I_fkultas, nAA,zz Na tHEnUMbeR123 of srOJameUqiU (TotAL_jurUsAN_KUBThey’rEx invoLVEd In. tsIL Met mOrF HIGesT O LOesT.","SELECT f.id_fakultas AS I_fkultas, f.nama AS NAA, COUNT(DISTINCT j.id_jurusan) AS TOTAL_jurUsAN_KUB
+FROM Fakultas f
+JOIN Mahasiswa m ON f.id_fakultas = m.id_fakultas
+JOIN Jurusan j ON m.id_jurusan = j.id_jurusan
+JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+GROUP BY f.id_fakultas, f.nama
+ORDER BY TOTAL_jurUsAN_KUB DESC","SELECT f.id_fakultas, f.nama, COUNT(DISTINCT j.id_jurusan) AS total_jurusan_klub
+  FROM Fakultas f
+  JOIN Mahasiswa m ON f.id_fakultas = m.id_fakultas
+  JOIN Jurusan j ON j.id_jurusan = m.id_jurusan
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY f.id_fakultas, f.nama
+  ORDER BY total_jurusan_klub DESC;",1.0
+21.1,"wHiChFaCULTYzz DaEh eacH tsAELta onEx ?ESRUOC SHOw Id_KEpAA, Nama_OsEN,123 nD jUmlAh_m_DAjaR.","SELECT F.id_fakultas, F.nama, COUNT(M.id_mk) AS jumlah_mata_kuliah_diajar
+FROM Fakultas AS F
+JOIN Dosen AS D ON F.id_fakultas = D.id_fakultas
+JOIN MataKuliah AS M ON D.id_dosen = M.id_pengajar
+GROUP BY F.id_fakultas, F.nama;","SELECT f.id_kepala, d.nama AS nama_dosen, COUNT(mk.id_mk) AS jumlah_mk_diajar
+  FROM Fakultas f
+  JOIN Dosen d ON f.id_kepala = d.id_dosen
+  JOIN MataKuliah mk ON mk.id_pengajar = d.id_dosen
+  GROUP BY f.id_kepala, d.nama
+  HAVING COUNT(mk.id_mk) > 0;",0.0
+21.2,"KePAlA sATUKAf MANa YnG seTIdAKNYa EnajaR UTs MATa KLiah123 tAmPLKanid_kpaL, ,NSOD_AAn an jMlAH mAtUL yAng iaJArKA.123","SELECT id_kepala, nama, COUNT(id_mk) AS jmlh_matkul
+FROM Fakultas
+JOIN Dosen ON Fakultas.id_kepala = Dosen.id_dosen
+JOIN MataKuliah ON Dosen.id_dosen = MataKuliah.id_pengajar
+GROUP BY id_kepala, nama
+HAVING COUNT(id_mk) >= 7;","SELECT f.id_kepala, d.nama AS nama_dosen, COUNT(mk.id_mk) AS jumlah_mk_diajar
+  FROM Fakultas f
+  JOIN Dosen d ON f.id_kepala = d.id_dosen
+  JOIN MataKuliah mk ON mk.id_pengajar = d.id_dosen
+  GROUP BY f.id_kepala, d.nama
+  HAVING COUNT(mk.id_mk) > 0;",0.0
+22.1,"TSil stNDutS WHo gOt123 a EdArG ROF eVer OuSETHey ATtENDEd. ,aWSIsAHAm_iWOHS nAMA, an JuMlAH_MK.","SELECT TSIL.nama, COUNT(EDARG.id_mk) AS JUMLAH_MK
+FROM Mahasiswa AS TSIL
+JOIN Nilai AS EDARG ON TSIL.id_mahasiswa = EDARG.id_mahasiswa
+WHERE EDARG.nilai_akhir = 123
+GROUP BY TSIL.nama
+HAVING COUNT(EDARG.id_mk) = (SELECT COUNT(*) FROM Nilai WHERE id_mahasiswa = TSIL.id_mahasiswa);","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT n.id_mk) AS jumlah_mk
+  FROM Mahasiswa m
+  JOIN Nilai n ON m.id_mahasiswa = n.id_mahasiswa
+  JOIN EnrolmenKelas e ON m.id_mahasiswa = e.id_mahasiswa
+  JOIN Sesi s ON e.id_sesi = s.id_sesi
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT n.id_mk) = (
+  SELECT COUNT(DISTINCT s2.id_mk)
+  FROM EnrolmenKelas e2
+  JOIN Sesi s2 ON s2.id_sesi = e2.id_sesi
+  WHERE e2.id_mahasiswa = m.id_mahasiswa
+  );",0.0
+22.2,"sip aJA aWsIsAham yang dapt NIlaI aHirx UNTUK123 sEmua MATKUl gNay dIa AmIL? ,awSiSAHaM_dI:MoLO Nama, .M_HalmUJ","SELECT n.nilai_akhir
+FROM Nilai AS n
+JOIN Mahasiswa AS m ON n.id_mahasiswa = m.id_mahasiswa
+WHERE m.nama ILIKE 'Molo Nama';","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT n.id_mk) AS jumlah_mk
+  FROM Mahasiswa m
+  JOIN Nilai n ON m.id_mahasiswa = n.id_mahasiswa
+  JOIN EnrolmenKelas e ON m.id_mahasiswa = e.id_mahasiswa
+  JOIN Sesi s ON e.id_sesi = s.id_sesi
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT n.id_mk) = (
+  SELECT COUNT(DISTINCT s2.id_mk)
+  FROM EnrolmenKelas e2
+  JOIN Sesi s2 ON s2.id_sesi = e2.id_sesi
+  WHERE e2.id_mahasiswa = m.id_mahasiswa
+  );",0.0
+23.1,"wHiCH sTDeNts both dId123 RESEARcH dNA tog AGRAdE evOBA 85? show id_mAHASiswa, nAMa,Otal_PROyEk YANG BErBdA, niLAI_tErtINGgI. ORt bY grAdE GNidNecSeD","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT p.id_proyek) AS Otal_PROyEk_YANG_BErBdA, MAX(n.nilai_akhir) AS niLAI_tErtINGgI
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN ProyekPenelitian AS p ON pp.id_proyek = p.id_proyek
+JOIN MataKuliah AS mk ON p.id_fakultas = mk.id_fakultas
+JOIN Nilai AS n ON m.id_mahasiswa = n.id_mahasiswa AND mk.id_mk = n.id_mk
+WHERE mk.judul ILIKE 'evOBA' AND p.judul ILIKE '%DNA%' AND n.nilai_akhir = 85
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY niLAI_tErtINGgI DESC","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pp.id_proyek) AS total_proyek, MAX(n.nilai_akhir) AS nilai_tertinggi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN Nilai n ON m.id_mahasiswa = n.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING MAX(n.nilai_akhir) > 85
+  ORDER BY nilai_tertinggi DESC;",0.0
+23.2,"siapa MAHaSIswa YAng uki rIse DAN JUg Dapet nIaI di aTA 85? tAMpilkNzz iD_mAHaSiSa, Nama, TotAL_RyeK gNAY eRBda,niLai_TErtinggi. nATuu DaRi NIlai TeRTInggIzz","SELECT m.id_mahasiswa, m.nama, SUM(mk.sks), MAX(hu.nilai_diperoleh) AS highest_score
+FROM Mahasiswa AS m
+JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+JOIN Ujian AS u ON hu.id_ujian = u.id_ujian
+JOIN MataKuliah AS mk ON u.id_mk = mk.id_mk
+WHERE u.jenis ILIKE 'Uki Rise' AND hu.nilai_diperoleh > 85
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY highest_score DESC","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pp.id_proyek) AS total_proyek, MAX(n.nilai_akhir) AS nilai_tertinggi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN Nilai n ON m.id_mahasiswa = n.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING MAX(n.nilai_akhir) > 85
+  ORDER BY nilai_tertinggi DESC;",0.0
+24.1,"DNIF srERuTCeL OHw sUPErvISEx STUdeNTS and TeACh In mUltIL SEMEStERS. WohS ,NeSod_dI AMA, ,AWsIShaM_LAtt JuMLAH_sMESTE.","SELECT d.nama, COUNT(DISTINCT s.semester) AS jumlah_semester FROM Dosen AS d JOIN Sesi AS s ON d.id_dosen = s.id_pengajar JOIN MataKuliah AS mk ON s.id_mk = mk.id_mk JOIN Mahasiswa AS m ON mk.id_jurusan = m.id_jurusan AND m.id_pembimbing = d.id_dosen GROUP BY d.nama HAVING COUNT(DISTINCT s.semester) > 1","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa,
+  COUNT(DISTINCT s.semester) AS jumlah_semester
+  FROM Dosen d
+  JOIN Mahasiswa m ON m.id_pembimbing = d.id_dosen
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  GROUP BY d.id_dosen, d.nama
+  HAVING COUNT(DISTINCT s.semester) > 1;",0.0
+24.2,"doSEN anaM AJAYaNg NGBimbinGzz MAHASIsWa dAN ugagaArdi hIbEl arI ?RETsemES TAmPIlkan iD_dosn, nama, tOtAL_maHaISWa UMlaHsEMEsTR.","SELECT d.id_dosen, d.nama, COUNT(m.id_mahasiswa) AS TOTAL_maHaISWa
+FROM Dosen AS d
+JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+WHERE d.nama ILIKE 'Ajayang'
+GROUP BY d.id_dosen, d.nama;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa,
+  COUNT(DISTINCT s.semester) AS jumlah_semester
+  FROM Dosen d
+  JOIN Mahasiswa m ON m.id_pembimbing = d.id_dosen
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  GROUP BY d.id_dosen, d.nama
+  HAVING COUNT(DISTINCT s.semester) > 1;",0.0
+25.1,"hIcH all aCILItiEs123 EA D by the SoM ?SITUCaf show ME d_fAsIiaS, THEzz faCiLiT NmE (nAmA_FaSIlItas), AnD123 Hw Ny FACULTieszz use eachzz ENo (toTALFakultaS).x soRtzz THE Litzz fROM MOT TO least SHaReD.123","SELECT ff.id_fasilitas, f.nama AS nama_fasilitas, COUNT(ff.id_fakultas) AS totalfakultas
+FROM FasilitasFakultas AS ff
+JOIN Fasilitas AS f ON ff.id_fasilitas = f.id_fasilitas
+JOIN Fakultas AS fk ON ff.id_fakultas = fk.id_fakultas
+WHERE fk.nama ILIKE 'School of Medicine' OR fk.nama ILIKE 'SOM'
+GROUP BY ff.id_fasilitas, f.nama
+ORDER BY totalfakultas DESC","SELECT f.id_fasilitas, f.nama AS nama_fasilitas, COUNT(DISTINCT ff.id_fakultas) AS total_fakultas
+  FROM Fasilitas f
+  JOIN FasilitasFakultas ff ON f.id_fasilitas = ff.id_fasilitas
+  GROUP BY f.id_fasilitas, f.nama
+  ORDER BY total_fakultas DESC;",0.0
+25.2,"aUmEs FasIlItaszz MAnAzz Aa sIH YNx diPAKaizz BarNG mAs PaLNg banyA FakLtas? naklIpMAt ,SAtIliSAf_DI NaMx FaSIlitaSnYa123 (naMA_falitaS), dn eRApa FkUlta123 GNAy pAkAI (TOTaL_fkULTAs. UrutkANx Dai AnG PalinG BanyAK dipAKA.","SELECT f.nama AS NAMA_FASILITAS, COUNT(ff.id_fakultas) AS TOTAL_FAKULTAS FROM Fasilitas AS f JOIN FasilitasFakultas AS ff ON f.id_fasilitas = ff.id_fasilitas GROUP BY f.nama ORDER BY TOTAL_FAKULTAS DESC","SELECT f.id_fasilitas, f.nama AS nama_fasilitas, COUNT(DISTINCT ff.id_fakultas) AS total_fakultas
+  FROM Fasilitas f
+  JOIN FasilitasFakultas ff ON f.id_fasilitas = ff.id_fasilitas
+  GROUP BY f.id_fasilitas, f.nama
+  ORDER BY total_fakultas DESC;",0.05
+26.1,"IHStDeNtszz NEVR mssED aN SALc (sTaTuS = hADr) ? i Tnw Id_mAhasiswA,x aMAzz TOTAsEsI_dihirI.123","SELECT m.id_mahasiswa, m.nama, COUNT(ck.id_kehadiran) AS total_kehadiran
+FROM Mahasiswa AS m
+JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa
+WHERE ck.status = 'HADR'
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(ck.id_kehadiran) = (SELECT COUNT(*) FROM CatatanKehadiran WHERE id_mahasiswa = m.id_mahasiswa);","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_sesi_dihadiri
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+  WHERE k.status = 'Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) = (
+  SELECT COUNT(*) FROM CatatanKehadiran k2 WHERE k2.id_mahasiswa = m.id_mahasiswa
+  );",0.0
+26.2,"ApAIS AHaSiswA YANg gazz PeRNaH Bols SeKLIPUN (staUs = hAdiR) ?KoLOM: ID_maHaSisWa, NaMa, TOtaseSi_IHaDiRI.","SELECT m.id_mahasiswa, m.nama, COUNT(ck.id_kehadiran) AS total_attendance
+FROM Mahasiswa AS m
+JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa
+WHERE ck.status = 'present'
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(CASE WHEN ck.status <> 'present' THEN 1 END) = 0;","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_sesi_dihadiri
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+  WHERE k.status = 'Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) = (
+  SELECT COUNT(*) FROM CatatanKehadiran k2 WHERE k2.id_mahasiswa = m.id_mahasiswa
+  );",0.0
+27.1,"LiStcLuBS EHw theAVERaGE PG fo mEbeRS Is BOVE 3..ShoW ,bUlk_di ,Ulk_Aan .Kpi_GVA","SELECT k.id_klub, k.nama, AVG(m.id_mahasiswa) AS KPI_GVA
+FROM OrganisasiKlub AS k
+JOIN KeanggotaanKlub AS kk ON k.id_klub = kk.id_klub
+JOIN Mahasiswa AS m ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY k.id_klub, k.nama
+HAVING AVG(m.id_mahasiswa) > 3;","SELECT k.id_klub, k.nama AS nama_klub, AVG(n.IPK) AS avg_ipk
+  FROM KeanggotaanKlub kk
+  JOIN OrganisasiKlub k ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  JOIN Nilai n ON n.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama
+  HAVING AVG(n.IPK) > 3.5;",0.0
+27.2,"kuB manA aJazz YaNg aNGGoA-anggOaNY AYnUP KpI RtA-rAT id atAs 3.5?x ampiLKAnzz Id_KlUb, ,Bulk_aan AVg_p.","SELECT id_klub, AVG(IPK) AS average_rating FROM Mahasiswa m JOIN KeanggotaanKlub k ON m.id_mahasiswa = k.id_mahasiswa GROUP BY id_klub HAVING AVG(IPK) > 3.5","SELECT k.id_klub, k.nama AS nama_klub, AVG(n.IPK) AS avg_ipk
+  FROM KeanggotaanKlub kk
+  JOIN OrganisasiKlub k ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  JOIN Nilai n ON n.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama
+  HAVING AVG(n.IPK) > 3.5;",0.0
+28.1,"Ich couRSeS HaEzz O UdEnTs bUtsTIlL Have sEsiOns? ShOw Id_m,123 juDuL, ISEs_halMUj","SELECT mk.id_mk, mk.judul, COUNT(s.id_sesi) AS session_count
+FROM MataKuliah AS mk
+LEFT JOIN Kelas AS k ON mk.id_mk = k.id_mk
+LEFT JOIN Sesi AS s ON mk.id_mk = s.id_mk
+WHERE k.id_mahasiswa IS NULL
+GROUP BY mk.id_mk, mk.judul
+HAVING COUNT(s.id_sesi) > 0;","SELECT mk.id_mk, mk.judul, COUNT(s.id_sesi) AS jumlah_sesi
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  WHERE NOT EXISTS (
+  SELECT 1 FROM EnrolmenKelas e
+  JOIN Sesi s2 ON e.id_sesi = s2.id_sesi
+  WHERE s2.id_mk = mk.id_mk
+  )
+  GROUP BY mk.id_mk, mk.judul;",1.0
+28.2,"MATkUL manA yANg pUnya isEs TpI123 Ga dA maHaSisWA yANG DAFTaR? kOlo: Id_mk,x JUDUL,x JumLah_SESI.","SELECT id_mk, judul, COUNT(id_sesi) AS jumlah_sesi FROM MataKuliah WHERE id_mk = 'TP123' AND NOT EXISTS (SELECT 1 FROM Sesi WHERE Sesi.id_mk = MataKuliah.id_mk) GROUP BY id_mk, judul","SELECT mk.id_mk, mk.judul, COUNT(s.id_sesi) AS jumlah_sesi
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  WHERE NOT EXISTS (
+  SELECT 1 FROM EnrolmenKelas e
+  JOIN Sesi s2 ON e.id_sesi = s2.id_sesi
+  WHERE s2.id_mk = mk.id_mk
+  )
+  GROUP BY mk.id_mk, mk.judul;",0.0
+29.1,"WhIC BOokSWere DErrOB Mor 5NaHt tIMEsaND123 lLITs hAVEcOpeS? SHwx ,uUB_di jUDul, ToTa_pEMiNjMa, sALInAN_tERSedia.x","SELECT bp.id_buku, bp.judul, bp.salinan_tersedia, COUNT(pb.id_buku) AS total_peminjaman
+FROM BukuPerpustakaan AS bp
+LEFT JOIN PeminjamanBuku AS pb ON bp.id_buku = pb.id_buku
+WHERE bp.salinan_tersedia = 123
+GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia
+HAVING COUNT(pb.id_buku) > 5;","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON b.id_buku = p.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  HAVING COUNT(p.id_peminjaman) > 5 AND b.salinan_tersedia > 0;",1.0
+29.2,"Uku aPa aJAzz YnGUDAhx dIpnJAM LeBIH aRizz XtaImaSitERsEDia? :MOlOk Id_bUKu, JudUL,zz tTaL_pEmiNjMa, .AIeSReT_NaniLa","SELECT id_buku, judul, COUNT(id_peminjaman) AS total_borrow_count, tahun_terbit FROM BukuPerpustakaan LEFT JOIN PeminjamanBuku ON id_buku = BukuPerpustakaan.id_buku GROUP BY id_buku, judul, tahun_terbit ORDER BY total_borrow_count DESC LIMIT 1","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON b.id_buku = p.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  HAVING COUNT(p.id_peminjaman) > 5 AND b.salinan_tersedia > 0;",0.0
+30.1,"eraOHW eh TOp 5 leTURerS WIth H tSOM roLES (tEacHNg, supRVIsIN, PbLiSHINg) SHOw iD_osN, NAa toTaL_PERaN.","WITH DosenRoles AS (
+    SELECT id_dosen, COUNT(*) AS total_roles
+    FROM (
+        SELECT id_pengajar AS id_dosen FROM MataKuliah
+        UNION ALL
+        SELECT id_pembimbing AS id_dosen FROM Mahasiswa
+        UNION ALL
+        SELECT id_dosen FROM PenulisPublikasi
+    ) AS CombinedRoles
+    GROUP BY id_dosen
+),
+TotalRoles AS (
+    SELECT SUM(total_roles) AS overall_total FROM DosenRoles
+)
+SELECT d.id_dosen, d.nama, (dr.total_roles * 100.0 / tr.overall_total) AS percentage_total
+FROM Dosen d
+JOIN DosenRoles dr ON d.id_dosen = dr.id_dosen
+CROSS JOIN TotalRoles tr
+ORDER BY dr.total_roles DESC
+LIMIT 5;","SELECT d.id_dosen, d.nama,
+  (SELECT COUNT(*) FROM Sesi WHERE id_pengajar = d.id_dosen) +
+  (SELECT COUNT(*) FROM Mahasiswa WHERE id_pembimbing = d.id_dosen) +
+  (SELECT COUNT(*) FROM PenulisPublikasi WHERE id_dosen = d.id_dosen) AS total_peran
+  FROM Dosen d
+  ORDER BY total_peran DESC
+  LIMIT 5;",0.0
+30.2,"doEn TeRAKTiF dalAm hal123 ,RAjaGN BIbing, dANPukasi sIPa aja? kolom:ID_DoseN,AmA,zz tot_PERAN.","SELECT d.id_dosen AS ID_DoseN, d.nama AS AmA, COUNT(p.id_partisipasi) AS zz_tot_PERAN
+FROM Dosen AS d
+JOIN ProyekPenelitian AS pp ON d.id_dosen = pp.id_dosen
+JOIN PartisipasiPenelitian AS p ON pp.id_proyek = p.id_proyek
+JOIN Fasilitas AS f ON pp.id_fakultas = f.id_fasilitas -- Assuming project location is tied to Fasilitas
+WHERE d.jabatan ILIKE '%aktif%' -- Active lecturers (doEn TeRAKTiF)
+  AND f.nama ILIKE '%123%' -- Hall 123 (hal123)
+  AND pp.judul ILIKE '%bing%' -- Confused/unclear role in Bing (RAjaGN BIbing)
+  AND f.lokasi ILIKE '%unknown%' -- Location unknown (dANPukasi sIPa aja)
+GROUP BY d.id_dosen, d.nama;","SELECT d.id_dosen, d.nama,
+  (SELECT COUNT(*) FROM Sesi WHERE id_pengajar = d.id_dosen) +
+  (SELECT COUNT(*) FROM Mahasiswa WHERE id_pembimbing = d.id_dosen) +
+  (SELECT COUNT(*) FROM PenulisPublikasi WHERE id_dosen = d.id_dosen) AS total_peran
+  FROM Dosen d
+  ORDER BY total_peran DESC
+  LIMIT 5;",0.0
+31.1,"tndutScIHW iS MOs acTIvEoVeRALL (sESsioNS, rEsEaRh, cLUBS)? sHW iD_AAsIsWa, NAma,x toTl_SeSi, TOTAL_pROyEk, tOaL_kluB.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT e.id_sesi) AS total_sessions, COUNT(DISTINCT p.id_proyek) AS total_projects, COUNT(DISTINCT k.id_klub) AS total_clubs
+FROM Mahasiswa AS m
+LEFT JOIN EnrolmenKelas AS e ON m.id_mahasiswa = e.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+LEFT JOIN ProyekPenelitian AS p ON pp.id_proyek = p.id_proyek
+LEFT JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+LEFT JOIN OrganisasiKlub AS k ON kk.id_klub = k.id_klub
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY total_sessions DESC, total_projects DESC, total_clubs DESC
+LIMIT 1;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT k.id_sesi) AS total_sesi,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian pp ON pp.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN KeanggotaanKlub kk ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY (COUNT(DISTINCT k.id_sesi) + COUNT(DISTINCT pp.id_proyek) + COUNT(DISTINCT kk.id_klub)) DESC
+LIMIT 1;
+",1.0
+31.2,"MaHassw123 MaA YaNG palInGAkIf seCArA123 AKAEMik? kOlom:123 Id_MAHaSiSwA, NAMa,x TTAL_sesI, toTalpROYEk, tOtal_KlUb.zz","WITH StudentAttendance AS (
+    SELECT id_mahasiswa, COUNT(DISTINCT id_sesi) AS total_sessions_attended
+    FROM CatatanKehadiran
+    GROUP BY id_mahasiswa
+),
+StudentProjects AS (
+    SELECT id_mahasiswa, COUNT(DISTINCT id_proyek) AS total_projects_completed
+    FROM PartisipasiPenelitian
+    GROUP BY id_mahasiswa
+),
+StudentClubs AS (
+    SELECT id_mahasiswa, COUNT(DISTINCT id_klub) AS total_clubs_joined
+    FROM KeanggotaanKlub
+    GROUP BY id_mahasiswa
+)
+SELECT m.id_mahasiswa, m.nama, COALESCE(sa.total_sessions_attended, 0) AS total_sessions_attended, COALESCE(sp.total_projects_completed, 0) AS total_projects_completed, COALESCE(sc.total_clubs_joined, 0) AS total_clubs_joined
+FROM Mahasiswa m
+LEFT JOIN StudentAttendance sa ON m.id_mahasiswa = sa.id_mahasiswa
+LEFT JOIN StudentProjects sp ON m.id_mahasiswa = sp.id_mahasiswa
+LEFT JOIN StudentClubs sc ON m.id_mahasiswa = sc.id_mahasiswa
+ORDER BY total_sessions_attended DESC, total_projects_completed DESC, total_clubs_joined DESC;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT k.id_sesi) AS total_sesi,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian pp ON pp.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN KeanggotaanKlub kk ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY (COUNT(DISTINCT k.id_sesi) + COUNT(DISTINCT pp.id_proyek) + COUNT(DISTINCT kk.id_klub)) DESC
+LIMIT 1;
+",0.0
+32.1,WHicH courSS haD eHT beSt eGaRevA OITApiItRp SORE? sHOWx iD_mk jUDULx AvG_Paripai.,"SELECT id_mk, judul, AVG(nilai_partisipasi) AS average_participation_score FROM MataKuliah JOIN EnrolmenKelas ON MataKuliah.id_mk = EnrolmenKelas.id_sesi GROUP BY id_mk, judul ORDER BY average_participation_score DESC LIMIT 1","SELECT mk.id_mk, mk.judul, AVG(e.nilai_partisipasi) AS avg_partisipasi
+  FROM MataKuliah mk
+  JOIN Sesi s ON s.id_mk = mk.id_mk
+  JOIN EnrolmenKelas e ON e.id_sesi = s.id_sesi
+  GROUP BY mk.id_mk, mk.judul
+  ORDER BY avg_partisipasi DESC
+  LIMIT 5;",0.0
+32.2,"MAtKUl manax NAY uNa NILAix PaTISIPasI tertiNGGi SECarAx ?aTa-tAR TaMPiLKan IDK, jUd,123 AvgpArTIpASI.","SELECT mk.id_mk, mk.judul, AVG(e.nilai_partisipasi) AS avg_participation_rate
+FROM MataKuliah AS mk
+JOIN Sesi AS s ON mk.id_mk = s.id_mk
+JOIN EnrolmenKelas AS e ON s.id_sesi = e.id_sesi
+GROUP BY mk.id_mk, mk.judul
+HAVING AVG(e.nilai_partisipasi) = (SELECT MAX(avg_part) FROM (SELECT AVG(e2.nilai_partisipasi) AS avg_part FROM MataKuliah AS mk2 JOIN Sesi AS s2 ON mk2.id_mk = s2.id_mk JOIN EnrolmenKelas AS e2 ON s2.id_sesi = e2.id_sesi GROUP BY mk2.id_mk) AS subquery);","SELECT mk.id_mk, mk.judul, AVG(e.nilai_partisipasi) AS avg_partisipasi
+  FROM MataKuliah mk
+  JOIN Sesi s ON s.id_mk = mk.id_mk
+  JOIN EnrolmenKelas e ON e.id_sesi = s.id_sesi
+  GROUP BY mk.id_mk, mk.judul
+  ORDER BY avg_partisipasi DESC
+  LIMIT 5;",0.0
+33.1,"HcIHW SrEruCel HcET n tEREFFid FaCultiE tHnthe ONe123 ThEy BEontO HW ,NeSo_DI NAMA AsSigNEd_faKlTaS, TaUgHTFAKUtAs.","SELECT f.nama AS NAMA_Assigned_fakultas, d.nama AS TaughtFakultas
+FROM Fakultas AS f
+JOIN Dosen AS d ON f.id_kepala = d.id_dosen
+WHERE f.nama ILIKE '%sre%hc%hce%'
+AND EXISTS (
+    SELECT 1
+    FROM FasilitasFakultas AS ff
+    JOIN Fasilitas AS fa ON ff.id_fasilitas = fa.id_fasilitas
+    WHERE ff.id_fakultas = f.id_fakultas AND fa.lokasi ILIKE '%one123%'
+)
+AND EXISTS (
+    SELECT 1
+    FROM Jurusan AS j
+    WHERE j.id_fakultas = f.id_fakultas AND j.nama ILIKE '%hw%'
+)
+AND EXISTS (
+    SELECT 1
+    FROM Jurusan AS j
+    WHERE j.id_fakultas = f.id_fakultas AND j.nama ILIKE '%neso_di%'
+);","SELECT d.id_dosen, d.nama, f1.nama AS assigned_fakultas, f2.nama AS taught_fakultas
+  FROM Dosen d
+  JOIN MataKuliah mk ON mk.id_pengajar = d.id_dosen
+  JOIN Fakultas f1 ON d.id_fakultas = f1.id_fakultas
+  JOIN Fakultas f2 ON mk.id_fakultas = f2.id_fakultas
+  WHERE f1.id_fakultas <> f2.id_fakultas;",1.0
+33.2,"DsEN ANA JA YanGngajaR di FAKUltas beRbeDADArizz teMPaT :mOLOK?YNlasA D_DosEN, amAx ,SAtLkAF_DeNGsSA .sAtLuKAF_thGuat","SELECT nama, MAX(DATE('now') - tanggal_lahir) AS max_age, f.nama AS faculty_name
+FROM Dosen AS d
+JOIN Fakultas AS f ON d.id_fakultas = f.id_fakultas
+WHERE d.nama ILIKE '%Moloko%'
+GROUP BY f.id_fakultas, d.nama;","SELECT d.id_dosen, d.nama, f1.nama AS assigned_fakultas, f2.nama AS taught_fakultas
+  FROM Dosen d
+  JOIN MataKuliah mk ON mk.id_pengajar = d.id_dosen
+  JOIN Fakultas f1 ON d.id_fakultas = f1.id_fakultas
+  JOIN Fakultas f2 ON mk.id_fakultas = f2.id_fakultas
+  WHERE f1.id_fakultas <> f2.id_fakultas;",0.0
+34.1,"hCIhW leCturers123 TAUGhT he sMEx COURsE In 3+SeMEStErS? Wohs Id_DosENx NAma, iD_mkjDuL, toTaL_sEMEsTeR.","SELECT id_pengajar, D.nama, id_mk
+FROM Sesi AS S
+JOIN Dosen AS D ON S.id_pengajar = D.id_dosen
+JOIN MataKuliah AS MK ON S.id_mk = MK.id_mk
+WHERE MK.judul ILIKE 'HCI'
+GROUP BY id_pengajar, D.nama, id_mk
+HAVING COUNT(DISTINCT semester) > 3;","SELECT d.id_dosen, d.nama, mk.id_mk, mk.judul, COUNT(DISTINCT s.semester) AS total_semester
+  FROM Dosen d
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  JOIN MataKuliah mk ON mk.id_mk = s.id_mk
+  GROUP BY d.id_dosen, d.nama, mk.id_mk, mk.judul
+  HAVING COUNT(DISTINCT s.semester) >= 3;",0.0
+34.2,"NeSOd mANa YaNgnGAjR mATKUl YANG SaMAx di 3 NakLIPMAT?ebReBReTsEmES iD_dOSN, NamA, I_mk,123 ,uDuJ eTSeMs_laToT","SELECT d.id_dosen, d.nama, mk.id_mk, mk.judul
+FROM Dosen AS d
+JOIN MataKuliah AS mk ON d.id_dosen = mk.id_pengajar
+JOIN Sesi AS s ON mk.id_mk = s.id_mk
+GROUP BY d.id_dosen, d.nama, mk.id_mk, mk.judul
+HAVING COUNT(DISTINCT s.semester) = 3;","SELECT d.id_dosen, d.nama, mk.id_mk, mk.judul, COUNT(DISTINCT s.semester) AS total_semester
+  FROM Dosen d
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  JOIN MataKuliah mk ON mk.id_mk = s.id_mk
+  GROUP BY d.id_dosen, d.nama, mk.id_mk, mk.judul
+  HAVING COUNT(DISTINCT s.semester) >= 3;",1.0
+35.1,"whICh TudeNS ErEx TnesA MorE ThA ?SeMIt ShOw ,AsISAHaM_DI NaMA, ttal_aBsEN.","SELECT m.nama, COUNT(ck.id_kehadiran) AS total_absences FROM Mahasiswa AS m JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa WHERE ck.status = 'Absent' GROUP BY m.nama HAVING COUNT(ck.id_kehadiran) > 7","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_absen
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  WHERE k.status = 'Tidak Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) > 5;",1.0
+35.2,"MAhaSiSWa123 MaNA123 yAG123 Es ebI dAIx 5x ?IAk oOm:iD_aHASSWA, nam, TOtaL_asEn.","SELECT id, total_assets
+FROM users
+WHERE id ILIKE 'MAhaSiSWa123' OR id ILIKE 'MaNA123' OR id ILIKE 'yAG123';","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_absen
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  WHERE k.status = 'Tidak Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) > 5;",0.0
+36.1,"WHIch reErch PrOecTs NOlVeDzz sTuDEnTs mOrf 3 dpaRtMenT? Show id_PROYe123 JUDul, ToTal_juRUsan.","SELECT pp.id_proyek, pp.judul, COUNT(DISTINCT p.id_mahasiswa) AS total_researchers
+FROM ProyekPenelitian AS pp
+JOIN PartisipasiPenelitian AS p ON pp.id_proyek = p.id_proyek
+JOIN Mahasiswa AS m ON p.id_mahasiswa = m.id_mahasiswa
+GROUP BY pp.id_proyek, pp.judul
+HAVING COUNT(DISTINCT m.id_jurusan) > 3;","SELECT p.id_proyek, p.judul, COUNT(DISTINCT m.id_jurusan) AS total_jurusan
+  FROM ProyekPenelitian p
+  JOIN PartisipasiPenelitian pp ON pp.id_proyek = p.id_proyek
+  JOIN Mahasiswa m ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY p.id_proyek, p.judul
+  HAVING COUNT(DISTINCT m.id_jurusan) >= 3;",1.0
+36.2,"PROyEK PenELtiAn ManA GnAY dIikUTi mAaSa dAri MINIMA123 3 JUrUSAn? koLom: ID_pRoyEk,x jUDL, tOTAl_jurusAN.","SELECT id_proyek, judul, COUNT(DISTINCT id_fakultas) AS total_departments FROM ProyekPenelitian GROUP BY id_proyek, judul HAVING COUNT(DISTINCT id_fakultas) >= 3","SELECT p.id_proyek, p.judul, COUNT(DISTINCT m.id_jurusan) AS total_jurusan
+  FROM ProyekPenelitian p
+  JOIN PartisipasiPenelitian pp ON pp.id_proyek = p.id_proyek
+  JOIN Mahasiswa m ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY p.id_proyek, p.judul
+  HAVING COUNT(DISTINCT m.id_jurusan) >= 3;",1.0
+37.1,"whICh lc HAvE HE mosT TIRaV fx STnedUts fROM TNEREfId MAjOrS eDlCNI( 1 fi theEArE no MORE tAN 1).?JsT OHs me the oP 5. ix waNtzz tO sEe id_KluB tHE luB Name ,)aMAN( DnA HOWzz YnaM diFFERenT DpaRENTS tHEr123 membERS COe123 FRmzz OTaL_JUruSAn).","SELECT ok.id_klub, ok.nama AS lubName, d.nama AS aMAN, COUNT(DISTINCT m.id_pembimbing) AS OTAL_JUruSan
+FROM OrganisasiKlub AS ok
+JOIN Dosen AS d ON ok.id_pembimbing_dosen = d.id_dosen
+JOIN KeanggotaanKlub AS kk ON ok.id_klub = kk.id_klub
+JOIN Mahasiswa AS m ON kk.id_mahasiswa = m.id_mahasiswa
+JOIN Jurusan AS j ON m.id_jurusan = j.id_jurusan
+WHERE j.nama ILIKE 'Theatre'
+GROUP BY ok.id_klub, ok.nama, d.nama
+ORDER BY COUNT(DISTINCT m.id_mahasiswa) DESC
+LIMIT 5;","SELECT k.id_klub, k.nama, COUNT(DISTINCT m.id_jurusan) AS total_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY k.id_klub, k.nama
+  ORDER BY total_jurusan DESC
+  LIMIT 5;",0.0
+37.2,"KlUB-Klubx aNam Aa YnGzz AnAtOgGNA paliNgzz MAGAreb dARi juRusAN berBEdazz Kalu CmaN sAT JuRUsan jUg GaPAPA)? tMPiLkAN 5 tErAtAs yA. Ku mazz taHiL ID_KLuB,123 NAmA ,)aMan(Aynbuk DAN NaSUrUJhALMu YaNg bERBedax (ToTal_JrUsaN) Da PAa aGgotAnYA.","SELECT k.id_klub, k.nama, COUNT(DISTINCT km.id_mahasiswa) AS JumlahAnggota, COUNT(DISTINCT m.id_jurusan) AS Total_Jurusan FROM OrganisasiKlub k JOIN KeanggotaanKlub km ON k.id_klub = km.id_klub JOIN Mahasiswa m ON km.id_mahasiswa = m.id_mahasiswa GROUP BY k.id_klub, k.nama ORDER BY Total_Jurusan DESC LIMIT 5","SELECT k.id_klub, k.nama, COUNT(DISTINCT m.id_jurusan) AS total_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY k.id_klub, k.nama
+  ORDER BY total_jurusan DESC
+  LIMIT 5;",1.0
+38.1,"wHAT ARe 3eHt moST bOrrOwED BOOksAn hOW Ynam CopIES re WoHs?TfEl ,uKub_dI UDul, TOtAL_PEMNjaaN, saLINAn_tEsEIA.","SELECT bp.id_buku, bp.judul, bp.salinan_tersedia, COUNT(pb.id_buku) AS total_borrow_count FROM BukuPerpustakaan bp LEFT JOIN PeminjamanBuku pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia ORDER BY total_borrow_count DESC LIMIT 3","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON p.id_buku = b.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  ORDER BY total_peminjaman DESC
+  LIMIT 3;",1.0
+38.2,"apa ajA 3 BukU123 YAGx gNilAP SERiN DIPiNJam dAn BeRpA NnILAs tErIsA OLoM:id_BUU, JudUL,zz ToTaL_pEmIjMN, SalinAN_TeRSEdi.","SELECT bp.id_buku, bp.judul, COUNT(pb.id_buku) AS total_loans, bp.salinan_tersedia FROM BukuPerpustakaan bp LEFT JOIN PeminjamanBuku pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia ORDER BY total_loans DESC LIMIT 3","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON p.id_buku = b.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  ORDER BY total_peminjaman DESC
+  LIMIT 3;",1.0
+39.1,"whICh stUDnTSHAVE ToP gp 10% dNA ThEIR adiSORzz PublIHd sOMEtHinG sHOW ID_MasIsW, Nma,ipk,123 TOTL_PUBlikaSiPEmBimbING.zz","SELECT m.id_mahasiswa, m.nama, m.id_mahasiswa, COUNT(pp.id_publikasi) AS total_publikasi_pembimbing
+FROM Mahasiswa AS m
+JOIN Dosen AS d ON m.id_pembimbing = d.id_dosen
+JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+WHERE m.id_mahasiswa IN (SELECT id_mahasiswa FROM Nilai ORDER BY IPK DESC LIMIT (SELECT COUNT(*) FROM Nilai) / 10)
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY m.id_mahasiswa;","SELECT m.id_mahasiswa, m.nama, MAX(n.IPK) AS IPK,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi_pembimbing
+  FROM Mahasiswa m
+  JOIN Nilai n ON n.id_mahasiswa = m.id_mahasiswa
+  JOIN Dosen d ON d.id_dosen = m.id_pembimbing
+  JOIN PenulisPublikasi pp ON pp.id_dosen = d.id_dosen
+  WHERE n.IPK > (SELECT percentile_cont(0.9) WITHIN GROUP (ORDER BY IPK) FROM Nilai)
+  GROUP BY m.id_mahasiswa, m.nama;",0.0
+39.2,"ApaiS mAhasISWazz ipk-nYax maSUK top 1% dA123 PEBMbIngNYa peRnh pUblikASI? kOlOM: id_MAHASISWa, nAMa, IPK, tOTal_pubLIkaSI_pEmBImbig.","SELECT m.id_mahasiswa, m.nama, n.IPK, COUNT(pp.id_publikasi) AS total_publikasi_dibimbing
+FROM Mahasiswa AS m
+JOIN Nilai AS n ON m.id_mahasiswa = n.id_mahasiswa
+LEFT JOIN Dosen AS d ON m.id_pembimbing = d.id_dosen
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+WHERE n.IPK >= (SELECT PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY IPK) FROM Nilai)
+GROUP BY m.id_mahasiswa, m.nama, n.IPK
+ORDER BY n.IPK DESC;","SELECT m.id_mahasiswa, m.nama, MAX(n.IPK) AS IPK,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi_pembimbing
+  FROM Mahasiswa m
+  JOIN Nilai n ON n.id_mahasiswa = m.id_mahasiswa
+  JOIN Dosen d ON d.id_dosen = m.id_pembimbing
+  JOIN PenulisPublikasi pp ON pp.id_dosen = d.id_dosen
+  WHERE n.IPK > (SELECT percentile_cont(0.9) WITHIN GROUP (ORDER BY IPK) FROM Nilai)
+  GROUP BY m.id_mahasiswa, m.nama;",0.0
+40.1,"sIL fACULTiES WitH > depaRTmeNt,zz 5+zz leCtUrER, and >3 proJC.123 sHO ,SaTlUKAfdi NAMa, TotaL_JuruSN, toTAL_oSeN, ToTal_proyeK.","SELECT f.nama AS faculty_name, COUNT(DISTINCT j.id_jurusan) AS total_jurusan, COUNT(DISTINCT d.id_dosen) AS total_dosen, COUNT(DISTINCT p.id_proyek) AS total_projek FROM Fakultas f LEFT JOIN Jurusan j ON f.id_fakultas = j.id_fakultas LEFT JOIN Dosen d ON f.id_fakultas = d.id_fakultas LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas GROUP BY f.nama HAVING COUNT(DISTINCT d.id_dosen) > 5 AND COUNT(DISTINCT p.id_proyek) > 3","SELECT f.id_fakultas, f.nama,
+  COUNT(DISTINCT j.id_jurusan) AS total_jurusan,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  LEFT JOIN Jurusan j ON j.id_fakultas = f.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  LEFT JOIN ProyekPenelitian p ON p.id_fakultas = f.id_fakultas
+  GROUP BY f.id_fakultas, f.nama
+  HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND COUNT(DISTINCT d.id_dosen) >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;",1.0
+40.2,"NaMtluKaF YNGx PuNyA >1 jURSaN, NESoD+5 AkTIf,123 NAD >3 Pyek? KLOM: i_fakUlTas nAmA, ,nAsuUj_LATT tOTAl_Sen, .KeYRp_LT","SELECT f.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_students, SUM(mk.sks) AS total_credits
+FROM Fakultas f
+JOIN Jurusan j ON f.id_fakultas = j.id_fakultas
+JOIN Mahasiswa m ON j.id_jurusan = m.id_jurusan
+JOIN MataKuliah mk ON j.id_jurusan = mk.id_jurusan
+JOIN Nilai n ON m.id_mahasiswa = n.id_mahasiswa
+WHERE m.tanggal_masuk IS NOT NULL
+GROUP BY f.nama
+HAVING COUNT(DISTINCT mk.id_mk) > 1 AND COUNT(DISTINCT CASE WHEN m.tanggal_masuk IS NOT NULL THEN m.id_mahasiswa END) >= 5 AND COUNT(DISTINCT CASE WHEN n.IPK > 3 THEN m.id_mahasiswa END) > 3;","SELECT f.id_fakultas, f.nama,
+  COUNT(DISTINCT j.id_jurusan) AS total_jurusan,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  LEFT JOIN Jurusan j ON j.id_fakultas = f.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  LEFT JOIN ProyekPenelitian p ON p.id_fakultas = f.id_fakultas
+  GROUP BY f.id_fakultas, f.nama
+  HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND COUNT(DISTINCT d.id_dosen) >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;",1.0
+41.1,"StEDuTShCIHw TOOk123 ExAm,x Idzz rESERCH,aJOineD lS? ShOW ,aM,aWSISham_Di TOl_UJiA, tTaL_prOyEK ttaL_kLuB.","SELECT m.nama, m.email, m.telepon, COUNT(DISTINCT pp.id_proyek) AS total_projects, COUNT(DISTINCT kk.id_klub) AS total_clubs
+FROM Mahasiswa AS m
+JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+JOIN Ujian AS u ON hu.id_ujian = u.id_ujian
+JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+JOIN OrganisasiKlub AS ok ON kk.id_klub = ok.id_klub
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+WHERE u.jenis ILIKE 'RESEARCH' AND ok.nama ILIKE 'LS'
+GROUP BY m.id_mahasiswa
+HAVING COUNT(DISTINCT kk.id_klub) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT h.id_ujian) AS total_ujian,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  LEFT JOIN HasilUjian h ON m.id_mahasiswa = h.id_mahasiswa
+  LEFT JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  LEFT JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT h.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;",0.0
+41.2,"AMASishaM gNay NaIJU ukI rISET,123 DANzz AktIFx dizz kb? KolOM: ID_MaHasSwA, NAma, ToTal_UJIan, ToAl_proyk, TOtAL_KlU.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT u.id_ujian) AS total_ujian, COUNT(DISTINCT p.id_proyek) AS total_proyek, COUNT(DISTINCT k.id_klub) AS total_klub
+FROM Mahasiswa AS m
+LEFT JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+LEFT JOIN Ujian AS u ON hu.id_ujian = u.id_ujian
+LEFT JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+LEFT JOIN ProyekPenelitian AS p ON pp.id_proyek = p.id_proyek
+LEFT JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+LEFT JOIN OrganisasiKlub AS k ON kk.id_klub = k.id_klub
+WHERE m.nama ILIKE 'AMASishaM gNay NaIJU'
+GROUP BY m.id_mahasiswa, m.nama;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT h.id_ujian) AS total_ujian,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  LEFT JOIN HasilUjian h ON m.id_mahasiswa = h.id_mahasiswa
+  LEFT JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  LEFT JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT h.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;",0.0
+42.1,"whiCH setluCf evaH a hEAd o t’nsEOd tEacH? ShOw Id_FAKLAs, NAma, ,ALpEK_I NAMAkEPAla.123","SELECT s.id_settlement, s.name, h.name AS head_of_household_name
+FROM Settlement AS s
+JOIN Household AS h ON s.id_settlement = h.id_settlement
+JOIN Person AS p ON h.head_of_household = p.id_person
+JOIN Occupation AS o ON p.occupation_id = o.id_occupation
+WHERE o.name ILIKE 'Teacher';","SELECT f.id_fakultas, f.nama, f.id_kepala, d.nama AS nama_kepala
+  FROM Fakultas f
+  JOIN Dosen d ON f.id_kepala = d.id_dosen
+  WHERE NOT EXISTS (
+  SELECT 1 FROM MataKuliah mk WHERE mk.id_pengajar = f.id_kepala
+  );",0.0
+42.2,"fakLTa MANa yAGzz keaLAzz FAkuLTsNyA GpeRNAh NAjA kOLoM: ID_FAKltAS123 ,aMAn i_KealA,zz Nama_kEpALAzz","SELECT F.nama AS nama_fakultas, D.nama AS nama_kepala_jurusan
+FROM Fakultas AS F
+LEFT JOIN Dosen AS D ON F.id_kepala = D.id_dosen
+WHERE F.id_fakultas ILIKE 'ID_FAKltAS123';","SELECT f.id_fakultas, f.nama, f.id_kepala, d.nama AS nama_kepala
+  FROM Fakultas f
+  JOIN Dosen d ON f.id_kepala = d.id_dosen
+  WHERE NOT EXISTS (
+  SELECT 1 FROM MataKuliah mk WHERE mk.id_pengajar = f.id_kepala
+  );",0.0
+43.1,"hCIhw SeSuoc ARe tAugT BY123 dIffeRNtlECTureRs TNeeFIdNi SEmEsTErs?x SHw I_Mk,123 JuDl, .rjaGNeP_lAoT","SELECT mk.id_mk, s.id_pengajar, d.nama
+FROM MataKuliah AS mk
+JOIN Sesi AS s ON mk.id_mk = s.id_mk
+JOIN Dosen AS d ON s.id_pengajar = d.id_dosen
+WHERE mk.judul IN ('HCI', 'Security', 'Software Architecture') AND s.semester IN ('Fall', 'Spring');","SELECT mk.id_mk, mk.judul, COUNT(DISTINCT s.id_pengajar) AS total_pengajar
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  GROUP BY mk.id_mk, mk.judul
+  HAVING COUNT(DISTINCT s.id_pengajar) > 1;",1.0
+43.2,"utam naM GNAy daJAR leh adebrEBNsOD dix SemeSTr bERBeDA?123 :moLOk id_MK jUDuL,tOtAL_PNJA","SELECT m.id_mahasiswa, m.nama FROM Mahasiswa AS m JOIN Fakultas AS f ON m.id_fakultas = f.id_fakultas JOIN Nilai AS n ON m.id_mahasiswa = n.id_mahasiswa WHERE f.nama ILIKE 'Adeberbensod' GROUP BY m.id_mahasiswa, m.nama HAVING COUNT(DISTINCT n.semester) > 1","SELECT mk.id_mk, mk.judul, COUNT(DISTINCT s.id_pengajar) AS total_pengajar
+  FROM MataKuliah mk
+  JOIN Sesi s ON mk.id_mk = s.id_mk
+  GROUP BY mk.id_mk, mk.judul
+  HAVING COUNT(DISTINCT s.id_pengajar) > 1;",1.0
+44.1,"whO gO The hIGhEtsCORe iN123 hcAE exAM? sHOW Id_uJIAN, ,siSahaM_DI AMa,niLaI_IPERoLEh.zz","SELECT u.id_ujian, m.nama AS nama_siswa, MAX(hu.nilai_diperoleh) AS nilai_tertinggi
+FROM Ujian AS u
+JOIN HasilUjian AS hu ON u.id_ujian = hu.id_ujian
+JOIN Mahasiswa AS m ON hu.id_mahasiswa = m.id_mahasiswa
+WHERE u.jenis ILIKE 'HCAE'
+GROUP BY u.id_ujian, m.nama
+ORDER BY nilai_tertinggi DESC
+LIMIT 1;","SELECT h.id_ujian, h.id_mahasiswa, m.nama, h.nilai_diperoleh
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON m.id_mahasiswa = h.id_mahasiswa
+  WHERE h.nilai_diperoleh = (
+  SELECT MAX(h2.nilai_diperoleh)
+  FROM HasilUjian h2
+  WHERE h2.id_ujian = h.id_ujian
+  );",0.0
+44.2,"Siapa AJA MAHaSisA dengANzz NILAI TEtINgGi DI sePx ujIAN? kolOm Id_UJiAN, D_MaHsiSWA,naa,zz NilaiDIpErLH.x","SELECT u.id_ujian, h.id_mahasiswa, m.nama, h.nilai_diperoleh
+FROM HasilUjian AS h
+JOIN (
+    SELECT id_ujian, MAX(nilai_diperoleh) AS max_nilai
+    FROM HasilUjian
+    GROUP BY id_ujian
+) AS max_scores ON h.id_ujian = max_scores.id_ujian AND h.nilai_diperoleh = max_scores.max_nilai
+JOIN Mahasiswa AS m ON h.id_mahasiswa = m.id_mahasiswa
+JOIN Ujian AS u ON h.id_ujian = u.id_ujian;","SELECT h.id_ujian, h.id_mahasiswa, m.nama, h.nilai_diperoleh
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON m.id_mahasiswa = h.id_mahasiswa
+  WHERE h.nilai_diperoleh = (
+  SELECT MAX(h2.nilai_diperoleh)
+  FROM HasilUjian h2
+  WHERE h2.id_ujian = h.id_ujian
+  );",1.0
+45.1,"whIcH Books wEre nevEr borROwe BUt123 are IN a CATEgoRy hAT OtHErSx ORrOw oFTn?x WOhS id_BukU, jUDuL, KATEgORI.123","SELECT id_buku, judul, kategori FROM BukuPerpustakaan WHERE id_buku NOT IN (SELECT id_buku FROM PeminjamanBuku) AND kategori IN (SELECT kategori FROM BukuPerpustakaan WHERE id_buku IN (SELECT id_buku FROM PeminjamanBuku) GROUP BY kategori HAVING COUNT(*) > 5)","SELECT b.id_buku, b.judul, b.kategori
+  FROM BukuPerpustakaan b
+  WHERE NOT EXISTS (
+  SELECT 1 FROM PeminjamanBuku p WHERE p.id_buku = b.id_buku
+  )
+  AND EXISTS (
+  SELECT 1 FROM BukuPerpustakaan b2
+  JOIN PeminjamanBuku p2 ON p2.id_buku = b2.id_buku
+  WHERE b2.kategori = b.kategori
+  GROUP BY b2.kategori
+  HAVING COUNT(*) > 3
+  );",1.0
+45.2,"AnaMkub YanGBElm pERNah DipiNJAm ipaT ERmaSuK kATGorIPOpulEr oLOm: id_bUku, jUdUL,kteGoRi.","SELECT id_buku, judul, kategori FROM BukuPerpustakaan WHERE id_buku IN (SELECT id_buku FROM PeminjamanBuku) AND kategori IN ('Fiction', 'Science Fiction', 'Mystery', 'Thriller');","SELECT b.id_buku, b.judul, b.kategori
+  FROM BukuPerpustakaan b
+  WHERE NOT EXISTS (
+  SELECT 1 FROM PeminjamanBuku p WHERE p.id_buku = b.id_buku
+  )
+  AND EXISTS (
+  SELECT 1 FROM BukuPerpustakaan b2
+  JOIN PeminjamanBuku p2 ON p2.id_buku = b2.id_buku
+  WHERE b2.kategori = b.kategori
+  GROUP BY b2.kategori
+  HAVING COUNT(*) > 3
+  );",1.0
+46.1,"WhiCH StUDENtHAEavSoRS THaT aLso wrITE pUBLiatIns? woS Id_mahaSISwA, NAMA, Id_peBmbin,123 nama_dosEn, TOTAl_PUBlkAS.zz","SELECT m.id_mahasiswa, m.nama AS nama_mahasiswa, d.id_dosen, d.nama AS nama_dosen, COUNT(pp.id_publikasi) AS total_publikasi
+FROM Mahasiswa AS m
+JOIN Dosen AS d ON m.id_pembimbing = d.id_dosen
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+GROUP BY m.id_mahasiswa, m.nama, d.id_dosen, d.nama
+HAVING COUNT(pp.id_publikasi) > 0;","SELECT m.id_mahasiswa, m.nama, d.id_dosen AS id_pembimbing, d.nama AS nama_dosen, COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Mahasiswa m
+  JOIN Dosen d ON m.id_pembimbing = d.id_dosen
+  JOIN PenulisPublikasi pp ON pp.id_dosen = d.id_dosen
+  GROUP BY m.id_mahasiswa, m.nama, d.id_dosen, d.nama;",1.0
+46.2,"mahasIsWa mNA Yang DSenNYa juGA NUlIS PublkAsI? KOom: ID_MAHassWa,nAmA, Id_PeMBMBIng, namA_DOsE ToaL_pUbLikASI.","SELECT D.id_dosen, D.nama AS nama_dosen, M.id_pembimbing, DM.nama AS nama_pembimbing, COUNT(P.id_publikasi) AS total_publikasi
+FROM Dosen AS D
+JOIN Mahasiswa AS M ON D.id_dosen = M.id_pembimbing
+JOIN Dosen AS DM ON M.id_pembimbing = DM.id_dosen
+LEFT JOIN PenulisPublikasi AS PP ON D.id_dosen = PP.id_dosen
+LEFT JOIN Publikasi AS P ON PP.id_publikasi = P.id_publikasi
+GROUP BY D.id_dosen, D.nama, M.id_pembimbing, DM.nama
+HAVING COUNT(P.id_publikasi) > 0;","SELECT m.id_mahasiswa, m.nama, d.id_dosen AS id_pembimbing, d.nama AS nama_dosen, COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Mahasiswa m
+  JOIN Dosen d ON m.id_pembimbing = d.id_dosen
+  JOIN PenulisPublikasi pp ON pp.id_dosen = d.id_dosen
+  GROUP BY m.id_mahasiswa, m.nama, d.id_dosen, d.nama;",0.0
+47.1,"Hw ArE t123 LectUrer123 thAeAcH ANd LEADzz rsEaRcH prjeCTs,zz BUT DoN’t SuErVIse aNy tUdEnTs?x juSt WoHS THEir id_DOSEnand NAA.","SELECT id_dosen, nama FROM Dosen WHERE id_dosen IN (SELECT id_pengajar FROM MataKuliah) AND id_dosen IN (SELECT id_dosen FROM ProyekPenelitian) EXCEPT SELECT id_dosen, nama FROM Dosen WHERE id_dosen IN (SELECT id_pembimbing FROM Mahasiswa)","SELECT DISTINCT d.id_dosen, d.nama
+  FROM Dosen d
+  WHERE EXISTS (
+  SELECT 1 FROM ProyekPenelitian p WHERE p.id_dosen = d.id_dosen
+  )
+  AND EXISTS (
+  SELECT 1 FROM Sesi s WHERE s.id_pengajar = d.id_dosen
+  )
+  AND NOT EXISTS (
+  SELECT 1 FROM Mahasiswa m WHERE m.id_pembimbing = d.id_dosen
+  );",1.0
+47.2,"NMneSoD Ja si yaNG KTiF ngJar dAnJAdIpENELIti, tAPinggA bimbIng MhaSisw ?IaksAMas tMiLkaN ID_dOsn dAN A MEEKaYa.123","SELECT d.id_dosen, d.nama
+FROM Dosen AS d
+WHERE d.id_dosen IN (SELECT s.id_pengajar FROM Sesi AS s)
+  AND d.id_dosen IN (SELECT u.id_mk FROM Ujian AS u);","SELECT DISTINCT d.id_dosen, d.nama
+  FROM Dosen d
+  WHERE EXISTS (
+  SELECT 1 FROM ProyekPenelitian p WHERE p.id_dosen = d.id_dosen
+  )
+  AND EXISTS (
+  SELECT 1 FROM Sesi s WHERE s.id_pengajar = d.id_dosen
+  )
+  AND NOT EXISTS (
+  SELECT 1 FROM Mahasiswa m WHERE m.id_pembimbing = d.id_dosen
+  );",1.0
+48.1,"hICfaILItIeSzz aRe AcCeSEd Byx all ?seITLUCAf ShoW ,AtIlisAf_I nam.x","SELECT nama, lokasi FROM Fasilitas","SELECT f.id_fasilitas, f.nama
+  FROM Fasilitas f
+  WHERE (
+  SELECT COUNT(DISTINCT ff.id_fakultas)
+  FROM FasilitasFakultas ff
+  WHERE ff.id_fasilitas = f.id_fasilitas
+  ) = (SELECT COUNT(*) FROM Fakultas);",0.0
+48.2,"ASiLITaS maA YanG123 eKApID smuA FalTaS?kOLO: ,AILISaf_di nAMA.",SELECT FASILITAS FROM FasilitasFakultas WHERE EKAPID = 123 AND AILISAF_DI = 'NAMA' AND FASILITAS IS NULL,"SELECT f.id_fasilitas, f.nama
+  FROM Fasilitas f
+  WHERE (
+  SELECT COUNT(DISTINCT ff.id_fakultas)
+  FROM FasilitasFakultas ff
+  WHERE ff.id_fasilitas = f.id_fasilitas
+  ) = (SELECT COUNT(*) FROM Fakultas);",0.0
+49.1,"WHICh TudeNTS evAh JoiNed rearChx tCejORp Led b leCTurERSFRoM DifFerEntfAcUTyx THAN HeIr owN?123 I wanTx to see Tex stUdENt’S id, ,EmAn tEIR FAcUlt ,DI eht SupERVIiNG LEcTueR’sfAcultY Id, AnD How YNaM ozz tEseCRoSs-FAulty pROjecTS NeebEv’yet paRt OF.x","SELECT M.id_mahasiswa, M.id_fakultas AS fakultas_mahasiswa, P.id_fakultas AS fakultas_dosen, COUNT(*) AS jumlah_proyek_lintas_fakultas
+FROM Mahasiswa AS M
+JOIN PartisipasiPenelitian AS PP ON M.id_mahasiswa = PP.id_mahasiswa
+JOIN ProyekPenelitian AS P ON PP.id_proyek = P.id_proyek
+WHERE M.id_fakultas <> P.id_fakultas
+GROUP BY M.id_mahasiswa, M.id_fakultas, P.id_fakultas
+HAVING COUNT(*) > 0;","SELECT 
+  m.id_mahasiswa,
+  m.nama,
+  m.id_fakultas AS id_fakultas_mahasiswa,
+  d.id_fakultas AS id_fakultas_dosen_pembimbing,
+  COUNT(*) AS total_proyek_silang_fakultas
+FROM PartisipasiPenelitian pp
+JOIN Mahasiswa m ON pp.id_mahasiswa = m.id_mahasiswa
+JOIN ProyekPenelitian p ON pp.id_proyek = p.id_proyek
+JOIN Dosen d ON p.id_dosen = d.id_dosen
+WHERE m.id_fakultas <> d.id_fakultas
+GROUP BY m.id_mahasiswa, m.nama, m.id_fakultas, d.id_fakultas;",0.0
+49.2,"siap Aa aWSISAHaM YnG ikut ProyEK peNElitAn gNeRAB doen Ari fakutAS Nial tamPILKAzz Id_mAhasWA, nAMa, DI FaKUlta MahasIWANYA,x i faKULTA oSeNnYA,dAn total oyK intAs STLukaf YAnG merEkA .iTUK","SELECT M.id_mahasiswa, M.nama, F.nama AS nama_fakultas, 'Nial' AS fakultas_samudra, 'Total Intake' AS status_total_intake
+FROM Mahasiswa AS M
+JOIN Fakultas AS F ON M.id_fakultas = F.id_fakultas
+JOIN PartisipasiPenelitian AS PP ON M.id_mahasiswa = PP.id_mahasiswa
+JOIN ProyekPenelitian AS Proj ON PP.id_proyek = Proj.id_proyek
+JOIN Dosen AS D ON Proj.id_dosen = D.id_dosen
+WHERE D.nama ILIKE 'Doen Ari'
+AND F.nama ILIKE 'Nial';","SELECT 
+  m.id_mahasiswa,
+  m.nama,
+  m.id_fakultas AS id_fakultas_mahasiswa,
+  d.id_fakultas AS id_fakultas_dosen_pembimbing,
+  COUNT(*) AS total_proyek_silang_fakultas
+FROM PartisipasiPenelitian pp
+JOIN Mahasiswa m ON pp.id_mahasiswa = m.id_mahasiswa
+JOIN ProyekPenelitian p ON pp.id_proyek = p.id_proyek
+JOIN Dosen d ON p.id_dosen = d.id_dosen
+WHERE m.id_fakultas <> d.id_fakultas
+GROUP BY m.id_mahasiswa, m.nama, m.id_fakultas, d.id_fakultas;",0.0
+50.1,"WhIHcLUBSzz HAve olYSTdEntszz froM The SAE dEPaRTmENT? WhS ID_Klub, nAmA_kLUB, iJuRUSan.","SELECT ok.id_klub, ok.nama AS nama_klub, m.nama AS nama_mahasiswa
+FROM OrganisasiKlub AS ok
+JOIN KeanggotaanKlub AS kk ON ok.id_klub = kk.id_klub
+JOIN Mahasiswa AS m ON kk.id_mahasiswa = m.id_mahasiswa
+WHERE m.id_jurusan IN (SELECT id_jurusan FROM Mahasiswa GROUP BY id_jurusan HAVING COUNT(*) > 1);","SELECT k.id_klub, k.nama AS nama_klub, m.id_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama, m.id_jurusan
+  HAVING COUNT(DISTINCT m.id_jurusan) = 1;",0.0
+50.2,"klub mANA YanG SEmU ANGgOTANyA dARI SatU nasURJ aj Kolm: iD_KluB, naMA_KLuB,123 Id_jurUsaN.","SELECT k.id_klub, k.nama, m.id_fakultas
+FROM OrganisasiKlub k
+JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY k.id_klub, k.nama, m.id_fakultas
+HAVING COUNT(DISTINCT m.id_fakultas) = 1;","SELECT k.id_klub, k.nama AS nama_klub, m.id_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama, m.id_jurusan
+  HAVING COUNT(DISTINCT m.id_jurusan) = 1;",0.1

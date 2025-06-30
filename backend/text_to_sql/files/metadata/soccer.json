@@ -1,0 +1,1236 @@
+{
+  "database": "soccer",
+  "tables": [
+    {
+      "name": "asst_referee_mast",
+      "description": "Table containing information about assistant referees.",
+      "columns": [
+        {
+          "key": "ass_ref_id",
+          "name": "ass_ref_id",
+          "type": "NUMBER(6,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for assistant referee."
+        },
+        {
+          "key": "ass_ref_name",
+          "name": "ass_ref_name",
+          "type": "VARCHAR(24)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the assistant referee."
+        },
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMBER(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_country(country_id)",
+          "description": "Reference to the country of the assistant referee."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_country",
+          "primary_table": "asst_referee_mast",
+          "join": "asst_referee_mast.country_id = soccer_country.country_id",
+          "description": "Each assistant referee is associated with a country."
+        }
+      ]
+    },
+    {
+      "name": "coach_mast",
+      "description": "Table containing information about coaches.",
+      "columns": [
+        {
+          "key": "coach_id",
+          "name": "coach_id",
+          "type": "NUMBER(5,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for coach."
+        },
+        {
+          "key": "coach_name",
+          "name": "coach_name",
+          "type": "VARCHAR(19)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the coach."
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "goal_details",
+      "description": "Table recording goal-related details in matches.",
+      "columns": [
+        {
+          "key": "goal_id",
+          "name": "goal_id",
+          "type": "NUMBER(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Goal identifier."
+        },
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMBER(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast(match_no)",
+          "description": "Reference to match."
+        },
+        {
+          "key": "player_id",
+          "name": "player_id",
+          "type": "NUMBER(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast(player_id)",
+          "description": "Player who scored the goal."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMBER(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team that scored the goal."
+        },
+        {
+          "key": "goal_time",
+          "name": "goal_time",
+          "type": "NUMBER(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Time of goal in minute. Example value: 57"
+        },
+        {
+          "key": "goal_type",
+          "name": "goal_type",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Type of goal. N for normal, P for penalty, O for own goal."
+        },
+        {
+          "key": "play_stage",
+          "name": "play_stage",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Stage of play. G for Group Stage, R for Round of 16 (or First Knockout Round), Q for Quarterfinals, S for Semifinals, and F for Final."
+        },
+        {
+          "key": "goal_schedule",
+          "name": "goal_schedule",
+          "type": "VARCHAR(2)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Schedule of goal. ST for stoppage time, NT for normal time, ET for extra time."
+        },
+        {
+          "key": "goal_half",
+          "name": "goal_half",
+          "type": "NUMBER(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Half in which goal was scored. 1 for first half, 2 for second half."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "goal_details",
+          "join": "goal_details.match_no = match_mast.match_no",
+          "description": "Goal is linked to the match where it was scored."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "goal_details",
+          "join": "goal_details.player_id = player_mast.player_id",
+          "description": "Goal was scored by a player."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "goal_details",
+          "join": "goal_details.team_id = soccer_team.team_id",
+          "description": "Goal is credited to a team."
+        }
+      ]
+    },
+    {
+      "name": "match_captain",
+      "description": "Table linking team captains to matches.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMBER(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast(match_no)",
+          "description": "Reference to match."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMBER(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team playing the match."
+        },
+        {
+          "key": "player_captain",
+          "name": "player_captain",
+          "type": "NUMBER(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast(player_id)",
+          "description": "Captain of the team for the match."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "match_captain",
+          "join": "match_captain.match_no = match_mast.match_no",
+          "description": "Captains are assigned for each match."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "match_captain",
+          "join": "match_captain.team_id = soccer_team.team_id",
+          "description": "Captain is selected from a specific team."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "match_captain",
+          "join": "match_captain.player_captain = player_mast.player_id",
+          "description": "Player assigned as team captain."
+        }
+      ]
+    },
+    {
+      "name": "match_details",
+      "description": "Table containing detailed results of matches.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMBER(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast(match_no)",
+          "description": "Reference to match."
+        },
+        {
+          "key": "play_stage",
+          "name": "play_stage",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Stage of play. G for Group Stage, R for Round of 16 (or First Knockout Round), Q for Quarterfinals, S for Semifinals, and F for Final."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMBER(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team involved in the match."
+        },
+        {
+          "key": "win_lose",
+          "name": "win_lose",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Win or lose status. W for win, L for lose, D for draw"
+        },
+        {
+          "key": "decided_by",
+          "name": "decided_by",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Method of deciding winner. N for normal time, P for penalty shootout."
+        },
+        {
+          "key": "goal_score",
+          "name": "goal_score",
+          "type": "NUMBER(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Number of goals scored."
+        },
+        {
+          "key": "penalty_score",
+          "name": "penalty_score",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Penalty score if any."
+        },
+        {
+          "key": "ass_ref",
+          "name": "ass_ref",
+          "type": "NUMBER(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "asst_referee_mast(ass_ref_id)",
+          "description": "Assistant referee for the match."
+        },
+        {
+          "key": "player_gk",
+          "name": "player_gk",
+          "type": "NUMBER(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast(player_id)",
+          "description": "Goalkeeper for the match."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "match_details",
+          "join": "match_details.match_no = match_mast.match_no",
+          "description": "Details are attached to a specific match."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "match_details",
+          "join": "match_details.team_id = soccer_team.team_id",
+          "description": "Match involves a specific team."
+        },
+        {
+          "foreign_table": "asst_referee_mast",
+          "primary_table": "match_details",
+          "join": "match_details.ass_ref = asst_referee_mast.ass_ref_id",
+          "description": "Assistant referee assigned to the match."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "match_details",
+          "join": "match_details.player_gk = player_mast.player_id",
+          "description": "Player who played as goalkeeper in the match."
+        }
+      ]
+    },
+    {
+      "name": "match_mast",
+      "description": "Main table for storing match information.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique match number."
+        },
+        {
+          "key": "play_stage",
+          "name": "play_stage",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Stage of the tournament. G for Group Stage, R for Round of 16 (or First Knockout Round), Q for Quarterfinals, S for Semifinals, and F for Final."
+        },
+        {
+          "key": "play_date",
+          "name": "play_date",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date of the match."
+        },
+        {
+          "key": "results",
+          "name": "results",
+          "type": "VARCHAR(4)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Result of the match. WIN, DRAW, LOSE"
+        },
+        {
+          "key": "decided_by",
+          "name": "decided_by",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Way the match was decided. N for normal time, P for penalty shootout."
+        },
+        {
+          "key": "goal_score",
+          "name": "goal_score",
+          "type": "VARCHAR(6)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Score of the match. Example value: 0-1"
+        },
+        {
+          "key": "venue_id",
+          "name": "venue_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_venue.venue_id",
+          "description": "Venue where the match was held."
+        },
+        {
+          "key": "referee_id",
+          "name": "referee_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "referee_mast.referee_id",
+          "description": "Main referee of the match."
+        },
+        {
+          "key": "audence",
+          "name": "audence",
+          "type": "NUMERIC(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Audience attendance."
+        },
+        {
+          "key": "plr_of_match",
+          "name": "plr_of_match",
+          "type": "NUMERIC(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast.player_id",
+          "description": "Player of the match."
+        },
+        {
+          "key": "stop1_sec",
+          "name": "stop1_sec",
+          "type": "NUMERIC(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Stop time in first half."
+        },
+        {
+          "key": "stop2_sec",
+          "name": "stop2_sec",
+          "type": "NUMERIC(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Stop time in second half."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_venue",
+          "primary_table": "match_mast",
+          "join": "match_mast.venue_id = soccer_venue.venue_id",
+          "description": "Match is played at a venue."
+        },
+        {
+          "foreign_table": "referee_mast",
+          "primary_table": "match_mast",
+          "join": "match_mast.referee_id = referee_mast.referee_id",
+          "description": "Referee who officiated the match."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "match_mast",
+          "join": "match_mast.plr_of_match = player_mast.player_id",
+          "description": "Player who was awarded player of the match."
+        }
+      ]
+    },
+    {
+      "name": "penalty_gk",
+      "description": "Stores goalkeeper assigned for penalty shootouts.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast.match_no",
+          "description": "Match number."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team.team_id",
+          "description": "Team taking the penalty."
+        },
+        {
+          "key": "player_gk",
+          "name": "player_gk",
+          "type": "NUMERIC(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast.player_id",
+          "description": "Goalkeeper assigned for penalty."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "penalty_gk",
+          "join": "penalty_gk.match_no = match_mast.match_no",
+          "description": "Match where penalty shootout occurred."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "penalty_gk",
+          "join": "penalty_gk.team_id = soccer_team.team_id",
+          "description": "Team involved in the penalty shootout."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "penalty_gk",
+          "join": "penalty_gk.player_gk = player_mast.player_id",
+          "description": "Goalkeeper who faced the penalty."
+        }
+      ]
+    },
+    {
+      "name": "penalty_shootout",
+      "description": "Stores penalty shootout details including players and goals.",
+      "columns": [
+        {
+          "key": "kick_id",
+          "name": "kick_id",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Kick identifier."
+        },
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast.match_no",
+          "description": "Match number."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team.team_id",
+          "description": "Team attempting the kick."
+        },
+        {
+          "key": "player_id",
+          "name": "player_id",
+          "type": "NUMERIC(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast.player_id",
+          "description": "Player taking the penalty."
+        },
+        {
+          "key": "score_goal",
+          "name": "score_goal",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Whether the goal was scored. Y for yes, N for no"
+        },
+        {
+          "key": "kick_no",
+          "name": "kick_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Kick number order."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "penalty_shootout",
+          "join": "penalty_shootout.match_no = match_mast.match_no",
+          "description": "Match for the penalty."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "penalty_shootout",
+          "join": "penalty_shootout.team_id = soccer_team.team_id",
+          "description": "Team involved in the penalty."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "penalty_shootout",
+          "join": "penalty_shootout.player_id = player_mast.player_id",
+          "description": "Player attempting the penalty kick."
+        }
+      ]
+    },
+    {
+      "name": "player_booked",
+      "description": "Stores records of players who received bookings during matches.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast(match_no)",
+          "description": "Match number where the booking happened."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team associated with the player."
+        },
+        {
+          "key": "player_id",
+          "name": "player_id",
+          "type": "NUMERIC(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast(player_id)",
+          "description": "Player who received the booking."
+        },
+        {
+          "key": "booking_time",
+          "name": "booking_time",
+          "type": "NUMERIC(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Time at which the booking occurred."
+        },
+        {
+          "key": "sent_off",
+          "name": "sent_off",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Indicates if the player was sent off. Y for yes, NULL for no"
+        },
+        {
+          "key": "play_schedule",
+          "name": "play_schedule",
+          "type": "VARCHAR(2)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Play schedule during which the booking occurred. ST for stoppage time, NT for normal time, ET for extra time."
+        },
+        {
+          "key": "play_half",
+          "name": "play_half",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Half of the game the booking occurred in. 1 for first half, 2 for second half."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "player_booked",
+          "join": "player_booked.match_no = match_mast.match_no",
+          "description": "Links the booking to a specific match."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "player_booked",
+          "join": "player_booked.player_id = player_mast.player_id",
+          "description": "Links the booking to a specific player."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "player_booked",
+          "join": "player_booked.team_id = soccer_team.team_id",
+          "description": "Links the booking to a team."
+        }
+      ]
+    },
+    {
+      "name": "player_in_out",
+      "description": "Tracks substitutions of players in and out during matches.",
+      "columns": [
+        {
+          "key": "match_no",
+          "name": "match_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "match_mast(match_no)",
+          "description": "Match in which the player was substituted."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team to which the player belongs."
+        },
+        {
+          "key": "player_id",
+          "name": "player_id",
+          "type": "NUMERIC(7,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "player_mast(player_id)",
+          "description": "Player who was substituted."
+        },
+        {
+          "key": "in_out",
+          "name": "in_out",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "'I' for in, 'O' for out."
+        },
+        {
+          "key": "time_in_out",
+          "name": "time_in_out",
+          "type": "NUMERIC(4,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Time of substitution."
+        },
+        {
+          "key": "play_schedule",
+          "name": "play_schedule",
+          "type": "VARCHAR(2)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Play schedule associated with substitution. ST for stoppage time, NT for normal time, ET for extra time."
+        },
+        {
+          "key": "play_half",
+          "name": "play_half",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Game half when substitution happened. 1 for first half, 2 for second half."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "match_mast",
+          "primary_table": "player_in_out",
+          "join": "player_in_out.match_no = match_mast.match_no",
+          "description": "Links the substitution to the match."
+        },
+        {
+          "foreign_table": "player_mast",
+          "primary_table": "player_in_out",
+          "join": "player_in_out.player_id = player_mast.player_id",
+          "description": "Links the substituted player."
+        },
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "player_in_out",
+          "join": "player_in_out.team_id = soccer_team.team_id",
+          "description": "Links the substitution to the team."
+        }
+      ]
+    },
+    {
+      "name": "player_mast",
+      "description": "Stores detailed player information.",
+      "columns": [
+        {
+          "key": "player_id",
+          "name": "player_id",
+          "type": "NUMERIC(7,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for each player."
+        },
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team(team_id)",
+          "description": "Team to which the player belongs."
+        },
+        {
+          "key": "jersey_no",
+          "name": "jersey_no",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Player's jersey number."
+        },
+        {
+          "key": "player_name",
+          "name": "player_name",
+          "type": "VARCHAR(22)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the player."
+        },
+        {
+          "key": "posi_to_play",
+          "name": "posi_to_play",
+          "type": "VARCHAR(2)",
+          "nullable": true,
+          "attributes": [],
+          "references": "playing_position(position_id)",
+          "description": "Playing position of the player."
+        },
+        {
+          "key": "dt_of_bir",
+          "name": "dt_of_bir",
+          "type": "TIMESTAMP WITH TIME ZONE",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Date of birth of the player."
+        },
+        {
+          "key": "age",
+          "name": "age",
+          "type": "NUMERIC(3,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Age of the player."
+        },
+        {
+          "key": "playing_club",
+          "name": "playing_club",
+          "type": "VARCHAR(19)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the club the player plays for."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_team",
+          "primary_table": "player_mast",
+          "join": "player_mast.team_id = soccer_team.team_id",
+          "description": "Link to the player's team."
+        },
+        {
+          "foreign_table": "playing_position",
+          "primary_table": "player_mast",
+          "join": "player_mast.posi_to_play = playing_position.position_id",
+          "description": "Link to player's playing position."
+        }
+      ]
+    },
+    {
+      "name": "playing_position",
+      "description": "Defines playing positions available to players.",
+      "columns": [
+        {
+          "key": "position_id",
+          "name": "position_id",
+          "type": "VARCHAR(3)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique ID for each playing position."
+        },
+        {
+          "key": "position_desc",
+          "name": "position_desc",
+          "type": "VARCHAR(50)",
+          "nullable": false,
+          "attributes": [],
+          "references": null,
+          "description": "Description of the position."
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "referee_mast",
+      "description": "Stores referee details.",
+      "columns": [
+        {
+          "key": "referee_id",
+          "name": "referee_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for the referee."
+        },
+        {
+          "key": "referee_name",
+          "name": "referee_name",
+          "type": "VARCHAR(23)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the referee."
+        },
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_country(country_id)",
+          "description": "Country ID of the referee."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_country",
+          "primary_table": "referee_mast",
+          "join": "referee_mast.country_id = soccer_country.country_id",
+          "description": "Referee's country reference."
+        }
+      ]
+    },
+    {
+      "name": "soccer_city",
+      "description": "City reference table.",
+      "columns": [
+        {
+          "key": "city_id",
+          "name": "city_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "City ID."
+        },
+        {
+          "key": "city",
+          "name": "city",
+          "type": "VARCHAR(13)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "City name."
+        },
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_country.country_id",
+          "description": "Country ID of the city."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_city",
+          "primary_table": "soccer_country",
+          "join": "soccer_city.country_id = soccer_country.country_id",
+          "description": "Country to which the city belongs."
+        }
+      ]
+    },
+    {
+      "name": "soccer_country",
+      "description": "Table containing information about countries participating in the tournament.",
+      "columns": [
+        {
+          "key": "country_id",
+          "name": "country_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for each country."
+        },
+        {
+          "key": "country_abbr",
+          "name": "country_abbr",
+          "type": "VARCHAR(3)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Abbreviation of the country name."
+        },
+        {
+          "key": "country_name",
+          "name": "country_name",
+          "type": "VARCHAR(19)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Full name of the country."
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "soccer_team",
+      "description": "Table containing statistics of soccer teams.",
+      "columns": [
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for the team."
+        },
+        {
+          "key": "team_group",
+          "name": "team_group",
+          "type": "VARCHAR(1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Group of the team."
+        },
+        {
+          "key": "match_played",
+          "name": "match_played",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Matches played."
+        },
+        {
+          "key": "won",
+          "name": "won",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Matches won."
+        },
+        {
+          "key": "draw",
+          "name": "draw",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Matches drawn."
+        },
+        {
+          "key": "lost",
+          "name": "lost",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Matches lost."
+        },
+        {
+          "key": "goal_for",
+          "name": "goal_for",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Goals scored for."
+        },
+        {
+          "key": "goal_agnst",
+          "name": "goal_agnst",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Goals conceded."
+        },
+        {
+          "key": "goal_diff",
+          "name": "goal_diff",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Goal difference."
+        },
+        {
+          "key": "points",
+          "name": "points",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Points earned."
+        },
+        {
+          "key": "group_position",
+          "name": "group_position",
+          "type": "NUMERIC(2,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Position in the group."
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "soccer_venue",
+      "description": "Table listing the venues used for the matches.",
+      "columns": [
+        {
+          "key": "venue_id",
+          "name": "venue_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": false,
+          "attributes": [
+            "PRIMARY KEY"
+          ],
+          "references": null,
+          "description": "Unique identifier for each venue."
+        },
+        {
+          "key": "venue_name",
+          "name": "venue_name",
+          "type": "VARCHAR(23)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Name of the venue."
+        },
+        {
+          "key": "city_id",
+          "name": "city_id",
+          "type": "NUMERIC(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_city.city_id",
+          "description": "City ID where the venue is located."
+        },
+        {
+          "key": "aud_capacity",
+          "name": "aud_capacity",
+          "type": "NUMERIC(6,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": null,
+          "description": "Audience capacity of the venue."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "soccer_venue",
+          "primary_table": "soccer_city",
+          "join": "soccer_venue.city_id = soccer_city.city_id",
+          "description": "City in which the venue is located."
+        }
+      ]
+    },
+    {
+      "name": "team_coaches",
+      "description": "Mapping of teams to their coaches.",
+      "columns": [
+        {
+          "key": "team_id",
+          "name": "team_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "soccer_team.team_id",
+          "description": "Team ID."
+        },
+        {
+          "key": "coach_id",
+          "name": "coach_id",
+          "type": "NUMERIC(5,1)",
+          "nullable": true,
+          "attributes": [],
+          "references": "coach_mast.coach_id",
+          "description": "Coach ID."
+        }
+      ],
+      "relations": [
+        {
+          "foreign_table": "team_coaches",
+          "primary_table": "soccer_team",
+          "join": "team_coaches.team_id = soccer_team.team_id",
+          "description": "Team associated with the coach."
+        },
+        {
+          "foreign_table": "team_coaches",
+          "primary_table": "coach_mast",
+          "join": "team_coaches.coach_id = coach_mast.coach_id",
+          "description": "Coach assigned to the team."
+        }
+      ]
+    }
+  ]
+}

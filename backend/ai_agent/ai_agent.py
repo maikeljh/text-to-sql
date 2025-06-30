@@ -190,6 +190,7 @@ def generate_sql_tool(state: AgentState) -> dict:
             provider=state.provider,
             api_key=ENUM.get(state.provider, ""),
             schema_path=f"./files/schema/{state.database}.txt",
+            metadata_path=f"../files/metadata/{state.database}.json",
         ),
         retrieve_context_config=ContextConfig(
             data_path=f"./files/dataset/dataset_{state.database}.csv"
@@ -205,7 +206,7 @@ def generate_sql_tool(state: AgentState) -> dict:
     text_to_sql = TextToSQL(config=text_to_sql_config)
 
     # Generate SQL
-    sql = text_to_sql.generate_v1(user_prompt=query, method="Multistage")
+    sql = text_to_sql.generate_v3(user_prompt=query)
     result = text_to_sql.execute_query(sql)
 
     return {"GenerateSQL": result, "GeneratedQueryRaw": sql}

@@ -41,6 +41,7 @@ class GeneralLLM:
             api_key=self.config.api_key,
             model=self.config.model,
             provider=self.config.provider,
+            timeout=self.config.timeout,
         )
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:

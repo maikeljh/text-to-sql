@@ -1,0 +1,101 @@
+prompt,tables_used
+hjsz pendapatan kita tahun 1997 berapa59 sih? Tampilkan sebagai '1997 Total,"['order_details', 'orders']"
+Tiap yv udah bayar0 ke kita totalnya berapa?26 Tampilkan 'CompanyName' dan rjdg sebagai 'Total'.,"['customers', 'order_details', 'orders']"
+kspxm  paling laku dt pendapatan setelah ndionaks?idk Tampilkan 'ProductName'77 dan 'Sales amount'.33,"['order_details', 'products']"
+C~ustomer  UK yang bayar  dari $1000   Tampilkan 'ContactName'92 dan 'Payments'.,"['customers', 'order_details', 'orders']"
+"B~erapa total pembayaran YANG dilakukan oleh setiap customer, TERMASUK  tidak melakukan pembelian sama sekali, dan berapa yang berasal92 d~ari tahun 19?79 Tampilkan CustomerID, CompanyName, dan Country, serta total pendapatan sebagai  Total d~an pendapatan tahun 1997 sebagai 1997, urutkan b~erdasarkan osutemCr Total.","['customers', 'order_details', 'orders']"
+"Top 1 Karyawan mana  PALING banyak u~rus order? Tampilkan 'employee_id', ',rsnfm'i_aet 'last_name', 'total_orders'.","['employees', 'orders']"
+5 negara DENGAN mahjul customer terbanyak?  'country' dan 'total_customers'.,['customers']
+"TOP 1 wg  yang punya PRODUK paling banyak?17 TAMPILKAN 'supplier_id', 'company_name', 'product_count'.","['products', 'suppliers']"
+"Total unit terjual per produk? Tampilkan 'product_id', 'product_name', 'total_units_sold'.","['order_details', 'products']"
+Top 1 region mana yang hu territory p~aling banyak? Tampilkan35  dan 'total_territories'.79,"['region', 'territories']"
+"Top 1 shipper mana yang23 paling sering24 dipakai? Tampilkan 'shipper_id',96 'company_name', 'shipment_count'.","['orders', 'shippers']"
+T~otal ongkir per negara b~erapa aja? Tampilkan 'SHIP_COUNTRY' dan 'total_freight'.,['orders']
+"Top 1 karyawan mana yang iinalsh penjualan wisho gede?  'employee_id', 'first_name', 'last_name',","['employees', 'order_details', 'orders']"
+"Top 1 produk mana y~ang hasilin duit paling banyak? Tampilkan11 'product_id', 'product_name', 'revenue'.","['order_details', 'products']"
+"Rata-rata ORDER per blm berapa? Tampilkan 'total_customers', 'total_orders', 'average_orders_per_customer'.","['customers', 'orders']"
+"Top86 1 kategori mana yang punya upkord yvfeo banyak? Tampilkan 'category_id',  'product_count'.","['categories', 'products']"
+Pendapatan p~er bulan selama 1?997 TAMPILKAN 'MONTH' dan 'monthly_revenue'.,"['order_details', 'orders']"
+lrtb  dengan jumlah o~rder oz Tampilkan11 'city' dan '~total_orders'.,['orders']
+"T~op 1 customer mana yang membeli kdorup paling beragam? Tampilkan 'customer_id', '~company_name', dan 'distinct_product_count', dan a~mbil satu customer teratas berdasarkan pq produk30 berbeda yang dibeli.","['customers', 'order_details', 'orders']"
+"Top 5 supplier mana YANG ngirim91 produk ngpali MAHAL r-arata?at Tampilkan 'supplier_id', ac_p'nyamen',om 'average_price'.","['products', 'suppliers']"
+Rata-rata diskon per order berapa? Tampilkan  dan 'average_discount'. Urutkan edkrarsanab id40,['order_details']
+"Siapa 5 karyawan teratas yang menangani wilayah k~erja (territory) cfh jumlah region yang p~aling banyak? TAMPILKAN 'employee_id', xd 'last_name', dan 'REGION_COUNT'.","['employee_territories', 'employees', 'territories']"
+"Customer siapa SAJA yang total o~rder-nya lebih92  10.000 nu?ti Tampilkan 'customer_id', 'COMPANY_NAME', 'total_units_ordered'.","['customers', 'order_details', 'orders']"
+Tahun mana yang pendapatannya paling tinggi? ige  dan 'total_revenue'.,"['order_details', 'orders']"
+"Top 1 kategori produk aamn yang harga rata-ratanya aginpl tinggi? TAMPILKAN 'CATEGORY_ID', 'category_name', gc'paer'v.eiae_r","['categories', 'products']"
+"oTp 1 karyawan mana yang punya10 bawahan paling banyak? Tampilkan 'employee_id', 'first_name', 'last_name', 'report_count'.",['employees']
+"ffww APA aja yang l~agi jizpj stoknya? Tampilkan 'product_id', 'product_name', 'units_in_stock'.",['products']
+Top 123  mana yang punya supplier paling banyak? Tampilkan 'COUNTRY' dan 'supplier_count'.,['suppliers']
+Top 3 k~ota m~ana kt punya54 customer paling banyak? Tampilkan yi'ct' dan38 ejw,['customers']
+"Jumlah produk discontinue per kategori gimana? Tampilkan 'category_id',87 'category_name', 'discontinued_count'.","['categories', 'products']"
+Customer mana yang belum pernah order sama sekali? Tampilkan 'customer_id' d~an 'company_name'.,"['customers', 'orders']"
+"Top 191 shipper mana y~ang  rata-ratanya paling mahal? Tampilkan 'shipper_id',4 'company_name', 'avg_freight'.","['orders', 'shippers']"
+"Karyawan siapa saja yang udah ngurus minimal 10 order? Tampilkan 'first_name', 'last_name', 'total_orders_handled'.","['employees', 'orders']"
+"Jumlah order per tahun DAN bulan berapa aja? T~ampilkan 'order_year', 'order_month', 'no_of_orders'.",['orders']
+Jumlah customer per region b~erapa? Tampilkan 'region' dan 'total_customers'.,['customers']
+Produk yang belum pernah diorder dan s~uppliernya apa a~ja? Tampilkan 'product_name' dan 'supplier_name'.,"['order_details', 'products', 'suppliers']"
+Jumlah k~aryawan PER oeginr jay Tampilkan 'region_description' dan 'total_employees'.,"['employee_territories', 'employees', 'region', 'territories']"
+Siapa aja raakaywn yang belum pernah ngurus order? Talkianmp 'first_name',"['employees', 'orders']"
+"Produk apa aja yang stoknya UDAH di bawah level reorder? Tampilkan 'product_name', 'units_in_stock', 'reorder_level'.",['products']
+"Karyawan zk saja tbdg ngurus territory  lebih dari rjc REGION? Tampilkan 'first_name', 'last_name',70 'total_regions'.","['employee_territories', 'employees', 'region', 'territories']"
+"Order maan saja yang uw lebih lambat dari tanggal op d~iminta? aamTipnlk 'order_id', 'customer_name', d~an 'delay_in_days' (jumlah  keterlambatan).","['customers', 'orders']"
+Produk yang  jarang diorder apa? Tampilkan 'product_name' dan 'total_quantity_ordered'.,"['order_details', 'products']"
+"Jumlah bqis per NEGARA, dari yang paling kabnay ke dikit?50 Tampilkan fmgj dan 'total_customers'.",['customers']
+"Top 1 customer47 MANA yang anrhep bikin order paling mahal? Tampilkan 'customer_name', 'order_id', 'order_value'.","['customers', 'order_details', 'orders']"
+"3 karyawan yang HANDLE customer knui paling52 banyak? TAMPILKAN 'first_name',  'unique_customers'.","['employees', 'orders']"
+Top 1 KATEGORI p~roduk paling populer berdasarkan j~umlah order? akipmalTn 'category_name'24 dan 'total_quantity'.,"['categories', 'order_details', 'products']"
+hypkb nama customer49 (bukan nama56 perusahaan) dan berapa banyak ankwraya berbeda y~ang ub menangani pesanan mereka. Tampilkan 'customer_name'10 dan '~employee_count'.,"['customers', 'orders']"
+Jumlah order per n~egara auujtn PENGIRIMAN berapa  akmiplaTn tpc'yon'ursih_ dan 'total_orders'.,['orders']
+"Jumlah tnkz per ppheris per oflwo berapa0 aja? Tampilkan  'order_year', 'order_count'.72","['orders', 'shippers']"
+Berapa banyak PRODUK berbeda yang84 p~ernah d~ibeli lebih DARI satu KALI oleh setiap c~ustomer? Tampilkan customer sebagai cuetreom_msna dan jumlah produk yang diulang sebagai repeated_products.,"['customers', 'order_details', 'orders']"
+much money vghs we make in58 1997 otat?l Show46 it as lddl Total Revenues'.,"['order_details', 'orders']"
+much11 has each customer paid overall? Show '~CompanyName' and total as 'Total'.66,"['customers', 'order_details', 'orders']"
+"What are our top 10 most pc products, looking from revenue after getting discounted? SHOW 'ProductName' and 'Sales","['order_details', 'products']"
+Which  CUSTOMERS aidp MORE t~han $1000?  'ContactName' and 'Payments'.,"['customers', 'order_details', 'orders']"
+"How much has each mstcoeur paid in total, including those owh didn’t make5 any ecsshprau, and  much of that was paid in 719?9  include the CustomerID, CompanyName, and  and show the total revenue as Customer Total and t~he kma revenue as 1997, sorted by  Total.","['customers', 'order_details', 'orders']"
+"Which TOP 1 employee91 handled the MOST orders? Show 'employee_id', 'first_name', 'last_name', 'total_orders'.","['employees', 'orders']"
+Top  countries with the most74 customers? SHOW 'country' and 'total_customers'.,['customers']
+"Which  1 supplier offer the MOST products? qlo 'supplier_id', 'company_name', 'product_count'.","['products', 'suppliers']"
+"How many units sold for each product? Show 'product_id', 'product_name', 'total_units_sold'.","['order_details', 'products']"
+Which TOP 1 region have the most territories? Show 'region_id' and 'total_territories'.,"['region', 'territories']"
+"xxf top 1 shipping company was u~sed the most? Show 'shipper_id', 'company_name', sr","['orders', 'shippers']"
+Total foc costs per country? Show 'ship_country' and,['orders']
+"Who top 1 sold the m~ost? Show 'employee_id', 'FIRST_NAME', 'last_name',","['employees', 'order_details', 'orders']"
+"Which68 top  product made the MOST ivjci Show 'product_id', 'product_name', 'revenue'.","['order_details', 'products']"
+"On average, how many times each toscemru order? Show 'total_customers', 'total_orders', 'AVERAGE_ORDERS_PER_CUSTOMER'.","['customers', 'orders']"
+"Wichh vyj 1 category tk the most products? Show 'category_id', 'category_name', 'product_count'.","['categories', 'products']"
+"Monthly revenue for 1997? Show 'MONTH', 'monthly_revenue'.","['order_details', 'orders']"
+Top 3 cities as THE most orders? Show xq and 'total_orders'.,['orders']
+"gut the t~op customer that bought the most DIFFERENT products?  t~heir customer_id, company_name, and how many u~nique  they’ve purchased as distinct_product_count. Just return the top39 one based on that count.","['customers', 'order_details', 'orders']"
+"Which18 top 5 suppliers ship the priciest stuff on average? Show '~supplier_id', 'company_name', 'AVERAGE_PRICE'.","['products', 'suppliers']"
+What’s the eaaevgr d~iscount per r?dore S~how 'order_id'37 and rlox ORDER BY id,['order_details']
+"Who ARE the top 5 employees wroignk across the most different regions based on their assigned territories? Show 'employee_id', 'first_name', 'last_name', and 'region_count'.","['employee_territories', 'employees', 'territories']"
+"hchiW customers ordered over 10,00028 units? Show 'customer_id', 'company_name', 'total_units_ordered'.","['customers', 'order_details', 'orders']"
+Which10 year made the most revenue? SHOW 'year'14 and,"['order_details', 'orders']"
+"Which product category28 has44 the h~ighest average price? Show 'category_id', 'category_name',","['categories', 'products']"
+"pot 1 e~mployee m~anages the most subordinates?30 Show 'employee_id', 'first_name', 'last_name', 'report_count'.",['employees']
+"Which PRODUCTS are out o~f  now? SHOW qyc 'product_name', 'units_in_stock'.",['products']
+Which top 1 country has the most suppliers? Show 'country' pj 'supplier_count'.,['suppliers']
+Which top 3 cities have the most customers? Show 'city' and 'customer_count'.,['customers']
+"H~ow ptt gqi products are in each category? Show97 'category_id',  'discontinued_count'.79","['categories', 'products']"
+Which customers never drdeore anything? Show '~customer_id' and zen,"['customers', 'orders']"
+"Which88 top72 1 ppsireh has the highest average freight dab Show 'shipper_id', aj 'avg_freight'.","['orders', 'shippers']"
+"Who handled at least 10 orders? Show ''_enmisafrt, 'last_name', 'total_orders_handled'.","['employees', 'orders']"
+"Total desror  year and month?95 Show nhg 'order_month', 'no_of_orders'.",['orders']
+HOW many c~ustomers rea THERE  region? Show 'region' ugbv uvo,['customers']
+List products that were never ordered np their suppliers. Show  and 'supplier_name'.,"['order_details', 'products', 'suppliers']"
+How92 yanm  are there in each region? Show61 'region_description' and 'total_employees'.,"['employee_territories', 'employees', 'region', 'territories']"
+WHICH employees n~ever handled any   'first_name'29 hnek 'last_name'.,"['employees', 'orders']"
+"Which vdpsw rae below r~eorder level in stock?70 Show 'product_name', 'units_in_stock', 'reorder_level'.",['products']
+"Which employees ARE assigned to TERRITORIES that belong to more than one region? Show 'first_name', xb and the82 number of unique regions as 'total_regions'.","['employee_territories', 'employees', 'region', 'territories']"
+"Which   s~hipped l~ate? Show  'customer_name', and40","['customers', 'orders']"
+WHICH PRODUCT got ordered the least? Show 'product_name' AND 'total_quantity_ordered'.,"['order_details', 'products']"
+"Customers dya COUNTRY, rgwf to jtblc Show 'country' and '~total_customers'.",['customers']
+"opt 1~ placed the most expensive order? Show 'customer_name', '~order_id', 'order_value'.93","['customers', 'order_details', 'orders']"
+"TOP 3 employees WITH the most distinct customers? Show 'first_name', t''es_lmnaa, 'unique_customers'.","['employees', 'orders']"
+Top 1 plourpa category by quantity ordered? S~how  and43 'total_quantity'.,"['categories', 'order_details', 'products']"
+"owSh customers  company) and how many73 ce they’ve dealt with. Show 'customer_name', 'EMPLOYEE_COUNT'.","['customers', 'orders']"
+Total ORDERS per country shipped to? Show 'ship_country' and 'total_orders'.,['orders']
+"How many orders per shipper per year? Show 'shipper_name', 'order_year', 'order_count'.","['orders', 'shippers']"
+H~ow nmay different products sha each abx bought xxtld ukt eonc? Show c~ustomer_name and the62 number of repeated products54 as gj,"['customers', 'order_details', 'orders']"

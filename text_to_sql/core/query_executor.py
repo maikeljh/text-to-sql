@@ -24,16 +24,18 @@ class QueryExecutor:
         )
         self.connection.autocommit = True
 
-    def execute_query(self, query: str, params: tuple = ()) -> list[dict]:
+    def execute_query(self, query: str, params: tuple = (), timeout: int = 5000) -> list[dict]:
         """
-        Executes an SQL query and returns the results as a list of dictionaries.
+        Executes an SQL query with an optional timeout and returns the results as a list of dictionaries.
 
         :param query: The SQL query to execute.
         :param params: Optional tuple of query parameters.
+        :param timeout: Timeout in milliseconds for the SQL statement.
         :return: Query result as a list of dictionaries.
         """
         with closing(self.connection.cursor()) as cursor:
             try:
+                cursor.execute(f"SET statement_timeout = {timeout}")
                 cursor.execute(query, params) if params else cursor.execute(query)
 
                 if cursor.description is None:

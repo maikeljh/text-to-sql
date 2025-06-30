@@ -1,0 +1,3895 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,"Can you show me the actor_id, first_name, and last_name of actors with the first name Scarlett?","SELECT actor_id, first_name, last_name
+FROM actor
+WHERE first_name ILIKE 'scarlett';","SELECT actor_id, first_name, last_name
+FROM actor
+WHERE first_name ILIKE 'scarlett';",1.0
+1.2,"Bisa kasih daftar actor_id, first_name, dan last_name dari aktor yang nama depannya Scarlett?","SELECT actor_id, first_name, last_name
+FROM actor
+WHERE first_name ILIKE 'scarlett';","SELECT actor_id, first_name, last_name
+FROM actor
+WHERE first_name ILIKE 'scarlett';",1.0
+2.1,How many different last_name values are there among all the actors?,SELECT COUNT(DISTINCT last_name) FROM actor;,SELECT COUNT(DISTINCT last_name) FROM actor;,1.0
+2.2,Total ada berapa nama belakang (last_name) aktor yang beda-beda?,SELECT COUNT(DISTINCT last_name) FROM actor;,SELECT COUNT(DISTINCT last_name) FROM actor;,1.0
+3.1,"Who’s the top 1 actor that’s been in the most films? Just show me their actor_id, first_name, and last_name.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    COUNT(fa.film_id) DESC
+LIMIT 1;","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    COUNT(fa.film_id) AS film_count
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    film_count DESC
+LIMIT 1;",1.0
+3.2,"Siapa aktor top 1 yang paling sering main film? Kasih tau actor_id, first_name, sama last_name-nya aja ya.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    COUNT(fa.film_id) DESC
+LIMIT 1;","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    COUNT(fa.film_id) AS film_count
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    film_count DESC
+LIMIT 1;",1.0
+4.1,"What are the top 5 film genres that brought in the highest revenue by looking from the payments in all store? Just show the genre names, sorted from the highest.","SELECT 
+    c.name AS genre
+FROM 
+    category c
+    JOIN film_category fc ON c.category_id = fc.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    c.name
+ORDER BY 
+    SUM(p.amount) DESC
+LIMIT 5;","SELECT 
+    c.name AS genre, 
+    SUM(p.amount) AS gross_revenue
+FROM 
+    category c
+    JOIN film_category fc ON c.category_id = fc.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    c.name
+ORDER BY 
+    gross_revenue DESC
+LIMIT 5;",1.0
+4.2,"Apa aja 5 genre film dengan pemasukan tertinggi dengan melihat pembayaran di semua toko? Cukup tampilkan nama genre-nya, urut dari yang paling banyak.","SELECT 
+    c.name AS genre
+FROM 
+    category c
+    JOIN film_category fc ON c.category_id = fc.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    c.name
+ORDER BY 
+    SUM(p.amount) DESC
+LIMIT 5;","SELECT 
+    c.name AS genre, 
+    SUM(p.amount) AS gross_revenue
+FROM 
+    category c
+    JOIN film_category fc ON c.category_id = fc.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    c.name
+ORDER BY 
+    gross_revenue DESC
+LIMIT 5;",1.0
+5.1,"How much revenue did each store make, looking from the staff's payments? Just show me the store_id and total revenue, sorted from highest to lowest.","SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN staff st ON s.store_id = st.store_id
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY s.store_id
+ORDER BY total_revenue DESC;","SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN staff st ON s.store_id = st.store_id
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY s.store_id
+ORDER BY total_revenue DESC;",1.0
+5.2,"Tiap toko dapet pemasukan berapa kalau dilihat dari pembayaran oleh staffnya? Tampilkan store_id sama total pemasukannya aja, urut dari yang paling besar.","SELECT 
+    s.store_id,
+    SUM(p.amount) AS total_pemasukan
+FROM 
+    store s
+JOIN staff st ON s.store_id = st.store_id
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY 
+    s.store_id
+ORDER BY 
+    total_pemasukan DESC;","SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN staff st ON s.store_id = st.store_id
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY s.store_id
+ORDER BY total_revenue DESC;",1.0
+6.1,Which language shows up the most in our movie list? Just give me the top 1 language name.,"SELECT 
+    l.name
+FROM 
+    language l
+    JOIN film f ON l.language_id = f.language_id
+GROUP BY 
+    l.name
+ORDER BY
+    COUNT(f.film_id) DESC
+LIMIT 1;","SELECT 
+    l.name
+FROM 
+    language l
+    JOIN film f ON l.language_id = f.language_id
+GROUP BY 
+    l.name
+ORDER BY
+    COUNT(f.film_id) DESC
+LIMIT 1;",1.0
+6.2,Bahasa apa yang paling sering muncul di daftar film kita? Cukup kasih nama bahasa yang jadi top 1 aja.,"SELECT 
+    l.name
+FROM 
+    language l
+    JOIN film f ON l.language_id = f.language_id
+GROUP BY 
+    l.name
+ORDER BY
+    COUNT(f.film_id) DESC
+LIMIT 1;","SELECT 
+    l.name
+FROM 
+    language l
+    JOIN film f ON l.language_id = f.language_id
+GROUP BY 
+    l.name
+ORDER BY
+    COUNT(f.film_id) DESC
+LIMIT 1;",1.0
+7.1,"Who are the top 5 customers based on how many movies they've rented? Show their customer ID, first name, last name, and total number of rentals, sorted from highest to lowest.","SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) as total_rentals
+FROM
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY
+    total_rentals DESC
+LIMIT 5;","SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) as total_rentals
+FROM
+    customer c
+    JOIN rental r ON c.customer_id= r.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY
+    total_rentals DESC
+LIMIT 5;",1.0
+7.2,"Siapa sih 5 pelanggan yang paling sering nyewa film? Tunjukin customer ID, nama depan, nama belakang, sama total film yang mereka sewa, urut dari yang paling banyak ya.","SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) AS total_rentals
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+GROUP BY 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY 
+    total_rentals DESC
+LIMIT 5;","SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) as total_rentals
+FROM
+    customer c
+    JOIN rental r ON c.customer_id= r.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY
+    total_rentals DESC
+LIMIT 5;",1.0
+8.1,"Which customers have rented from more than 3 categories? Show the customer ID, first name, last name, and the number of categories they've rented from.","SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    COUNT(DISTINCT fc.category_id) AS category_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+GROUP BY 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+HAVING 
+    COUNT(DISTINCT fc.category_id) > 3;","SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    COUNT(DISTINCT fc.category_id) AS category_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+GROUP BY 
+    c.customer_id
+HAVING 
+    COUNT(DISTINCT fc.category_id) > 3;",1.0
+8.2,"Pelanggan mana aja yang udah nyewa film dari lebih dari 3 kategori? Tampilkan ID pelanggan, nama depan, nama belakang, dan jumlah kategori yang disewa.","WITH customer_category_rentals AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name
+)
+SELECT 
+    customer_id,
+    first_name,
+    last_name,
+    category_count
+FROM 
+    customer_category_rentals
+WHERE 
+    category_count > 3;","SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    COUNT(DISTINCT fc.category_id) AS category_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+GROUP BY 
+    c.customer_id
+HAVING 
+    COUNT(DISTINCT fc.category_id) > 3;",1.0
+9.1,"Are there any movies in our collection that have never been rented at all, across any store? I need the film ID, title, and release year.","SELECT 
+    f.film_id, 
+    f.title, 
+    f.release_year
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY f.film_id;","SELECT 
+    f.film_id, 
+    f.title, 
+    f.release_year
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY f.film_id;",1.0
+9.2,"Ada nggak film di koleksi kita yang belum pernah disewa sama sekali di semua store? Aku butuh film ID, judul, dan tahun rilisnya.","SELECT 
+    f.film_id,
+    f.title,
+    f.release_year
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    );","SELECT 
+    f.film_id, 
+    f.title, 
+    f.release_year
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY f.film_id;",1.0
+10.1,"How much total revenue has each actor generated from the movies they've appeared in by looking from the payments of all store? Show the actor ID, first name, last name, and total revenue, sorted from highest to lowest.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    SUM(p.amount) AS total_revenue
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+    JOIN inventory i ON fa.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    total_revenue DESC;","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    SUM(p.amount) AS total_revenue
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+    JOIN inventory i ON fa.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    total_revenue DESC;",1.0
+10.2,"Berapa total pemasukan yang dihasilkan tiap aktor dari film yang mereka bintangi dengan melihat pembayaran di seluruh toko? Tampilkan ID aktor, nama depan, nama belakang, dan total pendapatannya, diurutkan dari yang paling besar.","SELECT 
+    a.actor_id,
+    a.first_name,
+    a.last_name,
+    SUM(p.amount) AS total_income
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+    JOIN film f ON fa.film_id = f.film_id
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    a.actor_id, a.first_name, a.last_name
+ORDER BY 
+    total_income DESC;","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    SUM(p.amount) AS total_revenue
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+    JOIN inventory i ON fa.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    total_revenue DESC;",1.0
+11.1,Which staff member handled the highest total payment? Just show their staff ID and the total amount they processed.,"SELECT 
+    p.staff_id,
+    SUM(p.amount) AS total_amount_processed
+FROM 
+    payment p
+GROUP BY 
+    p.staff_id
+ORDER BY 
+    total_amount_processed DESC
+LIMIT 1;","SELECT 
+    st.staff_id,
+    SUM(p.amount) AS total_amount_processed
+FROM 
+    staff st
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY 
+    st.staff_id
+ORDER BY 
+    total_amount_processed DESC
+LIMIT 1;",1.0
+11.2,Siapa staf yang memproses pembayaran dengan total terbesar? Tampilkan ID staf dan total jumlah yang mereka proses.,"SELECT 
+    p.staff_id,
+    SUM(p.amount) AS total_amount
+FROM 
+    payment p
+GROUP BY 
+    p.staff_id
+ORDER BY 
+    total_amount DESC
+LIMIT 1;","SELECT 
+    st.staff_id,
+    SUM(p.amount) AS total_amount_processed
+FROM 
+    staff st
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY 
+    st.staff_id
+ORDER BY 
+    total_amount_processed DESC
+LIMIT 1;",1.0
+12.1,"Which customers have rented the same film more than once? Show the customer ID, first name, last name, film title, and the number of times they rented it.","WITH customer_film_rentals AS (
+    SELECT 
+        r.customer_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        r.customer_id, f.film_id, f.title
+    HAVING 
+        COUNT(r.rental_id) > 1
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    cfr.title, 
+    cfr.rental_count
+FROM 
+    customer c
+    JOIN customer_film_rentals cfr ON c.customer_id = cfr.customer_id;","WITH customer_film_rentals AS (
+    SELECT 
+        r.customer_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        r.customer_id, f.film_id
+    HAVING 
+        COUNT(r.rental_id) > 1
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    cfr.title, 
+    cfr.rental_count
+FROM 
+    customer c
+    JOIN customer_film_rentals cfr ON c.customer_id = cfr.customer_id;",1.0
+12.2,"Siapa aja pelanggan yang nyewa film yang sama lebih dari sekali? Tampilkan ID pelanggan, nama depan, nama belakang, judul film, dan jumlah penyewaan.","SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    f.title,
+    COUNT(r.rental_id) AS rental_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+GROUP BY 
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    f.title
+HAVING 
+    COUNT(r.rental_id) > 1
+ORDER BY 
+    rental_count DESC;","WITH customer_film_rentals AS (
+    SELECT 
+        r.customer_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        r.customer_id, f.film_id
+    HAVING 
+        COUNT(r.rental_id) > 1
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    cfr.title, 
+    cfr.rental_count
+FROM 
+    customer c
+    JOIN customer_film_rentals cfr ON c.customer_id = cfr.customer_id;",1.0
+13.1,"Which films are in the top 5 most rented film categories? Show the film ID, title, replacement cost, and category name, sorted by replacement cost from highest to lowest.","WITH top_categories AS (
+    SELECT 
+        fc.category_id, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+)
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.replacement_cost, 
+    c.name AS category_name
+FROM 
+    film f
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    JOIN top_categories tc ON fc.category_id = tc.category_id
+ORDER BY 
+    f.replacement_cost DESC;","WITH top_categories AS (
+    SELECT 
+        fc.category_id, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+),
+top_films AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+    ORDER BY 
+        f.replacement_cost DESC
+)
+SELECT * FROM top_films;",1.0
+13.2,"Film apa saja yang masuk dalam 5 kategori paling sering disewa? Tampilkan ID film, judul, biaya ganti, dan nama kategori, urut biaya ganti dari yang paling mahal.","WITH top_categories AS (
+    SELECT 
+        fc.category_id,
+        c.name AS category_name,
+        COUNT(*) AS rental_count
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN category c ON fc.category_id = c.category_id
+    GROUP BY 
+        fc.category_id, c.name
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+),
+film_rentals AS (
+    SELECT 
+        f.film_id,
+        f.title,
+        f.replacement_cost,
+        tc.category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+)
+SELECT 
+    film_id,
+    title,
+    replacement_cost,
+    category_name
+FROM 
+    film_rentals
+ORDER BY 
+    replacement_cost DESC;","WITH top_categories AS (
+    SELECT 
+        fc.category_id, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+),
+top_films AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+    ORDER BY 
+        f.replacement_cost DESC
+)
+SELECT * FROM top_films;",1.0
+14.1,"Which pairs of actors have appeared together in the most films? Show only the actor IDs for each pair and how many films they've worked on together, sorted from most to least.","SELECT fa1.actor_id AS actor_id1, fa2.actor_id AS actor_id2, COUNT(*) AS films_together
+FROM film_actor fa1
+JOIN film_actor fa2 ON fa1.film_id = fa2.film_id AND fa1.actor_id < fa2.actor_id
+GROUP BY fa1.actor_id, fa2.actor_id
+ORDER BY films_together DESC;","SELECT a1.actor_id, a2.actor_id, COUNT(*) AS num_films_together
+FROM film_actor AS fa1
+JOIN film_actor AS fa2 ON fa1.film_id = fa2.film_id AND fa1.actor_id < fa2.actor_id
+JOIN actor AS a1 ON fa1.actor_id = a1.actor_id
+JOIN actor AS a2 ON fa2.actor_id = a2.actor_id
+GROUP BY a1.actor_id, a2.actor_id
+ORDER BY num_films_together DESC;",1.0
+14.2,"Pasangan aktor mana saja yang paling sering main film bareng? Tampilkan ID kedua aktor dan jumlah film yang mereka bintangi bersama, urut dari yang paling banyak.","SELECT 
+    fa1.actor_id AS actor_id1, 
+    fa2.actor_id AS actor_id2, 
+    COUNT(*) AS film_count
+FROM 
+    film_actor fa1
+JOIN 
+    film_actor fa2 ON fa1.film_id = fa2.film_id AND fa1.actor_id < fa2.actor_id
+GROUP BY 
+    fa1.actor_id, fa2.actor_id
+ORDER BY 
+    film_count DESC;","SELECT a1.actor_id, a2.actor_id, COUNT(*) AS num_films_together
+FROM film_actor AS fa1
+JOIN film_actor AS fa2 ON fa1.film_id = fa2.film_id AND fa1.actor_id < fa2.actor_id
+JOIN actor AS a1 ON fa1.actor_id = a1.actor_id
+JOIN actor AS a2 ON fa2.actor_id = a2.actor_id
+GROUP BY a1.actor_id, a2.actor_id
+ORDER BY num_films_together DESC;",1.0
+15.1,"Which movies are in the top 10% by total revenue? Show the film ID, title, and total revenue.","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+),
+top_10_percent AS (
+    SELECT 
+        film_id, 
+        title, 
+        total_revenue, 
+        PERCENT_RANK() OVER (ORDER BY total_revenue DESC) AS pct_rank
+    FROM 
+        film_revenue
+)
+SELECT 
+    film_id, 
+    title, 
+    total_revenue
+FROM 
+    top_10_percent
+WHERE 
+    pct_rank <= 0.1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+),
+top_10_percent AS (
+    SELECT 
+        film_id, 
+        title, 
+        total_revenue, 
+        PERCENT_RANK() OVER (ORDER BY total_revenue DESC) AS pct_rank
+    FROM 
+        film_revenue
+)
+SELECT 
+    film_id, 
+    title, 
+    total_revenue
+FROM 
+    top_10_percent
+WHERE 
+    pct_rank <= 0.1;",1.0
+15.2,"Film apa aja yang masuk 10% teratas berdasarkan pendapatan? Tampilkan ID film, judul, dan total pendapatan.","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+),
+top_10_percent AS (
+    SELECT 
+        film_id, 
+        title, 
+        total_revenue, 
+        PERCENT_RANK() OVER (ORDER BY total_revenue DESC) AS pct_rank
+    FROM 
+        film_revenue
+)
+SELECT 
+    film_id, 
+    title, 
+    total_revenue
+FROM 
+    top_10_percent
+WHERE 
+    pct_rank <= 0.1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+),
+top_10_percent AS (
+    SELECT 
+        film_id, 
+        title, 
+        total_revenue, 
+        PERCENT_RANK() OVER (ORDER BY total_revenue DESC) AS pct_rank
+    FROM 
+        film_revenue
+)
+SELECT 
+    film_id, 
+    title, 
+    total_revenue
+FROM 
+    top_10_percent
+WHERE 
+    pct_rank <= 0.1;",1.0
+16.1,"Which customers have rented every film in a specific category (e.g., 'Action')? Show the customer ID, first name, and last name.","WITH action_films AS (
+    SELECT 
+        fc.film_id
+    FROM 
+        film_category fc
+        JOIN category c ON fc.category_id = c.category_id
+    WHERE 
+        c.name = 'Action'
+),
+customer_rentals AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.film_id) AS films_rented
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN action_films af ON i.film_id = af.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_rentals cr ON c.customer_id = cr.customer_id
+WHERE 
+    cr.films_rented = (SELECT COUNT(*) FROM action_films);","WITH action_films AS (
+    SELECT 
+        fc.film_id
+    FROM 
+        film_category fc
+        JOIN category c ON fc.category_id = c.category_id
+    WHERE 
+        c.name = 'Action'
+),
+customer_rentals AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.film_id) AS films_rented
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN action_films af ON i.film_id = af.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_rentals cr ON c.customer_id = cr.customer_id
+WHERE 
+    cr.films_rented = (SELECT COUNT(*) FROM action_films);",1.0
+16.2,"Siapa pelanggan yang sudah menyewa semua film dalam satu genre (misalnya genre 'Action')? Tampilkan ID pelanggan, nama depan, dan nama belakang.","WITH action_films AS (
+    SELECT f.film_id
+    FROM film f
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    WHERE c.name = 'Action'
+),
+customer_rentals AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        COUNT(DISTINCT f.film_id) AS rented_action_films
+    FROM customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category cat ON fc.category_id = cat.category_id
+    WHERE cat.name = 'Action'
+    GROUP BY c.customer_id, c.first_name, c.last_name
+),
+total_action_films AS (
+    SELECT COUNT(*) AS total
+    FROM action_films
+)
+SELECT 
+    cr.customer_id,
+    cr.first_name,
+    cr.last_name
+FROM 
+    customer_rentals cr,
+    total_action_films taf
+WHERE 
+    cr.rented_action_films = taf.total;","WITH action_films AS (
+    SELECT 
+        fc.film_id
+    FROM 
+        film_category fc
+        JOIN category c ON fc.category_id = c.category_id
+    WHERE 
+        c.name = 'Action'
+),
+customer_rentals AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.film_id) AS films_rented
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN action_films af ON i.film_id = af.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_rentals cr ON c.customer_id = cr.customer_id
+WHERE 
+    cr.films_rented = (SELECT COUNT(*) FROM action_films);",1.0
+17.1,"Which movie has the highest average rental duration per customer? Show the film ID, title, and average rental duration. Just return the top 1.","SELECT f.film_id, f.title, AVG(f.rental_duration) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC
+LIMIT 1;","SELECT f.film_id, f.title, AVG(f.rental_duration) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC
+LIMIT 1;",1.0
+17.2,"Film mana yang punya rata-rata waktu sewa paling lama per pelanggan? Tampilkan ID film, judul, dan rata-rata durasi sewanya. Cukup ambil satu yang paling tinggi.","SELECT 
+    f.film_id,
+    f.title,
+    AVG(r.return_date - r.rental_date) AS avg_rental_duration
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    r.return_date IS NOT NULL
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    avg_rental_duration DESC
+LIMIT 1;","SELECT f.film_id, f.title, AVG(f.rental_duration) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC
+LIMIT 1;",0.0
+18.1,"Which staff member has processed the most payments, and what is the total amount they’ve handled? Show the staff ID, first name, last name, and total amount. Just return the top 1.","SELECT 
+    s.staff_id, 
+    s.first_name, 
+    s.last_name, 
+    SUM(p.amount) AS total_amount
+FROM 
+    staff s
+    JOIN payment p ON s.staff_id = p.staff_id
+GROUP BY 
+    s.staff_id, 
+    s.first_name, 
+    s.last_name
+ORDER BY 
+    total_amount DESC
+LIMIT 1;","SELECT 
+    s.staff_id, 
+    s.first_name, 
+    s.last_name, 
+    COUNT(p.payment_id) AS total_payments, 
+    SUM(p.amount) AS total_amount
+FROM 
+    staff s
+    JOIN payment p ON s.staff_id = p.staff_id
+GROUP BY 
+    s.staff_id
+ORDER BY 
+    total_amount DESC;",0.0
+18.2,"Siapa staf yang paling banyak memproses pembayaran, dan berapa total yang mereka proses? Tampilkan ID staf, nama depan, nama belakang, dan total jumlahnya. Cukup ambil satu yang paling atas.","SELECT 
+    s.staff_id,
+    s.first_name,
+    s.last_name,
+    SUM(p.amount) AS total_amount
+FROM 
+    staff s
+JOIN 
+    payment p ON s.staff_id = p.staff_id
+GROUP BY 
+    s.staff_id, s.first_name, s.last_name
+ORDER BY 
+    total_amount DESC
+LIMIT 1;","SELECT 
+    s.staff_id, 
+    s.first_name, 
+    s.last_name, 
+    COUNT(p.payment_id) AS total_payments, 
+    SUM(p.amount) AS total_amount
+FROM 
+    staff s
+    JOIN payment p ON s.staff_id = p.staff_id
+GROUP BY 
+    s.staff_id
+ORDER BY 
+    total_amount DESC;",0.0
+19.1,"Which films were never rented but are in the 5 most rented film categories? Show film ID, title, and category name, sorted by film ID.","WITH top_categories AS (
+    SELECT 
+        fc.category_id
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        COUNT(r.rental_id) DESC
+    LIMIT 5
+),
+films_in_top_categories AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+),
+rented_films AS (
+    SELECT DISTINCT 
+        f.film_id
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+)
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.category_name
+FROM 
+    films_in_top_categories f
+WHERE 
+    f.film_id NOT IN (SELECT film_id FROM rented_films)
+ORDER BY 
+    f.film_id;","WITH top_categories AS (
+    SELECT 
+        fc.category_id
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        COUNT(r.rental_id) DESC
+    LIMIT 5
+),
+films_in_top_categories AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+),
+rented_films AS (
+    SELECT DISTINCT 
+        f.film_id
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+)
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.category_name
+FROM 
+    films_in_top_categories f
+EXCEPT
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.category_name
+FROM 
+    films_in_top_categories f
+    JOIN rented_films r ON f.film_id = r.film_id
+ORDER BY 
+    film_id;
+",1.0
+19.2,"Film apa saja yang belum pernah disewa tetapi termasuk dalam 5 kategori film yang paling sering disewa? Tampilkan ID film, judul, dan nama kategori, lalu urutkan berdasarkan ID film.","WITH top_categories AS (
+    SELECT 
+        fc.category_id,
+        COUNT(*) AS rental_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+),
+
+rented_films AS (
+    SELECT DISTINCT 
+        i.film_id
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+)
+
+SELECT 
+    f.film_id,
+    f.title,
+    c.name AS category_name
+FROM 
+    film f
+    JOIN film_category fc ON f.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    JOIN top_categories tc ON fc.category_id = tc.category_id
+WHERE 
+    f.film_id NOT IN (SELECT film_id FROM rented_films)
+ORDER BY 
+    f.film_id;","WITH top_categories AS (
+    SELECT 
+        fc.category_id
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        COUNT(r.rental_id) DESC
+    LIMIT 5
+),
+films_in_top_categories AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+),
+rented_films AS (
+    SELECT DISTINCT 
+        f.film_id
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+)
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.category_name
+FROM 
+    films_in_top_categories f
+EXCEPT
+SELECT 
+    f.film_id, 
+    f.title, 
+    f.category_name
+FROM 
+    films_in_top_categories f
+    JOIN rented_films r ON f.film_id = r.film_id
+ORDER BY 
+    film_id;
+",1.0
+20.1,"Which customers have rented films from all categories? Show the customer ID, first name, and last name.","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_categories cc ON c.customer_id = cc.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_categories cc ON c.customer_id = cc.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+20.2,"Siapa aja pelanggan yang sudah nyewa film dari semua kategori? Tampilkan ID pelanggan, nama depan, dan nama belakang.","WITH customer_category_rentals AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name
+)
+SELECT 
+    customer_id,
+    first_name,
+    last_name
+FROM 
+    customer_category_rentals
+WHERE 
+    category_count = (SELECT COUNT(*) FROM category);","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_categories cc ON c.customer_id = cc.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+21.1,"Which films earn the most revenue per rental day across all stores, based only on rentals that have been returned? Calculate this by dividing total payments by total rental days. Show the film ID, title, and revenue per day (rounded to two decimal places) for the top 10 films.","WITH film_revenue_per_day AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        ROUND(
+            SUM(p.amount) / NULLIF(SUM(EXTRACT(DAY FROM (r.return_date - r.rental_date)) + 1, 0),
+            2
+        ) AS revenue_per_day
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        r.return_date IS NOT NULL
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    film_id, 
+    title, 
+    revenue_per_day
+FROM 
+    film_revenue_per_day
+ORDER BY 
+    revenue_per_day DESC
+LIMIT 10;","WITH film_revenue_per_day AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        ROUND(
+            SUM(p.amount) / NULLIF(SUM(EXTRACT(DAY FROM (r.return_date - r.rental_date))), 0),
+            2
+        ) AS revenue_per_day
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        r.return_date IS NOT NULL
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    film_id, 
+    title, 
+    revenue_per_day
+FROM 
+    film_revenue_per_day
+ORDER BY 
+    revenue_per_day DESC
+LIMIT 10;
+",0.0
+21.2,"Film mana yang menghasilkan pendapatan paling tinggi per hari sewa di seluruh store, hanya berdasarkan sewaan yang sudah dikembalikan? Hitung dengan membagi total pembayaran dengan total hari sewa. Tampilkan ID film, judul, dan pendapatan per harinya (dibulatkan sampai dua angka di belakang koma) untuk 10 film teratas.","SELECT 
+    f.film_id,
+    f.title,
+    ROUND(SUM(p.amount) / NULLIF(SUM(DATE_PART('day', r.return_date - r.rental_date) + 1, 0), 2) AS revenue_per_day
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+WHERE 
+    r.return_date IS NOT NULL
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    revenue_per_day DESC
+LIMIT 10;","WITH film_revenue_per_day AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        ROUND(
+            SUM(p.amount) / NULLIF(SUM(EXTRACT(DAY FROM (r.return_date - r.rental_date))), 0),
+            2
+        ) AS revenue_per_day
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        r.return_date IS NOT NULL
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    film_id, 
+    title, 
+    revenue_per_day
+FROM 
+    film_revenue_per_day
+ORDER BY 
+    revenue_per_day DESC
+LIMIT 10;
+",0.0
+22.1,"For each category, which films have the longest and shortest rental durations? Show the category name, film title, and rental duration. Return only one film for the longest and one for the shortest duration in each category (even if others have the same duration). Sort by category name ascending and rental duration descending.","WITH ranked_films AS (
+  SELECT
+    c.name AS category_name,
+    f.title AS film_title,
+    f.rental_duration,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration DESC) AS rank_longest,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration ASC) AS rank_shortest
+  FROM film f
+  JOIN film_category fc ON f.film_id = fc.film_id
+  JOIN category c ON fc.category_id = c.category_id
+)
+SELECT
+  category_name,
+  film_title,
+  rental_duration
+FROM ranked_films
+WHERE rank_longest = 1 OR rank_shortest = 1
+ORDER BY
+  category_name,
+  rental_duration DESC;","WITH CategoryRentalDuration AS (
+  SELECT
+    c.name AS category_name,
+    f.title AS film_title,
+    f.rental_duration,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration DESC) AS rn_desc,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration ASC) AS rn_asc
+  FROM film AS f
+  JOIN film_category AS fc
+    ON f.film_id = fc.film_id
+  JOIN category AS c
+    ON fc.category_id = c.category_id
+)
+SELECT
+  category_name,
+  film_title,
+  rental_duration
+FROM CategoryRentalDuration
+WHERE
+  rn_desc = 1 OR rn_asc = 1
+ORDER BY
+  category_name,
+  rn_desc;",1.0
+22.2,"Untuk setiap kategori, film mana yang punya durasi sewa terpanjang dan terpendek? Tampilkan nama kategori, judul film, dan durasi sewa. Ambil hanya satu film untuk yang durasinya paling panjang dan satu untuk yang paling pendek (meskipun ada film lain dengan durasi sama). Urutkan berdasarkan nama kategori secara menaik dan durasi sewa secara menurun.","SELECT 
+    c.name AS category_name,
+    f.title AS film_title,
+    f.rental_duration
+FROM 
+    film f
+JOIN 
+    film_category fc ON f.film_id = fc.film_id
+JOIN 
+    category c ON fc.category_id = c.category_id
+WHERE 
+    (f.rental_duration = (SELECT MAX(f2.rental_duration) FROM film f2 JOIN film_category fc2 ON f2.film_id = fc2.film_id WHERE fc2.category_id = fc.category_id)
+    OR f.rental_duration = (SELECT MIN(f3.rental_duration) FROM film f3 JOIN film_category fc3 ON f3.film_id = fc3.film_id WHERE fc3.category_id = fc.category_id))
+    AND (f.film_id IN (
+        SELECT MIN(f4.film_id) 
+        FROM film f4 
+        JOIN film_category fc4 ON f4.film_id = fc4.film_id 
+        WHERE fc4.category_id = fc.category_id 
+        GROUP BY f4.rental_duration
+    ))
+ORDER BY 
+    c.name ASC,
+    f.rental_duration DESC;","WITH CategoryRentalDuration AS (
+  SELECT
+    c.name AS category_name,
+    f.title AS film_title,
+    f.rental_duration,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration DESC) AS rn_desc,
+    ROW_NUMBER() OVER (PARTITION BY c.category_id ORDER BY f.rental_duration ASC) AS rn_asc
+  FROM film AS f
+  JOIN film_category AS fc
+    ON f.film_id = fc.film_id
+  JOIN category AS c
+    ON fc.category_id = c.category_id
+)
+SELECT
+  category_name,
+  film_title,
+  rental_duration
+FROM CategoryRentalDuration
+WHERE
+  rn_desc = 1 OR rn_asc = 1
+ORDER BY
+  category_name,
+  rn_desc;",1.0
+23.1,"Which customers have rented films from exactly 2 categories? Show the customer ID, first name, last name, and the categories they've rented from.","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        c.name AS category_name
+    FROM 
+        rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    GROUP BY 
+        r.customer_id, c.name
+),
+customer_category_count AS (
+    SELECT 
+        cc.customer_id, 
+        cu.first_name, 
+        cu.last_name, 
+        STRING_AGG(cc.category_name, ', ' ORDER BY cc.category_name) AS categories,
+        COUNT(DISTINCT cc.category_name) AS category_count
+    FROM 
+        customer_categories cc
+    JOIN customer cu ON cc.customer_id = cu.customer_id
+    GROUP BY 
+        cc.customer_id, cu.first_name, cu.last_name
+)
+SELECT 
+    customer_id, 
+    first_name, 
+    last_name, 
+    categories
+FROM 
+    customer_category_count
+WHERE 
+    category_count = 2;","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        c.name AS category_name
+    FROM 
+        rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    GROUP BY 
+        r.customer_id, c.name
+),
+customer_category_count AS (
+    SELECT 
+        cc.customer_id, 
+        cu.first_name, 
+        cu.last_name, 
+        STRING_AGG(cc.category_name, ', ' ORDER BY cc.category_name) AS categories,
+        COUNT(DISTINCT cc.category_name) AS category_count
+    FROM 
+        customer_categories cc
+    JOIN customer cu ON cc.customer_id = cu.customer_id
+    GROUP BY 
+        cc.customer_id, cu.first_name, cu.last_name
+)
+SELECT 
+    customer_id, 
+    first_name, 
+    last_name, 
+    categories
+FROM 
+    customer_category_count
+WHERE 
+    category_count = 2;",1.0
+23.2,"Ada gak pelanggan yang nyewa film dari tepat 2 kategori? Tampilkan ID pelanggan, nama depan, nama belakang, dan daftar kategorinya.","WITH customer_categories AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        cat.name AS category_name,
+        COUNT(DISTINCT cat.category_id) OVER (PARTITION BY c.customer_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+        JOIN category cat ON fc.category_id = cat.category_id
+)
+SELECT DISTINCT
+    customer_id,
+    first_name,
+    last_name,
+    STRING_AGG(DISTINCT category_name, ', ' ORDER BY category_name) AS categories
+FROM 
+    customer_categories
+WHERE 
+    category_count = 2
+GROUP BY 
+    customer_id, first_name, last_name, category_count;","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        c.name AS category_name
+    FROM 
+        rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film_category fc ON i.film_id = fc.film_id
+    JOIN category c ON fc.category_id = c.category_id
+    GROUP BY 
+        r.customer_id, c.name
+),
+customer_category_count AS (
+    SELECT 
+        cc.customer_id, 
+        cu.first_name, 
+        cu.last_name, 
+        STRING_AGG(cc.category_name, ', ' ORDER BY cc.category_name) AS categories,
+        COUNT(DISTINCT cc.category_name) AS category_count
+    FROM 
+        customer_categories cc
+    JOIN customer cu ON cc.customer_id = cu.customer_id
+    GROUP BY 
+        cc.customer_id, cu.first_name, cu.last_name
+)
+SELECT 
+    customer_id, 
+    first_name, 
+    last_name, 
+    categories
+FROM 
+    customer_category_count
+WHERE 
+    category_count = 2;",0.0
+24.1,"Which films have been rented more than the average number of rentals for their category? Show the film ID, title, category name, and rental count.","WITH film_rentals AS (
+    SELECT 
+        fc.category_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id, f.film_id, f.title
+),
+category_avg AS (
+    SELECT 
+        category_id,
+        AVG(rental_count) AS avg_rental_count
+    FROM film_rentals
+    GROUP BY category_id
+)
+SELECT 
+    fr.film_id, 
+    fr.title, 
+    c.name AS category_name, 
+    fr.rental_count
+FROM 
+    film_rentals fr
+    JOIN category_avg ca ON fr.category_id = ca.category_id
+    JOIN category c ON fr.category_id = c.category_id
+WHERE 
+    fr.rental_count > ca.avg_rental_count;","WITH film_rentals AS (
+    SELECT 
+        fc.category_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id, f.film_id, f.title
+),
+category_avg AS (
+    SELECT 
+        category_id,
+        AVG(rental_count) AS avg_rental_count
+    FROM film_rentals
+    GROUP BY category_id
+)
+SELECT 
+    fr.film_id, 
+    fr.title, 
+    c.name AS category_name, 
+    fr.rental_count
+FROM 
+    film_rentals fr
+    JOIN category_avg ca ON fr.category_id = ca.category_id
+    JOIN category c ON fr.category_id = c.category_id
+WHERE 
+    fr.rental_count > ca.avg_rental_count;",1.0
+24.2,"Film mana yang disewa lebih banyak dari rata-rata di kategori-nya? Tampilkan ID film, judul, nama kategori, dan jumlah penyewaannya.","WITH category_rental_avg AS (
+    SELECT 
+        fc.category_id,
+        AVG(COUNT(r.rental_id)) OVER (PARTITION BY fc.category_id) AS avg_rentals
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id, fc.film_id
+),
+film_rentals AS (
+    SELECT 
+        f.film_id,
+        f.title,
+        c.name AS category_name,
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id, f.title, c.name
+)
+SELECT 
+    fr.film_id,
+    fr.title,
+    fr.category_name,
+    fr.rental_count
+FROM 
+    film_rentals fr
+    JOIN film_category fc ON fr.film_id = fc.film_id
+    JOIN category_rental_avg cra ON fc.category_id = cra.category_id
+WHERE 
+    fr.rental_count > cra.avg_rentals
+ORDER BY 
+    fr.rental_count DESC;","WITH film_rentals AS (
+    SELECT 
+        fc.category_id, 
+        f.film_id, 
+        f.title, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id, f.film_id, f.title
+),
+category_avg AS (
+    SELECT 
+        category_id,
+        AVG(rental_count) AS avg_rental_count
+    FROM film_rentals
+    GROUP BY category_id
+)
+SELECT 
+    fr.film_id, 
+    fr.title, 
+    c.name AS category_name, 
+    fr.rental_count
+FROM 
+    film_rentals fr
+    JOIN category_avg ca ON fr.category_id = ca.category_id
+    JOIN category c ON fr.category_id = c.category_id
+WHERE 
+    fr.rental_count > ca.avg_rental_count;",0.0
+25.1,"Which actors have never appeared in any films with a rating of 'R'? Show the actor ID, first name, and last name.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM film_actor fa
+        JOIN film f ON fa.film_id = f.film_id
+        WHERE fa.actor_id = a.actor_id AND f.rating = 'R'
+    );","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM film_actor fa
+        JOIN film f ON fa.film_id = f.film_id
+        WHERE fa.actor_id = a.actor_id AND f.rating = 'R'
+    );",1.0
+25.2,"Aktor mana yang belum pernah main di film manapun dengan rating 'R'? Tampilkan ID aktor, nama depan, dan nama belakang.","SELECT 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+FROM 
+    actor a
+WHERE 
+    a.actor_id NOT IN (
+        SELECT DISTINCT fa.actor_id
+        FROM 
+            film_actor fa
+            JOIN film f ON fa.film_id = f.film_id
+        WHERE 
+            f.rating = 'R'
+    );","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM film_actor fa
+        JOIN film f ON fa.film_id = f.film_id
+        WHERE fa.actor_id = a.actor_id AND f.rating = 'R'
+    );",1.0
+26.1,"Get the top 1 film with the highest replacement cost among those that have never been rented in any store. Show the film ID, title, and replacement cost.","SELECT 
+    f.film_id, 
+    f.title, 
+    f.replacement_cost
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY 
+    f.replacement_cost DESC
+LIMIT 1;","SELECT 
+    f.film_id, 
+    f.title, 
+    f.replacement_cost
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY 
+    f.replacement_cost DESC
+LIMIT 1;
+",1.0
+26.2,"Ambil 1 film dengan biaya ganti tertinggi yang belum pernah disewa di toko mana pun. Tampilkan ID film, judul, dan biaya ganti.","SELECT 
+    f.film_id,
+    f.title,
+    f.replacement_cost
+FROM 
+    film f
+LEFT JOIN 
+    inventory i ON f.film_id = i.film_id
+LEFT JOIN 
+    rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    r.rental_id IS NULL
+ORDER BY 
+    f.replacement_cost DESC
+LIMIT 1;","SELECT 
+    f.film_id, 
+    f.title, 
+    f.replacement_cost
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY 
+    f.replacement_cost DESC
+LIMIT 1;
+",1.0
+27.1,"Which customers have rented films from all stores? Show the customer ID, first name, and last name.","WITH customer_stores AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_stores cs ON c.customer_id = cs.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);","WITH customer_stores AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_stores cs ON c.customer_id = cs.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);",1.0
+27.2,"Siapa pelanggan yang sudah nyewa dari semua toko? Tampilkan ID pelanggan, nama depan, dan nama belakang.","SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+FROM 
+    customer c
+WHERE 
+    NOT EXISTS (
+        SELECT 1 
+        FROM store s 
+        WHERE NOT EXISTS (
+            SELECT 1 
+            FROM rental r 
+            JOIN inventory i ON r.inventory_id = i.inventory_id 
+            WHERE r.customer_id = c.customer_id 
+            AND i.store_id = s.store_id
+        )
+    );","WITH customer_stores AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_stores cs ON c.customer_id = cs.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);",1.0
+28.1,"Which films have been rented in all stores? Show the film ID, title, and the number of stores it was rented in.","WITH film_stores AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    film_id, 
+    title, 
+    store_count
+FROM 
+    film_stores
+WHERE 
+    store_count = (SELECT COUNT(*) FROM store);","WITH film_stores AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    film_id, 
+    title, 
+    store_count
+FROM 
+    film_stores
+WHERE 
+    store_count = (SELECT COUNT(*) FROM store);",1.0
+28.2,"Film mana yang sudah pernah disewa di semua toko? Tampilkan ID film, judul, dan jumlah toko tempat film itu disewa.","SELECT 
+    f.film_id,
+    f.title,
+    COUNT(DISTINCT i.store_id) AS store_count
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.film_id, f.title
+HAVING 
+    COUNT(DISTINCT i.store_id) = (SELECT COUNT(DISTINCT store_id) FROM store)
+ORDER BY 
+    f.film_id;","WITH film_stores AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    film_id, 
+    title, 
+    store_count
+FROM 
+    film_stores
+WHERE 
+    store_count = (SELECT COUNT(*) FROM store);",1.0
+29.1,"Which film has the highest revenue per minute of runtime? Show the film ID, title, runtime, and revenue per minute. Round to two decimal points. Return only the top 1 result.","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.length, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id, f.title, f.length
+)
+SELECT 
+    film_id, 
+    title, 
+    length, 
+    ROUND(total_revenue / length, 2) AS revenue_per_minute
+FROM 
+    film_revenue
+WHERE 
+    length > 0
+ORDER BY 
+    revenue_per_minute DESC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.length, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id, f.title, f.length
+)
+SELECT 
+    film_id, 
+    title, 
+    length, 
+    ROUND(total_revenue / length, 2) AS revenue_per_minute
+FROM 
+    film_revenue
+WHERE 
+    length > 0
+ORDER BY 
+    revenue_per_minute DESC
+LIMIT 1;",1.0
+29.2,"Film mana yang memiliki pendapatan tertinggi per menit durasi? Tampilkan ID film, judul, durasi, dan pendapatan per menit. Ambil hanya 1 film teratas. Bulatkan ke 2 angka desimal","SELECT 
+    f.film_id,
+    f.title,
+    f.length AS duration,
+    ROUND(SUM(p.amount) / f.length, 2) AS revenue_per_minute
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    f.film_id
+ORDER BY 
+    revenue_per_minute DESC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.length, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id, f.title, f.length
+)
+SELECT 
+    film_id, 
+    title, 
+    length, 
+    ROUND(total_revenue / length, 2) AS revenue_per_minute
+FROM 
+    film_revenue
+WHERE 
+    length > 0
+ORDER BY 
+    revenue_per_minute DESC
+LIMIT 1;",1.0
+30.1,"Who are the customers that have rented the movie ZORRO ARK more than once? Just show their ID, first name, and last name.","WITH zorro_film AS (
+    SELECT film_id
+    FROM film
+    WHERE title = 'ZORRO ARK'
+),
+zorro_rentals AS (
+    SELECT r.customer_id
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id IN (SELECT film_id FROM zorro_film)
+)
+SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+FROM 
+    customer c
+JOIN (
+    SELECT customer_id
+    FROM zorro_rentals
+    GROUP BY customer_id
+    HAVING COUNT(*) > 1
+) zr ON c.customer_id = zr.customer_id;","WITH zorro_film AS (
+    SELECT film_id
+    FROM film
+    WHERE title = 'ZORRO ARK'
+),
+zorro_rentals AS (
+    SELECT r.customer_id
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id IN (SELECT film_id FROM zorro_film)
+)
+SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+FROM 
+    customer c
+JOIN (
+    SELECT customer_id
+    FROM zorro_rentals
+    GROUP BY customer_id
+    HAVING COUNT(*) > 1
+) zr ON c.customer_id = zr.customer_id;",1.0
+30.2,"Siapa aja pelanggan yang udah nyewa film ZORRO ARK lebih dari satu kali? Tampilkan ID, nama depan, dan nama belakang mereka ya.","WITH zorro_film AS (
+    SELECT film_id
+    FROM film
+    WHERE title = 'ZORRO ARK'
+),
+zorro_rentals AS (
+    SELECT r.customer_id
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id IN (SELECT film_id FROM zorro_film)
+SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+FROM 
+    customer c
+JOIN (
+    SELECT customer_id
+    FROM zorro_rentals
+    GROUP BY customer_id
+    HAVING COUNT(*) > 1
+) zr ON c.customer_id = zr.customer_id;","WITH zorro_film AS (
+    SELECT film_id
+    FROM film
+    WHERE title = 'ZORRO ARK'
+),
+zorro_rentals AS (
+    SELECT r.customer_id
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    WHERE i.film_id IN (SELECT film_id FROM zorro_film)
+)
+SELECT 
+    c.customer_id,
+    c.first_name,
+    c.last_name
+FROM 
+    customer c
+JOIN (
+    SELECT customer_id
+    FROM zorro_rentals
+    GROUP BY customer_id
+    HAVING COUNT(*) > 1
+) zr ON c.customer_id = zr.customer_id;",0.0
+31.1,"Which film has the most actors but has never been rented in any store? Just show the film ID, title, and number of actors — only the top one.","WITH unrented_films AS (
+    SELECT f.film_id, f.title
+    FROM film f
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+)
+SELECT 
+    uf.film_id, 
+    uf.title, 
+    COUNT(fa.actor_id) AS actor_count
+FROM 
+    unrented_films uf
+    JOIN film_actor fa ON uf.film_id = fa.film_id
+GROUP BY 
+    uf.film_id, uf.title
+ORDER BY 
+    actor_count DESC
+LIMIT 1;","WITH unrented_films AS (
+    SELECT f.film_id, f.title
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+),
+film_actor_counts AS (
+    SELECT 
+        uf.film_id, 
+        uf.title, 
+        COUNT(fa.actor_id) AS actor_count
+    FROM 
+        unrented_films uf
+        JOIN film_actor fa ON uf.film_id = fa.film_id
+    GROUP BY 
+        uf.film_id, uf.title
+)
+SELECT 
+    film_id, 
+    title, 
+    actor_count
+FROM 
+    film_actor_counts
+ORDER BY 
+    actor_count DESC
+LIMIT 1;",1.0
+31.2,"Film apa yang punya aktor paling banyak tapi belum pernah disewa di toko manapun? Tampilkan ID film, judul, dan jumlah aktornya — cukup ambil 1 film teratas.","WITH film_actor_counts AS (
+    SELECT 
+        f.film_id,
+        f.title,
+        COUNT(fa.actor_id) AS actor_count
+    FROM 
+        film f
+        JOIN film_actor fa ON f.film_id = fa.film_id
+    GROUP BY 
+        f.film_id
+),
+unrented_films AS (
+    SELECT 
+        f.film_id
+    FROM 
+        film f
+        LEFT JOIN inventory i ON f.film_id = i.film_id
+        LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE 
+        r.rental_id IS NULL
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    fac.film_id,
+    fac.title,
+    fac.actor_count
+FROM 
+    film_actor_counts fac
+    JOIN unrented_films uf ON fac.film_id = uf.film_id
+ORDER BY 
+    fac.actor_count DESC
+LIMIT 1;","WITH unrented_films AS (
+    SELECT f.film_id, f.title
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+),
+film_actor_counts AS (
+    SELECT 
+        uf.film_id, 
+        uf.title, 
+        COUNT(fa.actor_id) AS actor_count
+    FROM 
+        unrented_films uf
+        JOIN film_actor fa ON uf.film_id = fa.film_id
+    GROUP BY 
+        uf.film_id, uf.title
+)
+SELECT 
+    film_id, 
+    title, 
+    actor_count
+FROM 
+    film_actor_counts
+ORDER BY 
+    actor_count DESC
+LIMIT 1;",1.0
+32.1,Which movie has the longest runtime but has never been rented? Show the movie title and runtime. Return only the top 1 result.,"WITH unrented_films AS (
+    SELECT f.film_id, f.title, f.length
+    FROM film f
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+)
+SELECT 
+    title, 
+    length AS runtime
+FROM 
+    unrented_films
+ORDER BY 
+    runtime DESC
+LIMIT 1;","WITH unrented_films AS (
+    SELECT f.film_id, f.title, f.length
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT DISTINCT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+)
+SELECT 
+    title, 
+    length AS runtime
+FROM 
+    unrented_films
+ORDER BY 
+    runtime DESC
+LIMIT 1;",1.0
+32.2,Film apa yang punya durasi terpanjang tapi belum pernah disewa? Tampilkan judul film dan durasinya. Ambil hanya 1 film teratas.,"SELECT 
+    f.title,
+    f.length
+FROM 
+    film f
+LEFT JOIN 
+    inventory i ON f.film_id = i.film_id
+LEFT JOIN 
+    rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    r.rental_id IS NULL
+ORDER BY 
+    f.length DESC
+LIMIT 1;","WITH unrented_films AS (
+    SELECT f.film_id, f.title, f.length
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT DISTINCT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+)
+SELECT 
+    title, 
+    length AS runtime
+FROM 
+    unrented_films
+ORDER BY 
+    runtime DESC
+LIMIT 1;",1.0
+33.1,"Which top 10 customers have rented the most movies in a single whole day? Show the customer’s first name, last name, and the number of movies they rented on that day. Sort by number of rented movies descending.","WITH customer_daily_rentals AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        DATE(r.rental_date) AS rental_day,
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name, DATE(r.rental_date)
+SELECT 
+    first_name,
+    last_name,
+    rentals_count
+FROM 
+    customer_daily_rentals
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;","WITH customer_daily_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name, 
+        c.last_name,
+        DATE(r.rental_date) AS rental_day, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name, rental_day
+)
+SELECT 
+    first_name, 
+    last_name, 
+    rentals_count
+FROM 
+    customer_daily_rentals
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;",0.0
+33.2,"Siapa 10 pelanggan teratas yang menyewa film paling banyak dalam satu hari penuh? Tampilkan nama depan, nama belakang, dan jumlah film yang disewa pada hari itu. Urutkan dari yang terbanyak","SELECT 
+    c.first_name,
+    c.last_name,
+    COUNT(*) AS rental_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+WHERE 
+    DATE(r.rental_date) = DATE(r.rental_date + INTERVAL '1 day') - INTERVAL '1 day'
+GROUP BY 
+    c.customer_id,
+    DATE(r.rental_date),
+    c.first_name,
+    c.last_name
+ORDER BY 
+    rental_count DESC
+LIMIT 10;","WITH customer_daily_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name, 
+        c.last_name,
+        DATE(r.rental_date) AS rental_day, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name, rental_day
+)
+SELECT 
+    first_name, 
+    last_name, 
+    rentals_count
+FROM 
+    customer_daily_rentals
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;",0.5
+34.1,List the movies that have been rented under 10 times in total. Include each movie’s title and the number of times it has been rented. Order the results by title alphabetically.,"SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.title
+HAVING 
+    COUNT(r.rental_id) < 10
+ORDER BY 
+    f.title;","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.title
+HAVING 
+    COUNT(r.rental_id) < 10
+order by title;",1.0
+34.2,"Film apa saja yang telah disewa kurang dari 10 kali secara keseluruhan? Tampilkan judul film dan jumlah total penyewaannya, lalu urutkan hasilnya berdasarkan judul secara alfabet.","SELECT 
+    f.title,
+    COUNT(r.rental_id) AS total_rentals
+FROM 
+    film f
+    LEFT JOIN inventory i ON f.film_id = i.film_id
+    LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.film_id,
+    f.title
+HAVING 
+    COUNT(r.rental_id) < 10
+ORDER BY 
+    f.title ASC;","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+LEFT JOIN inventory i ON f.film_id = i.film_id
+LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.title
+HAVING 
+    COUNT(r.rental_id) < 10
+order by title;",1.0
+35.1,Which staff members have processed the most payments on weekends? Show the staff first name and the number of payments processed. Sort by number of payments descending.,"SELECT 
+    s.first_name AS staff_name, 
+    COUNT(p.payment_id) AS payments_count
+FROM 
+    staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE 
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY 
+    s.staff_id, s.first_name
+ORDER BY 
+    payments_count DESC;","SELECT 
+    s.first_name AS staff_name, 
+    COUNT(p.payment_id) AS payments_count
+FROM 
+    staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE 
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY 
+    s.staff_id, s.first_name
+ORDER BY 
+    payments_count DESC;
+",1.0
+35.2,Staf mana yang paling banyak memproses pembayaran saat akhir pekan? Tampilkan nama awal staf dan jumlah pembayaran yang diproses. Urutkan dari yang terbanyak.,"SELECT 
+    s.first_name AS staff_name, 
+    COUNT(p.payment_id) AS payments_count
+FROM 
+    staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE 
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY 
+    s.staff_id, s.first_name
+ORDER BY 
+    payments_count DESC;","SELECT 
+    s.first_name AS staff_name, 
+    COUNT(p.payment_id) AS payments_count
+FROM 
+    staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE 
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY 
+    s.staff_id, s.first_name
+ORDER BY 
+    payments_count DESC;
+",1.0
+36.1,"Which movie has the highest revenue but the lowest rental rate? Show the movie title, rental rate, and total revenue. Get top 1","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.rental_rate, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    rental_rate, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC, rental_rate ASC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.rental_rate, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    rental_rate, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC, rental_rate ASC
+LIMIT 1;",1.0
+36.2,"Film mana yang pendapatannya tinggi tapi harga sewanya rendah? Tampilkan judul film, harga sewa, dan total pendapatan. Dapatkan top 1 saja","SELECT 
+    f.title,
+    f.rental_rate,
+    SUM(p.amount) AS total_revenue
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    f.film_id
+ORDER BY 
+    total_revenue DESC,
+    f.rental_rate ASC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.rental_rate, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    rental_rate, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC, rental_rate ASC
+LIMIT 1;",1.0
+37.1,Which customers have rented movies from every store but have never rented a movie with a rating of 'R'? Show the customer first name.,"WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id, c.first_name
+),
+customer_no_r_ratings AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'R'
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_r_ratings cnr ON cs.customer_id = cnr.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);","WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_r_ratings AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'R'
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_r_ratings cnr ON cs.customer_id = cnr.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);",1.0
+37.2,Ada pelanggan yang sudah nyewa dari semua toko tapi gak pernah nyewa film dengan rating 'R'? Tampilkan nama awal pelanggan.,"WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_r_ratings AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'R'
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_r_ratings cnr ON cs.customer_id = cnr.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);","WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_r_ratings AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'R'
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_r_ratings cnr ON cs.customer_id = cnr.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);",1.0
+38.1,Which movies have been rented by customers from more than 5 different cities? Show the movie title and the number of cities.,"WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 5;","WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 5;",1.0
+38.2,Film mana yang disewa oleh pelanggan dari lebih dari 5 kota? Tampilkan judul film dan jumlah kotanya.,"WITH film_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    film_city_rentals
+WHERE 
+    city_count > 5;","WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 5;",1.0
+39.1,Which movies have the lowest number of actors and have never been rented in all stores? Show the movie title and number of actors. Get top 1,"SELECT 
+    f.title, 
+    COUNT(DISTINCT fa.actor_id) AS actor_count
+FROM 
+    film f
+JOIN film_actor fa ON f.film_id = fa.film_id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM inventory i
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE i.film_id = f.film_id
+)
+GROUP BY f.film_id, f.title
+ORDER BY actor_count ASC
+LIMIT 1;","SELECT 
+    f.title, 
+    COUNT(DISTINCT fa.actor_id) AS actor_count
+FROM 
+    film f
+JOIN film_actor fa ON f.film_id = fa.film_id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM inventory i
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE i.film_id = f.film_id
+)
+GROUP BY f.film_id, f.title
+ORDER BY actor_count ASC
+LIMIT 1;",1.0
+39.2,Film mana yang punya sedikit aktor dan belum pernah disewa di toko manapun? Tampilkan judul film dan jumlah aktor. Dapatkan top 1,"SELECT 
+    f.title,
+    COUNT(fa.actor_id) AS actor_count
+FROM 
+    film f
+    JOIN film_actor fa ON f.film_id = fa.film_id
+    LEFT JOIN inventory i ON f.film_id = i.film_id
+    LEFT JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    r.rental_id IS NULL
+GROUP BY 
+    f.title
+ORDER BY 
+    actor_count ASC,
+    f.title
+LIMIT 1;","SELECT 
+    f.title, 
+    COUNT(DISTINCT fa.actor_id) AS actor_count
+FROM 
+    film f
+JOIN film_actor fa ON f.film_id = fa.film_id
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM inventory i
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE i.film_id = f.film_id
+)
+GROUP BY f.film_id, f.title
+ORDER BY actor_count ASC
+LIMIT 1;",1.0
+40.1,"Which customers have rented the same movie more than once in a single full month? Show the customer first name, movie title, and the number of times rented. Sort by customer first name","WITH customer_movie_rentals AS (
+    SELECT 
+        c.first_name,
+        f.title,
+        TO_CHAR(r.rental_date, 'YYYY-MM') AS rental_month,
+        COUNT(*) AS rental_count
+    FROM 
+        customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        c.first_name,
+        f.title,
+        rental_month
+    HAVING 
+        COUNT(*) > 1
+)
+SELECT 
+    first_name,
+    title,
+    rental_count
+FROM 
+    customer_movie_rentals
+ORDER BY 
+    first_name;","WITH customer_movie_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        f.title, 
+        TO_CHAR(r.rental_date, 'YYYY-MM') AS rental_month,
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        c.customer_id, f.film_id, rental_month, c.first_name, c.last_name, f.title
+)
+SELECT 
+    customer_name, 
+    title, 
+    rentals_count
+FROM 
+    customer_movie_rentals
+WHERE 
+    rentals_count > 1
+ORDER BY
+    customer_name;",0.0
+40.2,"Siapa saja pelanggan yang pernah menyewa film yang sama lebih dari satu kali dalam bulan yang sama (bulan penuh mana pun, tidak harus bulan sekarang)? Tampilkan nama depan pelanggan, judul film, dan jumlah penyewaannya dalam bulan tersebut. Urutkan berdasarkan nama depan pelanggan.","SELECT 
+    c.first_name,
+    f.title,
+    COUNT(*) AS rental_count
+FROM 
+    customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+GROUP BY 
+    c.customer_id,
+    c.first_name,
+    f.film_id,
+    f.title,
+    DATE_TRUNC('month', r.rental_date)
+HAVING 
+    COUNT(*) > 1
+ORDER BY 
+    c.first_name;","WITH customer_movie_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        f.title, 
+        TO_CHAR(r.rental_date, 'YYYY-MM') AS rental_month,
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        c.customer_id, f.film_id, rental_month, c.first_name, c.last_name, f.title
+)
+SELECT 
+    customer_name, 
+    title, 
+    rentals_count
+FROM 
+    customer_movie_rentals
+WHERE 
+    rentals_count > 1
+ORDER BY
+    customer_name;",1.0
+41.1,Which movies have been rented by customers from every country? Show the movie title and the number of countries.,"WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count = (SELECT COUNT(*) FROM country);","WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count = (SELECT COUNT(*) FROM country);",1.0
+41.2,Film apa saja yang telah disewa oleh pelanggan dari seluruh negara yang ada di database? Tampilkan judul film dan jumlah negara asal pelanggan yang menyewa film tersebut. Hanya tampilkan film yang disewa oleh pelanggan dari semua negara.,"WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count = (SELECT COUNT(*) FROM country);","WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count = (SELECT COUNT(*) FROM country);",1.0
+42.1,"Which movies have been rented the most during holidays (e.g., December)? Show the movie title and the number of rentals.","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;
+",1.0
+42.2,Film mana yang paling sering disewa saat libur (misalnya bulan Desember)? Tampilkan judul film dan jumlah penyewaan.,"WITH december_rentals AS (
+    SELECT 
+        f.title,
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE 
+        EXTRACT(MONTH FROM r.rental_date) = 12
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    rental_count
+FROM 
+    december_rentals
+ORDER BY 
+    rental_count DESC
+LIMIT 1;","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;
+",1.0
+43.1,Which customers have rented movies from every category but have never rented a movie with a replacement cost over $20? Show the customer full name.,"WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_expensive_rentals AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.replacement_cost > 20
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_expensive_rentals cne ON cc.customer_id = cne.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_expensive_rentals AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.replacement_cost > 20
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_expensive_rentals cne ON cc.customer_id = cne.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+43.2,Ada pelanggan yang nyewa dari semua kategori tapi gak pernah nyewa film dengan biaya ganti di atas $20? Tampilkan nama lengkap pelanggan.,"WITH customer_category_rentals AS (
+    SELECT 
+        c.customer_id,
+        c.first_name,
+        c.last_name,
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name
+),
+customer_high_replacement_cost AS (
+    SELECT DISTINCT
+        c.customer_id
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film f ON i.film_id = f.film_id
+    WHERE 
+        f.replacement_cost > 20
+)
+SELECT 
+    first_name || ' ' || last_name AS full_name
+FROM 
+    customer_category_rentals ccr
+WHERE 
+    ccr.category_count = (SELECT COUNT(*) FROM category)
+    AND ccr.customer_id NOT IN (SELECT customer_id FROM customer_high_replacement_cost);","WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_expensive_rentals AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.replacement_cost > 20
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_expensive_rentals cne ON cc.customer_id = cne.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+44.1,"Which movies have the highest number of rentals but the lowest replacement cost? Show the movie title, replacement cost, and number of rentals. Get top 1","WITH film_rentals AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    replacement_cost, 
+    rentals_count
+FROM 
+    film_rentals
+ORDER BY 
+    rentals_count DESC, replacement_cost ASC
+LIMIT 1;","WITH film_rentals AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    replacement_cost, 
+    rentals_count
+FROM 
+    film_rentals
+ORDER BY 
+    rentals_count DESC, replacement_cost ASC
+LIMIT 1;",1.0
+44.2,"Film apa yang paling sering disewa tapi biaya gantinya rendah? Tampilkan judul film, biaya ganti, dan jumlah penyewaan. Dapatkan top 1","SELECT 
+    f.title,
+    f.replacement_cost,
+    COUNT(r.rental_id) AS rental_count
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY 
+    f.film_id
+ORDER BY 
+    rental_count DESC,
+    f.replacement_cost ASC
+LIMIT 1;","WITH film_rentals AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    replacement_cost, 
+    rentals_count
+FROM 
+    film_rentals
+ORDER BY 
+    rentals_count DESC, replacement_cost ASC
+LIMIT 1;",1.0
+45.1,Which customers have rented movies from every store but have never rented a movie with a runtime over 3 hours? Show the customer first name. Sort by customer name,"WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id, c.first_name
+),
+customer_no_long_movies AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.length > 180
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_long_movies cnl ON cs.customer_id = cnl.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store)
+ORDER BY
+    cs.customer_name;","WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_long_movies AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id and f.length > 180
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_long_movies cnl ON cs.customer_id = cnl.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store)
+ORDER BY
+    cs.customer_name;",1.0
+45.2,Siapa pelanggan yang nyewa dari semua toko tapi gak pernah nyewa film apapun yang berdurasi lebih dari 3 jam? Tampilkan nama awal pelanggan. Urutkan dengan nama awal pelanggan.,"SELECT DISTINCT c.first_name
+FROM customer c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM store s
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        WHERE r.customer_id = c.customer_id
+        AND i.store_id = s.store_id
+    )
+)
+AND NOT EXISTS (
+    SELECT 1
+    FROM rental r
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    WHERE r.customer_id = c.customer_id
+    AND f.length > 180
+)
+ORDER BY c.first_name;","WITH customer_stores AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_long_movies AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id and f.length > 180
+        )
+)
+SELECT 
+    cs.customer_name
+FROM 
+    customer_stores cs
+    JOIN customer_no_long_movies cnl ON cs.customer_id = cnl.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store)
+ORDER BY
+    cs.customer_name;",0.0
+46.1,Which movies have been rented by customers from more than 10 different cities? Show the movie title and the number of cities.,"WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 10;","WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 10;",1.0
+46.2,Film mana yang disewa oleh pelanggan dari lebih dari 10 kota? Tampilkan judul film dan jumlah kotanya.,"WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 10;","WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 10;",1.0
+47.1,Find the top 1 movie most frequently rented by customers who are no longer active. Display the title and the rental count. Sort by film title too,"SELECT 
+    f.title, 
+    COUNT(*) AS rental_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+WHERE c.active = 0
+GROUP BY f.film_id, f.title
+ORDER BY rental_count DESC, f.title ASC
+LIMIT 1;","SELECT 
+    f.title, 
+    COUNT(*) AS rental_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+WHERE c.active = 0
+GROUP BY f.film_id, f.title
+ORDER BY rental_count DESC, f.title ASC
+LIMIT 1;",1.0
+47.2,Film mana yang paling banyak disewa oleh pelanggan dan sedang tidak aktif? Tampilkan judul film dan jumlah rentalnya. Dapatkan top 1 dan urutkan juga berdasarkan judulnya,"SELECT 
+    f.title,
+    COUNT(r.rental_id) AS rental_count
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN customer c ON r.customer_id = c.customer_id
+WHERE 
+    c.active = 0
+GROUP BY 
+    f.title
+ORDER BY 
+    rental_count DESC,
+    f.title ASC
+LIMIT 1;","SELECT 
+    f.title, 
+    COUNT(*) AS rental_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+WHERE c.active = 0
+GROUP BY f.film_id, f.title
+ORDER BY rental_count DESC, f.title ASC
+LIMIT 1;",1.0
+48.1,Which top 1 movie has the highest revenue but has never been rented on weekends? Show the movie title and total revenue.,"WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    GROUP BY 
+        f.film_id, f.title
+),
+weekend_rentals AS (
+    SELECT DISTINCT 
+        f.film_id
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    WHERE 
+        EXTRACT(DOW FROM r.rental_date) IN (0, 6)
+)
+SELECT 
+    fr.title, 
+    fr.total_revenue
+FROM 
+    film_revenue fr
+WHERE 
+    fr.film_id NOT IN (SELECT film_id FROM weekend_rentals)
+ORDER BY 
+    fr.total_revenue DESC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        EXTRACT(DOW FROM r.rental_date) NOT IN (0, 6)
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC
+LIMIT 1;
+",0.0
+48.2,Film top 1 mana yang pendapatannya tinggi tapi tidak pernah disewa saat weekend? Tampilkan judul film dan total pendapatan.,"SELECT 
+    f.title,
+    SUM(p.amount) AS total_revenue
+FROM 
+    film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+WHERE 
+    f.film_id NOT IN (
+        SELECT DISTINCT i.film_id
+        FROM rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        WHERE EXTRACT(DOW FROM r.rental_date) IN (0, 6)
+    )
+GROUP BY 
+    f.title
+ORDER BY 
+    total_revenue DESC
+LIMIT 1;","WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        EXTRACT(DOW FROM r.rental_date) NOT IN (0, 6)
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC
+LIMIT 1;
+",0.0
+49.1,Which customers have rented movies from every category but have never rented a movie with a rating of 'PG-13'? Show the customer full name.,"WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_pg13 AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'PG-13'
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_pg13 cnp ON cc.customer_id = cnp.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_pg13 AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'PG-13'
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_pg13 cnp ON cc.customer_id = cnp.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+49.2,Ada pelanggan yang nyewa dari semua kategori tapi gak pernah nyewa film dengan rating 'PG-13'? Tampilkan nama lengkap pelanggan.,"WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_pg13 AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'PG-13'
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_pg13 cnp ON cc.customer_id = cnp.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_pg13 AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'PG-13'
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_pg13 cnp ON cc.customer_id = cnp.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);",1.0
+50.1,Which movies have been rented by customers from more than 5 different countries? Show the movie title and the number of countries.,"WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count > 5;","WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count > 5;",1.0
+50.2,Film mana yang disewa oleh pelanggan dari lebih dari 5 negara? Tampilkan judul film dan jumlah negara.,"WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count > 5;","WITH movie_country_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT co.country_id) AS country_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+        JOIN country co ON ci.country_id = co.country_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    country_count
+FROM 
+    movie_country_rentals
+WHERE 
+    country_count > 5;",1.0

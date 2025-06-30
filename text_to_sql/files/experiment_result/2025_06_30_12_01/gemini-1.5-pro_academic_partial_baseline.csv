@@ -1,0 +1,513 @@
+Question ID,Question,Generated SQL Query,Expected SQL Query,Execution Accuracy
+1.1,Can you tell me which faculty did the most research projects? I just need their name (nama) and the number of projects (total_proyek).,"SELECT F.nama, COUNT(P.id_proyek) AS total_proyek
+FROM Fakultas AS F
+JOIN ProyekPenelitian AS P ON F.id_fakultas = P.id_fakultas
+GROUP BY F.nama
+ORDER BY total_proyek DESC
+LIMIT 1;","SELECT f.nama, COUNT(p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_proyek DESC
+  LIMIT 1;",1.0
+1.2,Fakultas mana yang paling banyak bikin proyek penelitian? Tampilkan nama (nama) dan jumlah proyeknya (total_proyek).,"SELECT F.nama, COUNT(P.id_proyek) AS total_proyek FROM Fakultas AS F JOIN ProyekPenelitian AS P ON F.id_fakultas = P.id_fakultas GROUP BY F.nama ORDER BY total_proyek DESC LIMIT 1;","SELECT f.nama, COUNT(p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_proyek DESC
+  LIMIT 1;",1.0
+2.1,I’m curious which lecturer guides the most students. Please show their name (nama) and how many students they supervise (total_mahasiswa_dibimbing).,"SELECT d.nama, COUNT(m.id_pembimbing) AS total_mahasiswa_dibimbing
+FROM Dosen AS d
+JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+GROUP BY d.nama
+ORDER BY total_mahasiswa_dibimbing DESC
+LIMIT 1;","SELECT d.nama, COUNT(m.id_mahasiswa) AS total_mahasiswa_dibimbing
+  FROM Dosen d
+  JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  GROUP BY d.nama
+  ORDER BY total_mahasiswa_dibimbing DESC
+  LIMIT 1;",1.0
+2.2,Dosen mana yang ngebimbing mahasiswa paling banyak? Aku butuh namanya (nama) dan total mahasiswa bimbingannya (total_mahasiswa_dibimbing).,"SELECT d.nama, COUNT(m.id_pembimbing) AS total_mahasiswa_dibimbing
+FROM Dosen d
+LEFT JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+GROUP BY d.nama
+ORDER BY total_mahasiswa_dibimbing DESC
+LIMIT 1;","SELECT d.nama, COUNT(m.id_mahasiswa) AS total_mahasiswa_dibimbing
+  FROM Dosen d
+  JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  GROUP BY d.nama
+  ORDER BY total_mahasiswa_dibimbing DESC
+  LIMIT 1;",1.0
+3.1,Which student joined the most sessions? I want to see their name (nama) and how many sessions they attended (total_kehadiran).,"SELECT m.nama, COUNT(ek.id_sesi) AS total_kehadiran
+FROM Mahasiswa AS m
+JOIN EnrolmenKelas AS ek ON m.id_mahasiswa = ek.id_mahasiswa
+GROUP BY m.nama
+ORDER BY total_kehadiran DESC
+LIMIT 1;","SELECT m.nama, COUNT(k.id_kehadiran) AS total_kehadiran
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_kehadiran DESC
+  LIMIT 1;",1.0
+3.2,Mahasiswa mana yang paling rajin ikut sesi kelas? Kasih liat nama (nama) dan jumlah kehadirannya (total_kehadiran).,"SELECT m.nama, COUNT(ck.id_kehadiran) AS total_kehadiran
+FROM Mahasiswa m
+JOIN CatatanKehadiran ck ON m.id_mahasiswa = ck.id_mahasiswa
+GROUP BY m.nama
+ORDER BY total_kehadiran DESC
+LIMIT 1;","SELECT m.nama, COUNT(k.id_kehadiran) AS total_kehadiran
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_kehadiran DESC
+  LIMIT 1;",1.0
+5.1,Which faculty uses the most facilities? I need the faculty name (nama) and the number of facilities used (total_fasilitas).,"SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas FROM Fakultas AS f JOIN FasilitasFakultas AS ff ON f.id_fakultas = ff.id_fakultas GROUP BY f.nama ORDER BY total_fasilitas DESC LIMIT 1;","SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas
+  FROM Fakultas f
+  JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_fasilitas DESC 
+  LIMIT 1;",1.0
+5.2,Fakultas mana yang paling banyak pake fasilitas? Aku mau liat nama (nama) dan jumlah fasilitasnya (total_fasilitas).,"SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas FROM Fakultas f JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas GROUP BY f.nama ORDER BY total_fasilitas DESC LIMIT 1;","SELECT f.nama, COUNT(ff.id_fasilitas) AS total_fasilitas
+  FROM Fakultas f
+  JOIN FasilitasFakultas ff ON f.id_fakultas = ff.id_fakultas
+  GROUP BY f.nama
+  ORDER BY total_fasilitas DESC 
+  LIMIT 1;",1.0
+7.1,Who is the lecturer with the most publications? Just show their name (nama) and how many they’ve authored (total_publikasi).,"SELECT D.nama, COUNT(PP.id_publikasi) AS total_publikasi
+FROM Dosen AS D
+JOIN PenulisPublikasi AS PP ON D.id_dosen = PP.id_dosen
+GROUP BY D.nama
+ORDER BY total_publikasi DESC
+LIMIT 1;","SELECT d.nama, COUNT(p.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  JOIN Publikasi p ON pp.id_publikasi = p.id_publikasi
+  GROUP BY d.nama
+  ORDER BY total_publikasi DESC
+  LIMIT 1;",1.0
+7.2,Dosen mana yang paling banyak nulis publikasi? Tunjukin namanya (nama) dan total publikasinya (total_publikasi).,"SELECT D.nama, COUNT(PP.id_publikasi) AS total_publikasi
+FROM Dosen AS D
+JOIN PenulisPublikasi AS PP ON D.id_dosen = PP.id_dosen
+GROUP BY D.nama
+ORDER BY total_publikasi DESC
+LIMIT 1;","SELECT d.nama, COUNT(p.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  JOIN Publikasi p ON pp.id_publikasi = p.id_publikasi
+  GROUP BY d.nama
+  ORDER BY total_publikasi DESC
+  LIMIT 1;",1.0
+8.1,Which student has joined the most research projects? I need their name (nama) and the total number (total_partisipasi).,"SELECT m.nama, COUNT(pp.id_partisipasi) AS total_partisipasi
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+GROUP BY m.nama
+ORDER BY total_partisipasi DESC
+LIMIT 1;","SELECT m.nama, COUNT(pp.id_proyek) AS total_partisipasi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 1;",1.0
+8.2,Mahasiswa mana yang paling sering ikut proyek penelitian? Tunjukin namanya (nama) dan jumlah partisipasinya (total_partisipasi).,"SELECT m.nama, COUNT(pp.id_partisipasi) AS total_partisipasi FROM Mahasiswa AS m JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa GROUP BY m.nama ORDER BY total_partisipasi DESC LIMIT 1;","SELECT m.nama, COUNT(pp.id_proyek) AS total_partisipasi
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  GROUP BY m.nama
+  ORDER BY total_partisipasi DESC
+  LIMIT 1;",1.0
+10.1,Which club has the most members? Show the name (nama) and total members (total_anggota).,"SELECT ok.nama, COUNT(k.id_mahasiswa) AS total_anggota FROM OrganisasiKlub ok JOIN KeanggotaanKlub k ON ok.id_klub = k.id_klub GROUP BY ok.nama ORDER BY total_anggota DESC LIMIT 1;","SELECT k.nama, COUNT(kk.id_mahasiswa) AS total_anggota
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+  GROUP BY k.nama
+  ORDER BY total_anggota DESC
+  LIMIT 1;",1.0
+10.2,Klub mana yang anggotanya paling banyak? Kasih tau nama klubnya (nama) dan jumlah anggota (total_anggota).,"SELECT ok.nama, COUNT(k.id_mahasiswa) AS total_anggota FROM OrganisasiKlub ok JOIN KeanggotaanKlub k ON ok.id_klub = k.id_klub GROUP BY ok.nama ORDER BY total_anggota DESC LIMIT 1;","SELECT k.nama, COUNT(kk.id_mahasiswa) AS total_anggota
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+  GROUP BY k.nama
+  ORDER BY total_anggota DESC
+  LIMIT 1;",1.0
+12.1,"Can you list all faculties and show how many research projects, publications, and active lecturers each has? Show nama, total_proyek, total_publikasi, total_dosen_aktif.","SELECT f.nama, COUNT(DISTINCT p.id_proyek) AS total_proyek, COUNT(DISTINCT pu.id_publikasi) AS total_publikasi, COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif FROM Fakultas f LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas LEFT JOIN Publikasi pu ON f.id_fakultas = pu.id_fakultas LEFT JOIN Dosen d ON f.id_fakultas = d.id_fakultas GROUP BY f.nama","SELECT f.nama,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek,
+  COUNT(DISTINCT pb.id_publikasi) AS total_publikasi,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif
+  FROM Fakultas f
+  LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  LEFT JOIN Publikasi pb ON f.id_fakultas = pb.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  WHERE d.id_dosen IN (
+  SELECT id_dosen FROM PenulisPublikasi
+  UNION
+  SELECT id_dosen FROM ProyekPenelitian
+  )
+  GROUP BY f.nama;",1.0
+12.2,"Tolong tampilin semua fakultas beserta total proyek, publikasi, dan dosen aktifnya. Kolom: nama, total_proyek, total_publikasi, total_dosen_aktif.","SELECT f.nama, COUNT(DISTINCT p.id_proyek) AS total_proyek, COUNT(DISTINCT pu.id_publikasi) AS total_publikasi, COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif FROM Fakultas f LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas LEFT JOIN Publikasi pu ON f.id_fakultas = pu.id_fakultas LEFT JOIN Dosen d ON f.id_fakultas = d.id_fakultas GROUP BY f.nama","SELECT f.nama,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek,
+  COUNT(DISTINCT pb.id_publikasi) AS total_publikasi,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen_aktif
+  FROM Fakultas f
+  LEFT JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+  LEFT JOIN Publikasi pb ON f.id_fakultas = pb.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  WHERE d.id_dosen IN (
+  SELECT id_dosen FROM PenulisPublikasi
+  UNION
+  SELECT id_dosen FROM ProyekPenelitian
+  )
+  GROUP BY f.nama;",1.0
+15.1,"Which students joined more than 2 projects and are in a club? Show id_mahasiswa, nama, total_proyek, and total_klub.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pp.id_proyek) AS total_proyek, COUNT(DISTINCT k.id_klub) AS total_klub
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN KeanggotaanKlub AS k ON m.id_mahasiswa = k.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT pp.id_proyek) > 2;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT pp.id_proyek) > 2;",1.0
+15.2,"Siapa aja mahasiswa yang ikut lebih dari 2 proyek dan juga aktif di klub? Tampilkan id_mahasiswa, nama, total_proyek, total_klub.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pp.id_proyek) AS total_proyek, COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa AS m
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT pp.id_proyek) > 2 AND COUNT(DISTINCT kk.id_klub) > 0;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT pp.id_proyek) > 2;",1.0
+17.1,"Find me lecturers who both supervise students and publish papers. Show id_dosen, nama, total_mahasiswa_bimbingan, total_publikasi.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan, COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+FROM Dosen AS d
+LEFT JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT m.id_mahasiswa) > 0 AND COUNT(DISTINCT pp.id_publikasi) > 0;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  LEFT JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  LEFT JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  WHERE m.id_mahasiswa IS NOT NULL AND pp.id_publikasi IS NOT NULL
+  GROUP BY d.id_dosen, d.nama;",1.0
+17.2,"Dosen mana yang bimbing mahasiswa sekaligus bikin publikasi? Tampilkan id_dosen, nama, total_mahasiswa_bimbingan, total_publikasi.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan, COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+FROM Dosen AS d
+LEFT JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+LEFT JOIN PenulisPublikasi AS pp ON d.id_dosen = pp.id_dosen
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT m.id_mahasiswa) > 0 AND COUNT(DISTINCT pp.id_publikasi) > 0;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa_bimbingan,
+  COUNT(DISTINCT pp.id_publikasi) AS total_publikasi
+  FROM Dosen d
+  LEFT JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+  LEFT JOIN PenulisPublikasi pp ON d.id_dosen = pp.id_dosen
+  WHERE m.id_mahasiswa IS NOT NULL AND pp.id_publikasi IS NOT NULL
+  GROUP BY d.id_dosen, d.nama;",1.0
+18.1,"Which students both borrow books and attend 10+ sessions? Show id_mahasiswa, nama, total_buku_dipinjam, total_sesi.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam, COUNT(DISTINCT ek.id_sesi) AS total_sesi
+FROM Mahasiswa AS m
+JOIN PeminjamanBuku AS pb ON m.id_mahasiswa = pb.id_peminjam
+JOIN EnrolmenKelas AS ek ON m.id_mahasiswa = ek.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT ek.id_sesi) >= 10;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam,
+  COUNT(DISTINCT ck.id_sesi) AS total_sesi
+  FROM Mahasiswa m
+  LEFT JOIN PeminjamanBuku pb ON m.id_mahasiswa = pb.id_peminjam
+  LEFT JOIN CatatanKehadiran ck ON m.id_mahasiswa = ck.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT ck.id_sesi) >= 10 AND COUNT(DISTINCT pb.id_peminjaman) > 0;",1.0
+18.2,"Mahasiswa mana aja yang suka minjem buku dan hadir di lebih dari 10 sesi? Tampilkan id_mahasiswa, nama, total_buku_dipinjam, total_sesi.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam, COUNT(DISTINCT ck.id_sesi) AS total_sesi
+FROM Mahasiswa AS m
+JOIN PeminjamanBuku AS pb ON m.id_mahasiswa = pb.id_peminjam
+JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT pb.id_peminjaman) > 0 AND COUNT(DISTINCT ck.id_sesi) > 10;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT pb.id_peminjaman) AS total_buku_dipinjam,
+  COUNT(DISTINCT ck.id_sesi) AS total_sesi
+  FROM Mahasiswa m
+  LEFT JOIN PeminjamanBuku pb ON m.id_mahasiswa = pb.id_peminjam
+  LEFT JOIN CatatanKehadiran ck ON m.id_mahasiswa = ck.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT ck.id_sesi) >= 10 AND COUNT(DISTINCT pb.id_peminjaman) > 0;",1.0
+24.1,"Find lecturers who supervise students and teach in multiple semesters. Show id_dosen, nama, total_mahasiswa, jumlah_semester.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa, COUNT(DISTINCT s.semester) AS jumlah_semester
+FROM Dosen AS d
+JOIN Mahasiswa AS m ON d.id_dosen = m.id_pembimbing
+JOIN Sesi AS s ON d.id_dosen = s.id_pengajar
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT s.semester) > 1;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa,
+  COUNT(DISTINCT s.semester) AS jumlah_semester
+  FROM Dosen d
+  JOIN Mahasiswa m ON m.id_pembimbing = d.id_dosen
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  GROUP BY d.id_dosen, d.nama
+  HAVING COUNT(DISTINCT s.semester) > 1;",1.0
+24.2,"Dosen mana aja yang ngebimbing mahasiswa dan juga ngajar di lebih dari 1 semester? Tampilkan id_dosen, nama, total_mahasiswa, jumlah_semester.","SELECT d.id_dosen, d.nama, COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa, COUNT(DISTINCT s.semester) AS jumlah_semester
+FROM Dosen d
+JOIN Mahasiswa m ON d.id_dosen = m.id_pembimbing
+JOIN MataKuliah mk ON d.id_dosen = mk.id_pengajar
+JOIN Sesi s ON mk.id_mk = s.id_mk
+GROUP BY d.id_dosen, d.nama
+HAVING COUNT(DISTINCT s.semester) > 1;","SELECT d.id_dosen, d.nama,
+  COUNT(DISTINCT m.id_mahasiswa) AS total_mahasiswa,
+  COUNT(DISTINCT s.semester) AS jumlah_semester
+  FROM Dosen d
+  JOIN Mahasiswa m ON m.id_pembimbing = d.id_dosen
+  JOIN Sesi s ON s.id_pengajar = d.id_dosen
+  GROUP BY d.id_dosen, d.nama
+  HAVING COUNT(DISTINCT s.semester) > 1;",1.0
+29.1,"Which books were borrowed more than 5 times and still have copies? Show id_buku, judul, total_peminjaman, salinan_tersedia.","SELECT bp.id_buku, bp.judul, COUNT(pb.id_buku) AS total_peminjaman, bp.salinan_tersedia FROM BukuPerpustakaan AS bp JOIN PeminjamanBuku AS pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia HAVING COUNT(pb.id_buku) > 5 AND bp.salinan_tersedia > 0","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON b.id_buku = p.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  HAVING COUNT(p.id_peminjaman) > 5 AND b.salinan_tersedia > 0;",1.0
+29.2,"Buku apa aja yang udah dipinjam lebih dari 5x tapi masih tersedia? Kolom: id_buku, judul, total_peminjaman, salinan_tersedia.","SELECT bp.id_buku, bp.judul, COUNT(pb.id_buku) AS total_peminjaman, bp.salinan_tersedia FROM BukuPerpustakaan bp JOIN PeminjamanBuku pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia HAVING COUNT(pb.id_buku) > 5 AND bp.salinan_tersedia > 0","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON b.id_buku = p.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  HAVING COUNT(p.id_peminjaman) > 5 AND b.salinan_tersedia > 0;",1.0
+31.1,"Which student is most active overall (sessions, research, clubs)? Show id_mahasiswa, nama, total_sesi, total_proyek, total_klub.","WITH MahasiswaSesi AS (
+    SELECT id_mahasiswa, COUNT(id_sesi) AS total_sesi
+    FROM EnrolmenKelas
+    GROUP BY id_mahasiswa
+),
+MahasiswaProyek AS (
+    SELECT id_mahasiswa, COUNT(id_proyek) AS total_proyek
+    FROM PartisipasiPenelitian
+    GROUP BY id_mahasiswa
+),
+MahasiswaKlub AS (
+    SELECT id_mahasiswa, COUNT(id_klub) AS total_klub
+    FROM KeanggotaanKlub
+    GROUP BY id_mahasiswa
+)
+SELECT m.id_mahasiswa, m.nama, COALESCE(ms.total_sesi, 0) AS total_sesi, COALESCE(mp.total_proyek, 0) AS total_proyek, COALESCE(mk.total_klub, 0) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN MahasiswaSesi ms ON m.id_mahasiswa = ms.id_mahasiswa
+LEFT JOIN MahasiswaProyek mp ON m.id_mahasiswa = mp.id_mahasiswa
+LEFT JOIN MahasiswaKlub mk ON m.id_mahasiswa = mk.id_mahasiswa
+ORDER BY total_sesi DESC, total_proyek DESC, total_klub DESC
+LIMIT 1;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT k.id_sesi) AS total_sesi,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian pp ON pp.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN KeanggotaanKlub kk ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY (COUNT(DISTINCT k.id_sesi) + COUNT(DISTINCT pp.id_proyek) + COUNT(DISTINCT kk.id_klub)) DESC
+LIMIT 1;
+",0.0
+31.2,"Mahasiswa mana yang paling aktif secara akademik? Kolom: id_mahasiswa, nama, total_sesi, total_proyek, total_klub.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT e.id_sesi) AS total_sesi, COUNT(DISTINCT p.id_proyek) AS total_proyek, COUNT(DISTINCT k.id_klub) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN EnrolmenKelas e ON m.id_mahasiswa = e.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian p ON m.id_mahasiswa = p.id_mahasiswa
+LEFT JOIN KeanggotaanKlub k ON m.id_mahasiswa = k.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY total_sesi DESC, total_proyek DESC, total_klub DESC
+LIMIT 1;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT k.id_sesi) AS total_sesi,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa m
+LEFT JOIN CatatanKehadiran k ON k.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN PartisipasiPenelitian pp ON pp.id_mahasiswa = m.id_mahasiswa
+LEFT JOIN KeanggotaanKlub kk ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+ORDER BY (COUNT(DISTINCT k.id_sesi) + COUNT(DISTINCT pp.id_proyek) + COUNT(DISTINCT kk.id_klub)) DESC
+LIMIT 1;
+",1.0
+35.1,"Which students were absent more than 5 times? Show id_mahasiswa, nama, total_absen.","SELECT m.id_mahasiswa, m.nama, COUNT(ck.id_kehadiran) AS total_absen
+FROM Mahasiswa AS m
+JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa
+WHERE ck.status = 'Absent'
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(ck.id_kehadiran) > 5;","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_absen
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  WHERE k.status = 'Tidak Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) > 5;",1.0
+35.2,"Mahasiswa mana yang absen lebih dari 5 kali? Kolom: id_mahasiswa, nama, total_absen.","SELECT m.id_mahasiswa, m.nama, COUNT(ck.id_kehadiran) AS total_absen
+FROM Mahasiswa AS m
+JOIN CatatanKehadiran AS ck ON m.id_mahasiswa = ck.id_mahasiswa
+WHERE ck.status = 'Absen'
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(ck.id_kehadiran) > 5;","SELECT m.id_mahasiswa, m.nama, COUNT(*) AS total_absen
+  FROM Mahasiswa m
+  JOIN CatatanKehadiran k ON m.id_mahasiswa = k.id_mahasiswa
+  WHERE k.status = 'Tidak Hadir'
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(*) > 5;",1.0
+38.1,"What are the 3 most borrowed books and how many copies are left? Show id_buku, judul, total_peminjaman, salinan_tersedia.","SELECT bp.id_buku, bp.judul, COUNT(pb.id_buku) AS total_peminjaman, bp.salinan_tersedia FROM BukuPerpustakaan bp LEFT JOIN PeminjamanBuku pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia ORDER BY total_peminjaman DESC LIMIT 3","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON p.id_buku = b.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  ORDER BY total_peminjaman DESC
+  LIMIT 3;",1.0
+38.2,"Apa aja 3 buku yang paling sering dipinjam dan berapa salinan tersisa? Kolom: id_buku, judul, total_peminjaman, salinan_tersedia.","SELECT bp.id_buku, bp.judul, COUNT(pb.id_buku) AS total_peminjaman, bp.salinan_tersedia FROM Bukuperpustakaan AS bp LEFT JOIN PeminjamanBuku AS pb ON bp.id_buku = pb.id_buku GROUP BY bp.id_buku, bp.judul, bp.salinan_tersedia ORDER BY total_peminjaman DESC LIMIT 3","SELECT b.id_buku, b.judul, COUNT(p.id_peminjaman) AS total_peminjaman, b.salinan_tersedia
+  FROM BukuPerpustakaan b
+  JOIN PeminjamanBuku p ON p.id_buku = b.id_buku
+  GROUP BY b.id_buku, b.judul, b.salinan_tersedia
+  ORDER BY total_peminjaman DESC
+  LIMIT 3;",1.0
+40.1,"List faculties with >1 department, 5+ lecturers, and >3 projects. Show id_fakultas, nama, total_jurusan, total_dosen, total_proyek.","SELECT f.id_fakultas, f.nama, COUNT(DISTINCT j.id_jurusan) AS total_jurusan, f.jumlah_dosen AS total_dosen, COUNT(DISTINCT p.id_proyek) AS total_proyek
+FROM Fakultas f
+JOIN Jurusan j ON f.id_fakultas = j.id_fakultas
+JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+GROUP BY f.id_fakultas, f.nama, f.jumlah_dosen
+HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND f.jumlah_dosen >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;","SELECT f.id_fakultas, f.nama,
+  COUNT(DISTINCT j.id_jurusan) AS total_jurusan,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  LEFT JOIN Jurusan j ON j.id_fakultas = f.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  LEFT JOIN ProyekPenelitian p ON p.id_fakultas = f.id_fakultas
+  GROUP BY f.id_fakultas, f.nama
+  HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND COUNT(DISTINCT d.id_dosen) >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;",1.0
+40.2,"Fakultas mana yang punya >1 jurusan, 5+ dosen aktif, dan >3 proyek? Kolom: id_fakultas, nama, total_jurusan, total_dosen, total_proyek.","SELECT f.id_fakultas, f.nama, COUNT(DISTINCT j.id_jurusan) AS total_jurusan, COUNT(DISTINCT d.id_dosen) AS total_dosen, COUNT(DISTINCT p.id_proyek) AS total_proyek
+FROM Fakultas f
+JOIN Jurusan j ON f.id_fakultas = j.id_fakultas
+JOIN Dosen d ON f.id_fakultas = d.id_fakultas
+JOIN ProyekPenelitian p ON f.id_fakultas = p.id_fakultas
+GROUP BY f.id_fakultas, f.nama
+HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND COUNT(DISTINCT d.id_dosen) >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;","SELECT f.id_fakultas, f.nama,
+  COUNT(DISTINCT j.id_jurusan) AS total_jurusan,
+  COUNT(DISTINCT d.id_dosen) AS total_dosen,
+  COUNT(DISTINCT p.id_proyek) AS total_proyek
+  FROM Fakultas f
+  LEFT JOIN Jurusan j ON j.id_fakultas = f.id_fakultas
+  LEFT JOIN Dosen d ON d.id_fakultas = f.id_fakultas
+  LEFT JOIN ProyekPenelitian p ON p.id_fakultas = f.id_fakultas
+  GROUP BY f.id_fakultas, f.nama
+  HAVING COUNT(DISTINCT j.id_jurusan) > 1 AND COUNT(DISTINCT d.id_dosen) >= 5 AND COUNT(DISTINCT p.id_proyek) > 3;",1.0
+41.1,"Which students took exams, did research, and joined clubs? Show id_mahasiswa, nama, total_ujian, total_proyek, total_klub.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT hu.id_ujian) AS total_ujian, COUNT(DISTINCT pp.id_proyek) AS total_proyek, COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa AS m
+JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT hu.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT h.id_ujian) AS total_ujian,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  LEFT JOIN HasilUjian h ON m.id_mahasiswa = h.id_mahasiswa
+  LEFT JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  LEFT JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT h.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;",1.0
+41.2,"Mahasiswa mana yang ujian, ikut riset, dan aktif di klub? Kolom: id_mahasiswa, nama, total_ujian, total_proyek, total_klub.","SELECT m.id_mahasiswa, m.nama, COUNT(DISTINCT hu.id_ujian) AS total_ujian, COUNT(DISTINCT pp.id_proyek) AS total_proyek, COUNT(DISTINCT kk.id_klub) AS total_klub
+FROM Mahasiswa AS m
+JOIN HasilUjian AS hu ON m.id_mahasiswa = hu.id_mahasiswa
+JOIN PartisipasiPenelitian AS pp ON m.id_mahasiswa = pp.id_mahasiswa
+JOIN KeanggotaanKlub AS kk ON m.id_mahasiswa = kk.id_mahasiswa
+GROUP BY m.id_mahasiswa, m.nama
+HAVING COUNT(DISTINCT hu.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;","SELECT m.id_mahasiswa, m.nama,
+  COUNT(DISTINCT h.id_ujian) AS total_ujian,
+  COUNT(DISTINCT pp.id_proyek) AS total_proyek,
+  COUNT(DISTINCT kk.id_klub) AS total_klub
+  FROM Mahasiswa m
+  LEFT JOIN HasilUjian h ON m.id_mahasiswa = h.id_mahasiswa
+  LEFT JOIN PartisipasiPenelitian pp ON m.id_mahasiswa = pp.id_mahasiswa
+  LEFT JOIN KeanggotaanKlub kk ON m.id_mahasiswa = kk.id_mahasiswa
+  GROUP BY m.id_mahasiswa, m.nama
+  HAVING COUNT(DISTINCT h.id_ujian) > 0 AND COUNT(DISTINCT pp.id_proyek) > 0 AND COUNT(DISTINCT kk.id_klub) > 0;",1.0
+44.1,"Who got the highest score in each exam? Show id_ujian, id_mahasiswa, nama, nilai_diperoleh.","SELECT hu.id_ujian, hu.id_mahasiswa, m.nama, hu.nilai_diperoleh
+FROM HasilUjian hu
+JOIN Mahasiswa m ON hu.id_mahasiswa = m.id_mahasiswa
+WHERE (hu.id_ujian, hu.nilai_diperoleh) IN (SELECT id_ujian, MAX(nilai_diperoleh) FROM HasilUjian GROUP BY id_ujian);","SELECT h.id_ujian, h.id_mahasiswa, m.nama, h.nilai_diperoleh
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON m.id_mahasiswa = h.id_mahasiswa
+  WHERE h.nilai_diperoleh = (
+  SELECT MAX(h2.nilai_diperoleh)
+  FROM HasilUjian h2
+  WHERE h2.id_ujian = h.id_ujian
+  );",1.0
+44.2,"Siapa aja mahasiswa dengan nilai tertinggi di setiap ujian? Kolom: id_ujian, id_mahasiswa, nama, nilai_diperoleh.","SELECT u.id_ujian, hu.id_mahasiswa, m.nama, hu.nilai_diperoleh
+FROM HasilUjian hu
+JOIN (
+    SELECT id_ujian, MAX(nilai_diperoleh) as max_nilai
+    FROM HasilUjian
+    GROUP BY id_ujian
+) as max_nilai_ujian ON hu.id_ujian = max_nilai_ujian.id_ujian AND hu.nilai_diperoleh = max_nilai_ujian.max_nilai
+JOIN Mahasiswa m ON hu.id_mahasiswa = m.id_mahasiswa
+JOIN Ujian u ON hu.id_ujian = u.id_ujian;","SELECT h.id_ujian, h.id_mahasiswa, m.nama, h.nilai_diperoleh
+  FROM HasilUjian h
+  JOIN Mahasiswa m ON m.id_mahasiswa = h.id_mahasiswa
+  WHERE h.nilai_diperoleh = (
+  SELECT MAX(h2.nilai_diperoleh)
+  FROM HasilUjian h2
+  WHERE h2.id_ujian = h.id_ujian
+  );",1.0
+45.1,"Which books were never borrowed but are in a category that others borrow often? Show id_buku, judul, kategori.","SELECT id_buku, judul, kategori FROM BukuPerpustakaan WHERE id_buku NOT IN (SELECT id_buku FROM PeminjamanBuku) AND kategori IN (SELECT kategori FROM BukuPerpustakaan WHERE id_buku IN (SELECT id_buku FROM PeminjamanBuku) GROUP BY kategori HAVING COUNT(*) > 1);","SELECT b.id_buku, b.judul, b.kategori
+  FROM BukuPerpustakaan b
+  WHERE NOT EXISTS (
+  SELECT 1 FROM PeminjamanBuku p WHERE p.id_buku = b.id_buku
+  )
+  AND EXISTS (
+  SELECT 1 FROM BukuPerpustakaan b2
+  JOIN PeminjamanBuku p2 ON p2.id_buku = b2.id_buku
+  WHERE b2.kategori = b.kategori
+  GROUP BY b2.kategori
+  HAVING COUNT(*) > 3
+  );",1.0
+45.2,"Buku mana yang belum pernah dipinjam tapi termasuk kategori populer? Kolom: id_buku, judul, kategori.","SELECT id_buku, judul, kategori FROM BukuPerpustakaan WHERE kategori = 'Populer' EXCEPT SELECT bp.id_buku, bp.judul, bp.kategori FROM BukuPerpustakaan bp JOIN PeminjamanBuku pb ON bp.id_buku = pb.id_buku WHERE bp.kategori = 'Populer'","SELECT b.id_buku, b.judul, b.kategori
+  FROM BukuPerpustakaan b
+  WHERE NOT EXISTS (
+  SELECT 1 FROM PeminjamanBuku p WHERE p.id_buku = b.id_buku
+  )
+  AND EXISTS (
+  SELECT 1 FROM BukuPerpustakaan b2
+  JOIN PeminjamanBuku p2 ON p2.id_buku = b2.id_buku
+  WHERE b2.kategori = b.kategori
+  GROUP BY b2.kategori
+  HAVING COUNT(*) > 3
+  );",1.0
+48.1,"Which facilities are accessed by all faculties? Show id_fasilitas, nama.","SELECT id_fasilitas, nama
+FROM Fasilitas
+WHERE id_fasilitas IN (
+    SELECT id_fasilitas
+    FROM FasilitasFakultas
+    GROUP BY id_fasilitas
+    HAVING COUNT(DISTINCT id_fakultas) = (SELECT COUNT(*) FROM Fakultas)
+);","SELECT f.id_fasilitas, f.nama
+  FROM Fasilitas f
+  WHERE (
+  SELECT COUNT(DISTINCT ff.id_fakultas)
+  FROM FasilitasFakultas ff
+  WHERE ff.id_fasilitas = f.id_fasilitas
+  ) = (SELECT COUNT(*) FROM Fakultas);",1.0
+48.2,"Fasilitas mana yang dipake semua fakultas? Kolom: id_fasilitas, nama.","SELECT id_fasilitas, nama FROM Fasilitas WHERE id_fasilitas IN (SELECT id_fasilitas FROM FasilitasFakultas GROUP BY id_fasilitas HAVING COUNT(DISTINCT id_fakultas) = (SELECT COUNT(*) FROM Fakultas))","SELECT f.id_fasilitas, f.nama
+  FROM Fasilitas f
+  WHERE (
+  SELECT COUNT(DISTINCT ff.id_fakultas)
+  FROM FasilitasFakultas ff
+  WHERE ff.id_fasilitas = f.id_fasilitas
+  ) = (SELECT COUNT(*) FROM Fakultas);",1.0
+50.1,"Which clubs have only students from the same department? Show id_klub, nama_klub, id_jurusan.","SELECT ok.id_klub, ok.nama, m.id_jurusan
+FROM OrganisasiKlub ok
+JOIN KeanggotaanKlub kk ON ok.id_klub = kk.id_klub
+JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY ok.id_klub, ok.nama, m.id_jurusan
+HAVING COUNT(DISTINCT m.id_jurusan) = 1;","SELECT k.id_klub, k.nama AS nama_klub, m.id_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama, m.id_jurusan
+  HAVING COUNT(DISTINCT m.id_jurusan) = 1;",1.0
+50.2,"Klub mana yang semua anggotanya dari satu jurusan aja? Kolom: id_klub, nama_klub, id_jurusan.","SELECT k.id_klub, k.nama, m.id_jurusan
+FROM OrganisasiKlub k
+JOIN KeanggotaanKlub kk ON k.id_klub = kk.id_klub
+JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+GROUP BY k.id_klub, k.nama, m.id_jurusan
+HAVING COUNT(DISTINCT m.id_jurusan) = 1;","SELECT k.id_klub, k.nama AS nama_klub, m.id_jurusan
+  FROM OrganisasiKlub k
+  JOIN KeanggotaanKlub kk ON kk.id_klub = k.id_klub
+  JOIN Mahasiswa m ON kk.id_mahasiswa = m.id_mahasiswa
+  GROUP BY k.id_klub, k.nama, m.id_jurusan
+  HAVING COUNT(DISTINCT m.id_jurusan) = 1;",1.0

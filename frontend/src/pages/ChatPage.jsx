@@ -29,6 +29,8 @@ function ChatPage() {
   );
   const [selectedDatabase, setSelectedDatabase] = useState("sakila");
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showSQLModal, setShowSQLModal] = useState(false);
+  const [sqlQueryText, setSqlQueryText] = useState("");
 
   const navigate = useNavigate();
   const userId = localStorage.getItem("user_id");
@@ -177,6 +179,7 @@ function ChatPage() {
           data: msg.agent.data.result || [],
           id: msg.id,
           feedback: msg.feedback || null,
+          query: msg.query || null,
         },
       ]);
 
@@ -542,19 +545,39 @@ function ChatPage() {
                                 </table>
                               </div>
 
-                              {(Object.keys(msg.data[0]).length > 7 ||
-                                msg.data.length > 10) && (
-                                <div className="text-right mt-3">
-                                  <button
-                                    onClick={() => {
-                                      setShowTableModal(true);
-                                      setModalTableData(msg.data);
-                                    }}
-                                    className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-200 transition"
-                                  >
-                                    See All
-                                  </button>
+                              {msg.query || msg.data ? (
+                                <div className="mt-3 flex justify-end gap-4">
+                                  {msg.query && (
+                                    <div className="text-right">
+                                      <button
+                                        onClick={() => {
+                                          setSqlQueryText(msg.query);
+                                          setShowSQLModal(true);
+                                        }}
+                                        className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border border-white-400 text-white-300 hover:bg-white-400/10 hover:text-white-200 transition"
+                                      >
+                                        Show SQL
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {(Object.keys(msg.data[0]).length > 7 ||
+                                    msg.data.length > 10) && (
+                                    <div className="text-right">
+                                      <button
+                                        onClick={() => {
+                                          setShowTableModal(true);
+                                          setModalTableData(msg.data);
+                                        }}
+                                        className="cursor-pointer inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border border-cyan-400 text-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-200 transition"
+                                      >
+                                        See All
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
+                              ) : (
+                                <></>
                               )}
                             </>
                           )}
@@ -665,6 +688,37 @@ function ChatPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      )}
+      {showSQLModal && (
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#1B2332] max-w-xl w-full rounded-xl p-6 border border-white/20 text-white shadow-xl">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">SQL Query</h2>
+              <button
+                onClick={() => setShowSQLModal(false)}
+                className="text-white/50 hover:text-red-400 text-xl cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <pre className="whitespace-pre-wrap bg-[#232C41] text-sm p-4 rounded overflow-x-auto border border-white/10 mb-4">
+              {sqlQueryText}
+            </pre>
+            <div className="flex justify-end">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(sqlQueryText);
+                  toast.success("Query copied to clipboard!", {
+                    style: { background: "#000", color: "#fff" },
+                  });
+                }}
+                className="bg-white/10 hover:bg-white/20 px-4 py-2 text-sm rounded transition cursor-pointer"
+              >
+                Copy
+              </button>
             </div>
           </div>
         </div>

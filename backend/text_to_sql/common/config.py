@@ -10,7 +10,6 @@ class LLMConfig:
         use_gpu: bool = False,
         model: str = "",
         provider: str = "",
-        timeout: int = 300,
     ):
         self.type = type
         self.api_key = api_key
@@ -18,11 +17,10 @@ class LLMConfig:
         self.use_gpu = use_gpu
         self.model = model
         self.provider = provider
-        self.timeout = timeout
 
     def __repr__(self):
         return (
-            f"LLMConfig(type={self.type}, provider={self.provider}, timeout={self.timeout}"
+            f"LLMConfig(type={self.type}, provider={self.provider}, "
             f"model={self.model}, use_gpu={self.use_gpu}, "
             f"model_path={self.model_path}, api_key={'****' if self.api_key else 'None'})"
         )

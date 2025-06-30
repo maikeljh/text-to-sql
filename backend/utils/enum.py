@@ -33,19 +33,5 @@ ENUM = {
             "DB_SOURCE_PASSWORD": os.getenv("DB_SOCCER_PASSWORD"),
             "DB_SOURCE_PORT": os.getenv("DB_SOCCER_PORT"),
         },
-        "tpc-ds": {
-            "DB_SOURCE_HOST": os.getenv("DB_TPCDS_HOST"),
-            "DB_SOURCE_DATABASE": os.getenv("DB_TPCDS_DATABASE"),
-            "DB_SOURCE_USER": os.getenv("DB_TPCDS_USER"),
-            "DB_SOURCE_PASSWORD": os.getenv("DB_TPCDS_PASSWORD"),
-            "DB_SOURCE_PORT": os.getenv("DB_TPCDS_PORT"),
-        },
-        "adventure-works": {
-            "DB_SOURCE_HOST": os.getenv("DB_ADVENTUREWORKS_HOST"),
-            "DB_SOURCE_DATABASE": os.getenv("DB_ADVENTUREWORKS_DATABASE"),
-            "DB_SOURCE_USER": os.getenv("DB_ADVENTUREWORKS_USER"),
-            "DB_SOURCE_PASSWORD": os.getenv("DB_ADVENTUREWORKS_PASSWORD"),
-            "DB_SOURCE_PORT": os.getenv("DB_ADVENTUREWORKS_PORT"),
-        },
     },
 }

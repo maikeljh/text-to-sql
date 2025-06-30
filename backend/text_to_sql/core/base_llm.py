@@ -62,7 +62,7 @@ class BaseLLM(ABC):
                 f"System prompt file not found at {system_prompt_path}."
             )
 
-        with open(system_prompt_path, "r") as file:
+        with open(system_prompt_path, encoding="utf-8") as file:
             return file.read().strip()
 
     @abstractmethod

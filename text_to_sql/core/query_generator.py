@@ -52,6 +52,7 @@ class QueryGenerator(BaseLLM):
         sql_query = self.model.generate(
             system_prompt=formatted_system_prompt, user_prompt=user_prompt
         )
+        print(f"Generated SQL Query: {sql_query}")
 
         return sql_query.strip()
 
@@ -76,6 +77,7 @@ class QueryGenerator(BaseLLM):
         sql_query = self.model.generate(
             system_prompt=formatted_system_prompt, user_prompt=user_prompt
         )
+        print(f"Generated SQL Query: {sql_query}")
 
         return sql_query.strip()
 
@@ -105,6 +107,7 @@ class QueryGenerator(BaseLLM):
         sql_query = self.model.generate(
             system_prompt=formatted_system_prompt, user_prompt=user_prompt
         )
+        print(f"Generated SQL Query: {sql_query}")
 
         return sql_query.strip()
 
@@ -145,5 +148,6 @@ class QueryGenerator(BaseLLM):
             system_prompt=formatted_system_prompt,
             user_prompt=user_prompt,
         )
+        print(f"Fixed SQL Query: {fixed_query}")
 
         return fixed_query.strip()

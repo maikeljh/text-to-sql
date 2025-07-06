@@ -30,5 +30,6 @@ class RewriterPrompt(BaseLLM):
         rewritten_prompt = self.model.generate(
             system_prompt=self.system_prompt, user_prompt=user_prompt
         )
+        print(f"Rewritten Prompt :{rewritten_prompt}")
 
         return rewritten_prompt

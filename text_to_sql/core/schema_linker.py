@@ -95,6 +95,7 @@ class SchemaLinker(BaseLLM):
 
         enriched_prompt = self._generate_schema_aware_prompt(user_prompt)
         entities = self.predict_entities(enriched_prompt)
+        print(f"Entities: {entities}")
 
         if not entities:
             return {
@@ -109,6 +110,7 @@ class SchemaLinker(BaseLLM):
             }
 
         entity_embeddings = self.embedding_model.encode(entities, convert_to_tensor=True)
+        print(f"Entity Embeddings: {entity_embeddings}")
         table_scores = defaultdict(float)
 
         for entity_emb in entity_embeddings:
@@ -117,10 +119,13 @@ class SchemaLinker(BaseLLM):
                 table_scores[table_name] += score
 
         sorted_tables_scores = sorted(table_scores.items(), key=lambda x: x[1], reverse=True)
+        print(f"Similarity Scores: {sorted_tables_scores}")
 
         top_k = len(entities)
         top_tables = [t for t, _ in sorted_tables_scores[:top_k]]
+        print(f"Top Tables: {top_tables}")
         related_tables = set(top_tables).union(self.get_related_tables(top_tables))
+        print(f"Related Tables: {related_tables}")
 
         hints_detail = {
             t: round(table_scores[t], 4)

@@ -102,11 +102,13 @@ class TextToSQL:
         )
 
         subquestions = [line.strip("- ").strip() for line in subquestions_text.strip().splitlines() if line.strip()]
+        print(f"Sub-questions: {subquestions}")
 
         intermediate_queries = []
         for step in subquestions:
             step_sql = self.query_generator.generate_baseline(user_prompt=step, schema=schema)
             intermediate_queries.append({"step": step, "sql": step_sql})
+        print(f"Steps: {intermediate_queries}")
 
         final_sql_prompt = (
             f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"
@@ -135,12 +137,14 @@ class TextToSQL:
         )
 
         subquestions = [line.strip("- ").strip() for line in subquestions_text.strip().splitlines() if line.strip()]
+        print(f"Sub-questions: {subquestions}")
 
         intermediate_queries = []
         for step in subquestions:
             relevant_example = self.retrieve_context.generate(user_prompt=step)
             step_sql = self.query_generator.generate_v1(user_prompt=step, schema=schema, example=relevant_example)
             intermediate_queries.append({"step": step, "sql": step_sql})
+        print(f"Steps: {intermediate_queries}")
 
         final_sql_prompt = (
             f"Given the following SQL steps and their sub-questions, generate a final SQL query that answers the original question:\n\n"

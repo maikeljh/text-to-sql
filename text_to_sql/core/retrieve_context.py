@@ -85,13 +85,16 @@ class RetrieveContext:
         """
         result = self.search(user_prompt, top_n=1)
         if result:
-            return {
+            final = {
                 "relevant_question": result[0]["Question"],
                 "relevant_answer": result[0]["Answer"],
                 "relevant_summary": result[0]["Summary"],
             }
-        return {
-            "relevant_question": None,
-            "relevant_answer": None,
-            "relevant_summary": None,
-        }
+        else:
+            final = {
+                "relevant_question": None,
+                "relevant_answer": None,
+                "relevant_summary": None,
+            }
+        print(f"Relevant Example: {final}")
+        return final

@@ -1,0 +1,453 @@
+Question,Answer,Summary,Alternative Prompt 1 (English),Alternative Prompt 2 (Bahasa Indonesia),Expected Result,Checked
+"Which pairs of actors have appeared together in the most films? Show only the actor IDs for each pair and the number of films they've worked on together, sorted by the number of films in descending order.","SELECT a1.actor_id, a2.actor_id, COUNT(*) AS num_films_together
+FROM film_actor AS fa1
+JOIN film_actor AS fa2 ON fa1.film_id = fa2.film_id AND fa1.actor_id < fa2.actor_id
+JOIN actor AS a1 ON fa1.actor_id = a1.actor_id
+JOIN actor AS a2 ON fa2.actor_id = a2.actor_id
+GROUP BY a1.actor_id, a2.actor_id
+ORDER BY num_films_together DESC;","This SQL query identifies pairs of actors who have appeared together in films and counts their co-appearances. It joins the 'film_actor' table to itself on matching film IDs while ensuring unique actor pairs (fa1.actor_id < fa2.actor_id), then links to the 'actor' table for actor details. The query groups by actor pairs, counts co-appearances, and sorts by frequency. Key operations include self-join with inequality, counting, and sorting. The output helps analyze actor collaborations, useful for casting decisions or promotional strategies. Modifications could include: 1) Adding a WHERE clause to focus on specific genres by joining the 'film' table, 2) Calculating collaboration frequency as a percentage of each actor's total films by adding subqueries, or 3) Filtering for pairs with minimum co-appearances using HAVING. Potential questions this could answer include: Which actor pairs work together most frequently? Are there unexpected collaboration patterns in the dataset? Which actors would be most likely to have chemistry based on past collaborations?","Which pairs of actors have appeared together in the most films? Show only the actor IDs for each pair and how many films they've worked on together, sorted from most to least.","Pasangan aktor mana saja yang paling sering main film bareng? Tampilkan ID kedua aktor dan jumlah film yang mereka bintangi bersama, urut dari yang paling banyak.","['actor1_id', 'actor2_id', 'films_together']",True
+"Which customers have rented the same movie more than once in a single full month? Show the customer first name, movie title, and the number of times rented. Sort by customer first name","WITH customer_movie_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name AS customer_name, 
+        f.title, 
+        TO_CHAR(r.rental_date, 'YYYY-MM') AS rental_month,
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+    JOIN rental r ON c.customer_id = r.customer_id
+    JOIN inventory i ON r.inventory_id = i.inventory_id
+    JOIN film f ON i.film_id = f.film_id
+    GROUP BY 
+        c.customer_id, f.film_id, rental_month, c.first_name, c.last_name, f.title
+)
+SELECT 
+    customer_name, 
+    title, 
+    rentals_count
+FROM 
+    customer_movie_rentals
+WHERE 
+    rentals_count > 1
+ORDER BY
+    customer_name;","This SQL query identifies customers who have rented the same movie multiple times in a single month by using a CTE (customer_movie_rentals) to join the 'customer', 'rental', 'inventory', and 'film' tables. The query groups by customer, movie, and rental month, then filters for cases where the rental count exceeds 1. Key operations include date formatting (TO_CHAR), counting rentals, and CTE usage. This helps identify customer preferences and potential repeat viewing behavior. Business applications include personalized marketing and inventory management. The query could be modified to: 1) include payment amounts to analyze revenue impact, 2) expand the time window to identify movies rented multiple times across months, or 3) add film categories to detect genre preferences. It answers questions like 'Which customers frequently rewatch specific movies?' and 'What content has the highest rewatch value?'","Which customers have rented the same movie more than once in a single full month? Show the customer first name, movie title, and the number of times rented. Sort by customer first name","Siapa saja pelanggan yang pernah menyewa film yang sama lebih dari satu kali dalam bulan yang sama (bulan penuh mana pun, tidak harus bulan sekarang)? Tampilkan nama depan pelanggan, judul film, dan jumlah penyewaannya dalam bulan tersebut. Urutkan berdasarkan nama depan pelanggan.","['customer_name', 'title', 'rentals_count']",True
+"Which film has never been rented in all stores and features the highest number of actors? Show the film ID, title, and number of actors. Return only the top 1 result, sorted by number of actors in descending order.","WITH unrented_films AS (
+    SELECT f.film_id, f.title
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+),
+film_actor_counts AS (
+    SELECT 
+        uf.film_id, 
+        uf.title, 
+        COUNT(fa.actor_id) AS actor_count
+    FROM 
+        unrented_films uf
+        JOIN film_actor fa ON uf.film_id = fa.film_id
+    GROUP BY 
+        uf.film_id, uf.title
+)
+SELECT 
+    film_id, 
+    title, 
+    actor_count
+FROM 
+    film_actor_counts
+ORDER BY 
+    actor_count DESC
+LIMIT 1;","This SQL query identifies the unrented film with the most actors by first creating a CTE (unrented_films) to find films never rented (using a NOT IN subquery against inventory and rental tables), then joining with film_actor to count actors per unrented film. The query outputs the unrented film with the highest actor count, which could indicate over-investment in casting for unpopular titles. Business relevance includes inventory optimization and production budgeting insights. Key modifications could include: (1) adding actor names to identify frequently cast but unprofitable stars, (2) comparing with rented films' actor counts to find optimal casting levels, or (3) incorporating film categories to see if certain genres are over-represented. The query helps answer questions like 'Are we overspending on casts for certain films?' and 'Which actor combinations fail to attract rentals?' The two-step CTE approach cleanly separates the unrented film identification from actor analysis.","Which film has the most actors but has never been rented in any store? Just show the film ID, title, and number of actors — only the top one.","Film apa yang punya aktor paling banyak tapi belum pernah disewa di toko manapun? Tampilkan ID film, judul, dan jumlah aktornya — cukup ambil 1 film teratas.","['film_id', 'title', 'actor_count']",True
+Which movies have been rented by customers from more than 10 different cities? Show the movie title and the number of cities.,"WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 10;","This SQL query identifies movies that have been rented in more than 10 different cities. It utilizes the 'film', 'inventory', 'rental', 'customer', 'address', and 'city' tables, aggregating rental data at the city level using COUNT(DISTINCT ci.city_id). The result is a list of movie titles along with the number of unique cities where they have been rented, which can help in analyzing the geographic popularity of films. Possible modifications include adjusting the city count threshold to explore movies with varying levels of geographic reach, incorporating rental frequency per city to assess demand concentration, or filtering by genre to analyze regional preferences for specific types of movies.",Which movies have been rented by customers from more than 10 different cities? Show the movie title and the number of cities.,Film mana yang disewa oleh pelanggan dari lebih dari 10 kota? Tampilkan judul film dan jumlah kotanya.,"['title', 'city_count']",True
+"Which staff member has processed the most payments in total? Show their staff ID, first name, last name, and the total amount processed. Return only the top 1.","SELECT 
+    s.staff_id, 
+    s.first_name, 
+    s.last_name, 
+    COUNT(p.payment_id) AS total_payments, 
+    SUM(p.amount) AS total_amount
+FROM 
+    staff s
+    JOIN payment p ON s.staff_id = p.staff_id
+GROUP BY 
+    s.staff_id
+ORDER BY 
+    total_amount DESC;","This SQL query retrieves payment performance metrics for each staff member by calculating the total number of payments processed and the total revenue collected. It joins the 'staff' and 'payment' tables using 'staff_id', then groups results by staff ID while aggregating the total number of transactions and the total payment amount per staff member. The output is ordered in descending order of total revenue collected. Possible modifications include filtering by date range to analyze performance trends over time, segmenting by store location if multiple stores exist, or incorporating customer demographics to assess payment trends by staff interactions. This query can help answer questions about staff efficiency in handling transactions, revenue contribution per staff member, and potential training needs based on performance.","Which staff member has processed the most payments, and what is the total amount they’ve handled? Show the staff ID, first name, last name, and total amount. Just return the top 1.","Siapa staf yang paling banyak memproses pembayaran, dan berapa total yang mereka proses? Tampilkan ID staf, nama depan, nama belakang, dan total jumlahnya. Cukup ambil satu yang paling atas.","['staff_id', 'first_name', 'last_name', 'total_amount']",True
+Which customers have rented movies from every category but have never rented a movie with a rating of 'PG-13'? Show the customer full name.,"WITH customer_categories AS (
+    SELECT 
+        c.customer_id, 
+        CONCAT(c.first_name, ' ', c.last_name) AS customer_name, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        c.customer_id
+),
+customer_no_pg13 AS (
+    SELECT 
+        c.customer_id
+    FROM 
+        customer c
+    WHERE 
+        NOT EXISTS (
+            SELECT 1
+            FROM rental r
+            JOIN inventory i ON r.inventory_id = i.inventory_id
+            JOIN film f ON i.film_id = f.film_id
+            WHERE r.customer_id = c.customer_id AND f.rating = 'PG-13'
+        )
+)
+SELECT 
+    cc.customer_name
+FROM 
+    customer_categories cc
+    JOIN customer_no_pg13 cnp ON cc.customer_id = cnp.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","This SQL query identifies customers who have rented films from all available categories while never renting a movie with a 'PG-13' rating. It utilizes the 'customer', 'rental', 'inventory', 'film_category', and 'film' tables, counting the number of distinct film categories each customer has rented and filtering out customers who have rented at least one 'PG-13' film. The final result lists customers who have rented from every category without ever selecting a 'PG-13' film, which can be useful for understanding customer preferences and restrictions. Potential modifications include adjusting the rating filter to analyze customer behavior for other classifications, grouping results by customer demographics to identify patterns, or expanding the query to examine rental frequency in each category for deeper insights.",Which customers have rented movies from every category but have never rented a movie with a rating of 'PG-13'? Show the customer full name.,Ada pelanggan yang nyewa dari semua kategori tapi gak pernah nyewa film dengan rating 'PG-13'? Tampilkan nama lengkap pelanggan.,['customer_name'],True
+"Which customers have rented films from all stores? Show the customer ID, first name, and last name.","WITH customer_stores AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.store_id) AS store_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_stores cs ON c.customer_id = cs.customer_id
+WHERE 
+    cs.store_count = (SELECT COUNT(*) FROM store);","This SQL query identifies customers who have rented movies from all available stores. It first creates a temporary table ('customer_stores') that counts the number of distinct stores each customer has rented from by joining the 'rental' and 'inventory' tables. The final selection retrieves customer details from the 'customer' table for those whose 'store_count' matches the total number of stores from the 'store' table. Potential modifications include adjusting the filter to find customers who have rented from a specific minimum number of stores, incorporating rental frequency to analyze high-value customers, or adding time constraints to track multi-store renters within a given period. This query can help businesses understand customer engagement across multiple locations, identify loyal customers, or inform marketing strategies targeting multi-location renters.","Which customers have rented films from all stores? Show the customer ID, first name, and last name.","Siapa pelanggan yang sudah nyewa dari semua toko? Tampilkan ID pelanggan, nama depan, dan nama belakang.","['customer_id', 'first_name', 'last_name']",True
+"Which top 1 film has the highest replacement cost among those that have never been rented in any store? Show the film ID, title, and replacement cost.","SELECT 
+    f.film_id, 
+    f.title, 
+    f.replacement_cost
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY 
+    f.replacement_cost DESC
+LIMIT 1;
+","This SQL query identifies the most expensive film (by replacement cost) that has never been rented, by checking for films with no corresponding inventory records linked to rentals. It joins the 'film' table with 'inventory' and 'rental' tables in a NOT EXISTS subquery, filters for films without rental history, and orders by replacement cost in descending order to find the single most expensive unrented film. The output helps inventory management by highlighting potentially overvalued or unpopular stock. Modifications could include: (1) removing the LIMIT to list all unrented films for bulk analysis, (2) adding rental duration or customer demographics from the rental table to investigate why certain films aren't rented, or (3) joining with the 'category' table to analyze unrented films by genre. This query could answer business questions like 'Which high-value films are poor inventory investments?' or 'Are there patterns in films that never get rented?'","Get the top 1 film with the highest replacement cost among those that have never been rented in any store. Show the film ID, title, and replacement cost.","Ambil 1 film dengan biaya ganti tertinggi yang belum pernah disewa di toko mana pun. Tampilkan ID film, judul, dan biaya ganti.","['film_id', 'title', 'replacement_cost']",True
+"Which customers have rented the most films in a single whole day? Show their first name, last name, and the number of rentals. Return only the top 10 results, sorted by the number of rentals in descending order.","WITH customer_daily_rentals AS (
+    SELECT 
+        c.customer_id, 
+        c.first_name, 
+        c.last_name,
+        DATE(r.rental_date) AS rental_day, 
+        COUNT(r.rental_id) AS rentals_count
+    FROM 
+        customer c
+        JOIN rental r ON c.customer_id = r.customer_id
+    GROUP BY 
+        c.customer_id, c.first_name, c.last_name, rental_day
+)
+SELECT 
+    first_name, 
+    last_name, 
+    rentals_count
+FROM 
+    customer_daily_rentals
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;","This SQL query identifies the top 10 customers with the highest number of rentals in a single day by creating a CTE (customer_daily_rentals) that aggregates rental counts per customer per day. It joins the 'customer' and 'rental' tables, groups by customer and rental date, and counts rentals. The output reveals peak rental activity patterns, useful for understanding customer engagement and demand spikes. Business applications include targeted marketing and inventory planning. Key modifications could include: (1) adding date filters to analyze seasonal patterns, (2) incorporating rental duration to identify binge-watchers, or (3) joining with payment data to find high-value rental days. The query helps answer questions like 'Which customers have the highest daily engagement?' and 'When do customers rent multiple items at once?' The DATE() function ensures accurate daily grouping regardless of rental time.","Which top 10 customers have rented the most movies in a single whole day? Show the customer’s first name, last name, and the number of movies they rented on that day. Sort by number of rented movies descending.","Siapa 10 pelanggan teratas yang menyewa film paling banyak dalam satu hari penuh? Tampilkan nama depan, nama belakang, dan jumlah film yang disewa pada hari itu. Urutkan dari yang terbanyak","['first_name', 'last_name', 'rentals_count']",True
+"Which customers have rented films from all categories? Show the customer ID, first name, and last name.","WITH customer_categories AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT fc.category_id) AS category_count
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN film_category fc ON i.film_id = fc.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_categories cc ON c.customer_id = cc.customer_id
+WHERE 
+    cc.category_count = (SELECT COUNT(*) FROM category);","This SQL query identifies customers who have rented films from every available category. It first calculates the number of distinct film categories each customer has rented from using the 'rental', 'inventory', and 'film_category' tables. Then, it filters customers whose category count matches the total number of available categories, ensuring only those who have rented across all categories are included. The final output consists of customer IDs, first names, and last names, which can be useful for analyzing highly engaged customers or tailoring loyalty programs. Potential modifications include adjusting the query to find customers who have rented from a minimum threshold of categories rather than all, tracking rental patterns over time to analyze changes in customer preferences, or incorporating rental frequency to differentiate occasional renters from frequent customers. This query helps answer questions related to customer engagement, cross-category rental behavior, and targeted marketing strategies.","Which customers have rented films from all categories? Show the customer ID, first name, and last name.","Siapa aja pelanggan yang sudah nyewa film dari semua kategori? Tampilkan ID pelanggan, nama depan, dan nama belakang.","['customer_id', 'first_name', 'last_name']",True
+"Which films belong to the top 5 most rented film categories? List them sorted by replacement cost from highest to lowest, showing film ID, title, replacement cost, and category name.","WITH top_categories AS (
+    SELECT 
+        fc.category_id, 
+        COUNT(r.rental_id) AS rental_count
+    FROM 
+        film_category fc
+        JOIN inventory i ON fc.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    GROUP BY 
+        fc.category_id
+    ORDER BY 
+        rental_count DESC
+    LIMIT 5
+),
+top_films AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        f.replacement_cost, 
+        c.name AS category_name
+    FROM 
+        film f
+        JOIN film_category fc ON f.film_id = fc.film_id
+        JOIN category c ON fc.category_id = c.category_id
+        JOIN top_categories tc ON fc.category_id = tc.category_id
+    ORDER BY 
+        f.replacement_cost DESC
+)
+SELECT * FROM top_films;","This SQL query identifies the top 5 most rented film categories and retrieves the most expensive films within those categories. It first creates a common table expression (CTE) 'top_categories' to rank film categories based on rental frequency. Another CTE, 'top_films', filters films belonging to these top categories and selects the most expensive ones by replacement cost. The final result includes film titles, their replacement costs, and corresponding category names. Possible modifications include adjusting the LIMIT value to analyze a broader range of categories, incorporating rental revenue data to prioritize high-earning films, or filtering by rental date ranges to capture recent trends. This query helps answer questions related to film category popularity, pricing strategy, and rental demand for premium films.","Which films are in the top 5 most rented film categories? Show the film ID, title, replacement cost, and category name, sorted by replacement cost from highest to lowest.","Film apa saja yang masuk dalam 5 kategori paling sering disewa? Tampilkan ID film, judul, biaya ganti, dan nama kategori, urut biaya ganti dari yang paling mahal.","['film_id', 'title', 'replacement_cost', 'category_name']",True
+"How much total revenue did each store generate by looking from the staff's payments? Show the store_id and total revenue, sorted from highest to lowest.","SELECT s.store_id, SUM(p.amount) AS total_revenue
+FROM store s
+JOIN staff st ON s.store_id = st.store_id
+JOIN payment p ON st.staff_id = p.staff_id
+GROUP BY s.store_id
+ORDER BY total_revenue DESC;","This SQL query calculates the total revenue generated by each store by joining the 'store', 'staff', and 'payment' tables. The main objective is to determine the revenue contribution of each store. The query uses JOIN operations to link the tables, a GROUP BY clause to aggregate results by store, and SUM(p.amount) to calculate total revenue per store. The results are ordered in descending order by revenue, providing a ranking of stores by their financial performance. The expected output includes the store ID and its corresponding total revenue, which is useful for evaluating store performance and allocating resources. This query can be modified to analyze revenue for specific time periods by adding a WHERE clause on the payment date, or extended to include additional details like city or country by joining the 'address' and 'city' tables. Potential questions this query might answer include: 'Which store generates the most revenue?' or 'How does revenue vary across stores?'.","How much revenue did each store make, looking from the staff's payments? Just show me the store_id and total revenue, sorted from highest to lowest.","Tiap toko dapet pemasukan berapa kalau dilihat dari pembayaran oleh staffnya? Tampilkan store_id sama total pemasukannya aja, urut dari yang paling besar.","['store_id', 'total_revenue']",True
+Which movies have been rented by customers from more than 5 different cities? Show the movie title and the number of cities.,"WITH movie_city_rentals AS (
+    SELECT 
+        f.title, 
+        COUNT(DISTINCT ci.city_id) AS city_count
+    FROM 
+        film f
+        JOIN inventory i ON f.film_id = i.film_id
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        JOIN customer c ON r.customer_id = c.customer_id
+        JOIN address a ON c.address_id = a.address_id
+        JOIN city ci ON a.city_id = ci.city_id
+    GROUP BY 
+        f.film_id
+)
+SELECT 
+    title, 
+    city_count
+FROM 
+    movie_city_rentals
+WHERE 
+    city_count > 5;","This SQL query identifies films that have been rented in more than five distinct cities, helping analyze the geographical reach and popularity of films. It utilizes the 'film', 'inventory', 'rental', 'customer', 'address', and 'city' tables, using joins to track rental activity across cities. The query aggregates the count of unique cities per film and filters results to include only those rented in more than five cities. This query is useful for understanding film demand distribution across locations. Potential modifications include adjusting the city threshold to analyze varying levels of popularity, incorporating revenue metrics to assess profitability by region, or adding a time filter to focus on recent rental trends.",Which movies have been rented by customers from more than 5 different cities? Show the movie title and the number of cities.,Film mana yang disewa oleh pelanggan dari lebih dari 5 kota? Tampilkan judul film dan jumlah kotanya.,"['title', 'city_count']",True
+"Which films have never been rented across any store? Show the film_id, title, and release_year.","SELECT 
+    f.film_id, 
+    f.title, 
+    f.release_year
+FROM 
+    film f
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+        WHERE i.film_id = f.film_id
+    )
+ORDER BY f.film_id;","This SQL query identifies films that have never been rented by using a NOT EXISTS subquery to check for missing rental records in the 'inventory' and 'rental' tables. The query selects film details (ID, title, release year) from the 'film' table where no corresponding rental transactions exist, ordered by film ID. Key operations include the anti-join pattern using NOT EXISTS, which efficiently filters out films with any rental history. The output helps identify underperforming or potentially problematic inventory that may need promotional efforts or removal. The query could be modified to: 1) include film categories to analyze which genres aren't renting, 2) add rental duration or rating filters to focus on specific segments, or 3) combine with inventory data to check if unrented films are actually in stock. Potential business questions include identifying dead inventory, evaluating acquisition decisions, or detecting potential catalog issues affecting rentability.","Are there any movies in our collection that have never been rented at all, across any store? I need the film ID, title, and release year.","Ada nggak film di koleksi kita yang belum pernah disewa sama sekali di semua store? Aku butuh film ID, judul, dan tahun rilisnya.","['film_id', 'title', 'release_year']",True
+List the top 5 film genres by total gross revenue and by looking from the payments in all store? Show the genre name in descending order of total revenue.,"SELECT 
+    c.name AS genre, 
+    SUM(p.amount) AS gross_revenue
+FROM 
+    category c
+    JOIN film_category fc ON c.category_id = fc.category_id
+    JOIN inventory i ON fc.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    c.name
+ORDER BY 
+    gross_revenue DESC
+LIMIT 5;","This SQL query calculates the top 5 highest-grossing film categories by joining the 'category', 'film_category', 'inventory', 'rental', and 'payment' tables. The main objective is to determine which film categories generate the most revenue. The query uses multiple JOIN operations to link the tables, a GROUP BY clause to aggregate results by category, and SUM(p.amount) to calculate total revenue per category. The results are ordered in descending order by revenue, and the LIMIT 5 clause ensures only the top 5 categories are returned. The expected output includes the category name and its corresponding gross revenue, which is useful for identifying high-performing genres and informing business decisions. This query can be modified to analyze revenue for specific time periods by adding a WHERE clause on the rental or payment dates, or extended to include additional metrics like average revenue per film by joining the 'film' table. Potential questions this query might answer include: 'Which film categories generate the most revenue?' or 'What is the revenue distribution across film categories?'.","What are the top 5 film genres that brought in the highest revenue by looking from the payments in all store? Just show the genre names, sorted from the highest.","Apa aja 5 genre film dengan pemasukan tertinggi dengan melihat pembayaran di semua toko? Cukup tampilkan nama genre-nya, urut dari yang paling banyak.",['genre'],True
+"List the top five customers by number of rented movies, sorted from highest to lowest. Show the customer ID, first name, last name, and number of rented movies for each customer.","SELECT
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COUNT(r.rental_id) as total_rentals
+FROM
+    customer c
+    JOIN rental r ON c.customer_id= r.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY
+    total_rentals DESC
+LIMIT 5;","This SQL query identifies the top 5 customers with the highest number of movie rentals by joining the 'customer' and 'rental' tables on 'customer_id'. The main objective is to determine the most active customers based on rental activity. The query uses a JOIN operation to link the tables, a GROUP BY clause to aggregate results by customer, and COUNT(r.rental_id) to calculate the total number of rentals per customer. The results are ordered in descending order by rental count, and the LIMIT 5 clause ensures only the top 5 customers are returned. The expected output includes the customer ID, first name, last name, and total rentals, which is useful for identifying loyal customers or targeting marketing campaigns. This query can be modified to analyze rentals for specific time periods by adding a WHERE clause on the rental date, or extended to include additional metrics like total revenue by joining the 'payment' table. Potential questions this query might answer include: 'Who are the most active customers?' or 'How does rental activity vary across customers?'.","Who are the top 5 customers based on how many movies they've rented? Show their customer ID, first name, last name, and total number of rentals, sorted from highest to lowest.","Siapa sih 5 pelanggan yang paling sering nyewa film? Tunjukin customer ID, nama depan, nama belakang, sama total film yang mereka sewa, urut dari yang paling banyak ya.","['customer_id', 'first_name', 'last_name', 'total_rentals']",True
+"Which movies have been rented the most during holidays (e.g., December)? Show the movie title and the number of rentals.","SELECT 
+    f.title, 
+    COUNT(r.rental_id) AS rentals_count
+FROM 
+    film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+WHERE 
+    EXTRACT(MONTH FROM r.rental_date) = 12
+GROUP BY 
+    f.film_id, f.title
+ORDER BY 
+    rentals_count DESC
+LIMIT 10;
+","This SQL query identifies the top 10 most rented movies in December by counting the number of rentals for each film. It retrieves data from the 'film', 'inventory', and 'rental' tables, filtering rentals to include only those made in December using the MONTH() function. The query aggregates rental counts per film, orders the results in descending order, and limits the output to the top 10. This analysis is useful for understanding seasonal rental trends and identifying popular holiday movies. Potential modifications include adjusting the month filter to analyze different periods, incorporating revenue data to determine the highest-grossing films, or segmenting results by customer demographics to explore audience preferences.","Which movies have been rented the most during holidays (e.g., December)? Show the movie title and the number of rentals.",Film mana yang paling sering disewa saat libur (misalnya bulan Desember)? Tampilkan judul film dan jumlah penyewaan.,"['title', 'rentals_count']",True
+Which movie has been rented the most by customers who are currently inactive? Show the movie title and the number of times it was rented. Return only the top result based on rental count and sort by film title too.,"SELECT 
+    f.title, 
+    COUNT(*) AS rental_count
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+JOIN customer c ON r.customer_id = c.customer_id
+WHERE c.active = 0
+GROUP BY f.film_id, f.title
+ORDER BY rental_count DESC, f.title ASC
+LIMIT 1;","This SQL query identifies the most rented film among inactive customers by joining the 'film', 'inventory', 'rental', and 'customer' tables. It filters for inactive customers (active = 0), counts rentals per film, and returns the top film by rental count (with alphabetical tie-breaker). Key operations include multi-table joins, COUNT aggregation, and filtering on customer status. This helps understand inactive customer preferences for retention strategies. Business applications include reactivation campaigns and content analysis. The query could be modified to: 1) include rental dates to analyze recent inactive customer behavior, 2) compare with active customer preferences, or 3) add payment data to assess revenue impact. It answers questions like 'What content resonates with inactive customers?' and 'Which films might help re-engage lapsed customers?'",Find the top 1 movie most frequently rented by customers who are no longer active. Display the title and the rental count. Sort by film title too,Film mana yang paling banyak disewa oleh pelanggan dan sedang tidak aktif? Tampilkan judul film dan jumlah rentalnya. Dapatkan top 1 dan urutkan juga berdasarkan judulnya,"['title', 'rentals_count']",True
+Which top 1 movie has the highest revenue but has never been rented on weekends? Show the movie title and total revenue.,"WITH film_revenue AS (
+    SELECT 
+        f.film_id, 
+        f.title, 
+        SUM(p.amount) AS total_revenue
+    FROM 
+        film f
+    JOIN inventory i ON f.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+    WHERE 
+        EXTRACT(DOW FROM r.rental_date) NOT IN (0, 6)
+    GROUP BY 
+        f.film_id, f.title
+)
+SELECT 
+    title, 
+    total_revenue
+FROM 
+    film_revenue
+ORDER BY 
+    total_revenue DESC
+LIMIT 1;
+","This SQL query identifies the highest-grossing film on weekdays (excluding weekends) by using a CTE (film_revenue) to join the 'film', 'inventory', 'rental', and 'payment' tables. The query filters for weekday rentals (EXTRACT(DOW) NOT IN (0,6)), sums payment amounts per film, and returns the top revenue-generating film. Key operations include date extraction, SUM aggregation, and CTE usage. This helps analyze weekday viewing patterns and optimize inventory scheduling. Business applications include weekday promotion strategies and staff allocation. The query could be modified to: 1) compare weekday vs weekend performance by adding a day-of-week breakdown, 2) include rental duration to calculate revenue per day, or 3) filter by specific weekdays to identify peak demand days. It answers questions like 'What content performs best on weekdays?' and 'How does weekday revenue compare to weekends?'",Which top 1 movie has the highest revenue but has never been rented on weekends? Show the movie title and total revenue.,Film top 1 mana yang pendapatannya tinggi tapi tidak pernah disewa saat weekend? Tampilkan judul film dan total pendapatan.,"['title', 'total_revenue']",False
+"Which customers have rented every film in a specific category (e.g., 'Action')? Show the customer ID, first name, and last name.","WITH action_films AS (
+    SELECT 
+        fc.film_id
+    FROM 
+        film_category fc
+        JOIN category c ON fc.category_id = c.category_id
+    WHERE 
+        c.name = 'Action'
+),
+customer_rentals AS (
+    SELECT 
+        r.customer_id, 
+        COUNT(DISTINCT i.film_id) AS films_rented
+    FROM 
+        rental r
+        JOIN inventory i ON r.inventory_id = i.inventory_id
+        JOIN action_films af ON i.film_id = af.film_id
+    GROUP BY 
+        r.customer_id
+)
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name
+FROM 
+    customer c
+    JOIN customer_rentals cr ON c.customer_id = cr.customer_id
+WHERE 
+    cr.films_rented = (SELECT COUNT(*) FROM action_films);","This SQL query identifies customers who have rented every available 'Action' film. It first creates a CTE 'action_films' to retrieve all film IDs classified under the 'Action' category from the 'film_category' and 'category' tables. Another CTE, 'customer_rentals', counts the distinct 'Action' films rented by each customer using joins with the 'rental' and 'inventory' tables. The final selection filters for customers whose rental count matches the total number of 'Action' films, ensuring only those who have rented every 'Action' film are included in the output. Possible modifications include filtering for different genres, analyzing rental trends over time by incorporating rental dates, or ranking customers based on the percentage of action films they have rented instead of an exact match. This query helps answer questions about highly engaged customers, genre-based rental behaviors, and potential marketing opportunities for loyal renters.","Which customers have rented every film in a specific category (e.g., 'Action')? Show the customer ID, first name, and last name.","Siapa pelanggan yang sudah menyewa semua film dalam satu genre (misalnya genre 'Action')? Tampilkan ID pelanggan, nama depan, dan nama belakang.","['customer_id', 'first_name', 'last_name']",True
+"What is the total revenue generated by each actor based on the films they've appeared in by looking from the payments of all stores? Show the actor ID, first name, last name, and total revenue, sorted from highest to lowest.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name, 
+    SUM(p.amount) AS total_revenue
+FROM 
+    actor a
+    JOIN film_actor fa ON a.actor_id = fa.actor_id
+    JOIN inventory i ON fa.film_id = i.film_id
+    JOIN rental r ON i.inventory_id = r.inventory_id
+    JOIN payment p ON r.rental_id = p.rental_id
+GROUP BY 
+    a.actor_id,
+    a.first_name,
+    a.last_name
+ORDER BY 
+    total_revenue DESC;","This SQL query calculates and ranks actors by their total revenue generated from film rentals, joining five tables ('actor', 'film_actor', 'inventory', 'rental', and 'payment') through a series of INNER JOINs on key IDs. The primary operation is a SUM aggregation of payment amounts grouped by actor, with results ordered by total revenue in descending order. The query outputs each actor's ID, name, and cumulative revenue, providing valuable insights into which actors drive the most rental income. This analysis could inform contract negotiations, marketing strategies, or content acquisition decisions. The query could be modified to: 1) filter by date range to analyze revenue trends over time, 2) add average revenue per film to identify particularly valuable actors, or 3) include film categories to determine which genres generate the most revenue per actor. Potential business questions include identifying top-performing actors for contract renewals, understanding revenue distribution across the actor roster, or evaluating the financial return on actor investments.","How much total revenue has each actor generated from the movies they've appeared in by looking from the payments of all store? Show the actor ID, first name, last name, and total revenue, sorted from highest to lowest.","Berapa total pemasukan yang dihasilkan tiap aktor dari film yang mereka bintangi dengan melihat pembayaran di seluruh toko? Tampilkan ID aktor, nama depan, nama belakang, dan total pendapatannya, diurutkan dari yang paling besar.","['actor_id', 'first_name', 'last_name', 'total_revenue']",True
+"Which film has the highest average rental duration per customer? Show the film ID, title, and the average rental duration. Return only the top 1.","SELECT f.film_id, f.title, AVG(f.rental_duration) AS average_rental_duration
+FROM film f
+JOIN inventory i ON f.film_id = i.film_id
+JOIN rental r ON i.inventory_id = r.inventory_id
+GROUP BY f.film_id, f.title
+ORDER BY average_rental_duration DESC
+LIMIT 1;","This SQL query identifies the top 10 films with the longest average rental duration. It first calculates the average rental duration for each film by computing the difference between 'return_date' and 'rental_date' using the 'rental', 'inventory', and 'film' tables. The results are grouped by film ID and title, then ordered in descending order of average rental duration. The final selection retrieves the top 10 films with the highest values. Potential modifications include filtering by specific genres by joining with the 'film_category' table, analyzing rental duration trends over time by incorporating rental dates, or segmenting results by customer demographics to understand rental behaviors. This query helps answer questions related to film popularity in terms of rental retention, customer engagement with longer rentals, and inventory management strategies.","Which movie has the highest average rental duration per customer? Show the film ID, title, and average rental duration. Just return the top 1.","Film mana yang punya rata-rata waktu sewa paling lama per pelanggan? Tampilkan ID film, judul, dan rata-rata durasi sewanya. Cukup ambil satu yang paling tinggi.","['film_id', 'title', 'avg_rental_duration']",True
+"Which actors have never appeared in all films with a rating of 'R'? Show the actor ID, first name, and last name.","SELECT 
+    a.actor_id, 
+    a.first_name, 
+    a.last_name
+FROM 
+    actor a
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM film_actor fa
+        JOIN film f ON fa.film_id = f.film_id
+        WHERE fa.actor_id = a.actor_id AND f.rating = 'R'
+    );","This SQL query retrieves a list of actors who have never appeared in an 'R'-rated film. It utilizes the 'actor', 'film_actor', and 'film' tables, employing a NOT EXISTS subquery to exclude actors associated with films that have an 'R' rating. The result includes the actor ID, first name, and last name, offering insights into actors who have exclusively worked in less restrictive film categories. Potential modifications include adjusting the rating filter to analyze actors by other MPAA ratings, identifying actors who have only appeared in a specific genre by joining with the 'film_category' table, or incorporating rental data to assess the popularity of these actors’ films. This query can help analysts study trends in casting choices, assess actors' suitability for family-friendly productions, or explore correlations between rating preferences and box office performance.","Which actors have never appeared in any films with a rating of 'R'? Show the actor ID, first name, and last name.","Aktor mana yang belum pernah main di film manapun dengan rating 'R'? Tampilkan ID aktor, nama depan, dan nama belakang.","['actor_id', 'first_name', 'last_name']",True
+Which staff members have processed the most payments on weekends? Show the staff first name and the number of payments processed. Sort by number of payments descending.,"SELECT 
+    s.first_name AS staff_name, 
+    COUNT(p.payment_id) AS payments_count
+FROM 
+    staff s
+JOIN payment p ON s.staff_id = p.staff_id
+WHERE 
+    EXTRACT(DOW FROM p.payment_date) IN (0, 6)
+GROUP BY 
+    s.staff_id, s.first_name
+ORDER BY 
+    payments_count DESC;
+","This SQL query analyzes staff performance by counting the number of payments processed by each staff member on weekends (Sunday = 0, Saturday = 6) using EXTRACT(DOW) on the payment_date. It joins the 'staff' and 'payment' tables, groups by staff_id and first_name, and orders results by payment count in descending order. The query helps identify weekend staffing patterns and performance. Key operations include date extraction, counting, and conditional filtering. Business relevance includes workforce scheduling optimization and weekend performance analysis. Modifications could: 1) add payment amount sums to assess revenue impact, 2) compare weekday vs weekend performance by adding a day-of-week breakdown, or 3) filter by specific date ranges to analyze seasonal trends. The query answers questions like 'Which staff members handle the most weekend transactions?' or 'How does weekend payment volume compare to weekdays?'",Which staff members have processed the most payments on weekends? Show the staff first name and the number of payments processed. Sort by number of payments descending.,Staf mana yang paling banyak memproses pembayaran saat akhir pekan? Tampilkan nama awal staf dan jumlah pembayaran yang diproses. Urutkan dari yang terbanyak.,"['staff_name', 'payments_count']",True
+"Which movie has the longest runtime among those that have never been rented? Show the movie title and runtime. Return only the top 1 result, sorted by runtime in descending order.","WITH unrented_films AS (
+    SELECT f.film_id, f.title, f.length
+    FROM film f
+    WHERE f.film_id NOT IN (
+        SELECT DISTINCT i.film_id
+        FROM inventory i
+        JOIN rental r ON i.inventory_id = r.inventory_id
+    )
+)
+SELECT 
+    title, 
+    length AS runtime
+FROM 
+    unrented_films
+ORDER BY 
+    runtime DESC
+LIMIT 1;","This SQL query identifies the longest unrented film by first creating a CTE (unrented_films) that isolates films never rented through a NOT IN subquery against inventory and rental tables. It then selects the film with the maximum runtime from these unrented titles. The query helps identify potential inventory inefficiencies by highlighting unused content with significant production investment (as indicated by longer runtimes). Business applications include inventory optimization and content acquisition strategy. Key modifications could include: (1) adding replacement_cost to find the most expensive unused asset, (2) incorporating film categories to identify problematic genres, or (3) expanding the time window in the rental subquery to focus on recent inactivity. The query helps answer questions like 'Which high-investment films are failing to generate rentals?' and 'Should we adjust our inventory of long-form content?' The DISTINCT in the subquery efficiently handles potential duplicate inventory records.",Which movie has the longest runtime but has never been rented? Show the movie title and runtime. Return only the top 1 result.,Film apa yang punya durasi terpanjang tapi belum pernah disewa? Tampilkan judul film dan durasinya. Ambil hanya 1 film teratas.,"['title', 'runtime']",True

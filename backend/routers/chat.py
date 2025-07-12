@@ -9,8 +9,11 @@ from utils.auth import get_current_user_id
 from utils.enum import ENUM
 from text_to_sql.core import GeneralLLM
 from text_to_sql.common import LLMConfig
+from text_to_sql.core import Summarization
 
 import orjson
+import pandas as pd
+import re
 
 
 router = APIRouter()
@@ -209,5 +212,48 @@ def give_feedback(
         db.add(ChatFeedback(message_id=message.id, feedback=req.feedback))
 
     db.commit()
+    
+    # Add feedback to dataset
+    if message.generated_query and req.feedback == "positive":
+        general_config = LLMConfig(
+            type="api",
+            model=req.model,
+            provider=req.provider,
+            api_key=ENUM.get(req.provider, ""),
+        )
+        summarization = Summarization(config=general_config)
+        dataset_path = f"./files/dataset/dataset_{req.database}.csv"
+        
+        # New data
+        question = message.user_input
+        answer = message.generated_query
+        raw_summary = summarization.generate(message.generated_query)
+
+        if raw_summary:
+            raw_summary = re.sub(r"^```json|^```|```$", "", raw_summary.strip(), flags=re.MULTILINE).strip()
+
+            try:
+                if isinstance(raw_summary, str):
+                    parsed = orjson.loads(raw_summary)
+                else:
+                    parsed = raw_summary
+
+                summary = parsed.get("summary", "").strip()
+
+            except (orjson.JSONDecodeError, AttributeError, TypeError) as e:
+                summary = raw_summary
+                print(f"Warning: Failed to parse summary JSON: {e}")
+
+            # Add data
+            df = pd.read_csv(dataset_path)
+            new_row = {
+                "Question": question,
+                "Answer": answer,
+                "Summary": summary
+            }
+            df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+
+            # Save
+            df.to_csv(dataset_path, index=False)
 
     return {"detail": f"Feedback '{req.feedback}' saved successfully"}

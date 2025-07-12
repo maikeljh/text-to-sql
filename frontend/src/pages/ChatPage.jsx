@@ -235,14 +235,23 @@ function ChatPage() {
 
   const sendFeedback = async (messageId, feedback) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/chat/feedback`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ message_id: messageId, feedback }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/chat/feedback`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            message_id: messageId,
+            feedback: feedback,
+            model: selectedModel,
+            provider: selectedProvider,
+            database: selectedDatabase,
+          }),
+        }
+      );
 
       handle401Redirect(res);
 

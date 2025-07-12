@@ -22,3 +22,6 @@ class QueryRequest(BaseModel):
 class FeedbackRequest(BaseModel):
     message_id: int
     feedback: Literal["positive", "negative"]
+    model: str
+    provider: str
+    database: str
